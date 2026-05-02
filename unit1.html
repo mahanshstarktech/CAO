@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO Unit 1 — Data Representation, Register Transfer & Basic Computer | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:       #050d10;
+  --bg2:      #071520;
+  --surface:  #0c1e28;
+  --surface2: #102534;
+  --border:   #1a3545;
+  --border2:  #0e2030;
+  --u1: #22d3ee;
+  --u2: #f97316;
+  --u3: #ef4444;
+  --u4: #a78bfa;
+  --u5: #10b981;
+  --u6: #3b82f6;
+  --upred: #f59e0b;
+  --gold: #fbbf24;
+  --text: #dde8f2;
+  --dim:  #3a5868;
+  --dim2: #6090a8;
+  --mono: 'JetBrains Mono', monospace;
+  --head: 'Fraunces', serif;
+  --body: 'Outfit', sans-serif;
+  --sidebar-w: 300px;
+  --content-max: 1400px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: clamp(16px, 1.1vw, 20px); }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  line-height: 1.82;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── TOP NAV ── */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(5,13,16,0.97);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 28px;
+  display: flex; align-items: center; gap: 4px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.topnav::-webkit-scrollbar { display: none; }
+.tnlabel {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--u3);
+  padding: 15px 14px 15px 0;
+  border-right: 1px solid var(--border); margin-right: 8px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.tnlink {
+  font-family: var(--mono); font-size: 11.5px;
+  padding: 8px 14px; border-radius: 6px;
+  text-decoration: none; color: var(--dim2);
+  white-space: nowrap; flex-shrink: 0;
+  transition: all .18s; border: 1px solid transparent;
+}
+.tnlink:hover { color: var(--text); background: var(--surface2); }
+.tnlink.active { color: var(--u3); background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); }
+.tnlink.pyq { color: var(--upred); background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.22); }
+.tnlink.pred { color: var(--upred); background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.35); font-weight: 600; }
+
+/* ── CREDIT ── */
+.credit-band {
+  background: #060e14; border-bottom: 1px solid var(--border2);
+  padding: 11px 32px;
+  display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;
+}
+.credit-text { font-family: var(--mono); font-size: 11.5px; color: var(--dim2); }
+.credit-text span { color: var(--u3); font-weight: 600; }
+
+/* ── HERO ── */
+.hero {
+  position: relative; overflow: hidden;
+  padding: clamp(40px, 6vw, 80px) 5vw clamp(36px, 5vw, 64px);
+  background: var(--bg);
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(239,68,68,.1) 1px, transparent 1px),
+    radial-gradient(circle, rgba(34,211,238,.05) 1px, transparent 1px);
+  background-size: 44px 44px, 88px 88px;
+  background-position: 0 0, 22px 22px;
+  animation: dotDrift 30s linear infinite;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 55% at 10% 50%, rgba(239,68,68,.08) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 50% at 85% 15%, rgba(34,211,238,.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+@keyframes dotDrift { 0%{transform:translate(0,0);} 100%{transform:translate(44px,44px);} }
+.hero-inner { position: relative; z-index: 1; max-width: var(--content-max); margin: 0 auto; }
+.hero-tag {
+  font-family: var(--mono); font-size: clamp(10px,0.75vw,12px); color: var(--u3);
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+.hero-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--u3); box-shadow: 0 0 14px var(--u3);
+  animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(.7);} }
+.hero h1 {
+  font-family: var(--head); font-weight: 800;
+  font-size: clamp(30px, 5vw, 72px);
+  line-height: 1.02; color: #fff; letter-spacing: -1.5px;
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--u3); }
+.hero h1 em { color: var(--u1); font-style: normal; }
+.hero-sub {
+  color: var(--dim2); font-size: clamp(15px, 1.4vw, 19px);
+  max-width: 760px; line-height: 1.8; margin-bottom: 22px;
+}
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  font-family: var(--mono); font-size: clamp(10px,0.7vw,12px);
+  padding: 5px 14px; border-radius: 5px; border: 1px solid;
+}
+.badge-r { color: var(--u3); border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08); }
+.badge-c { color: var(--u1); border-color: rgba(34,211,238,.35); background: rgba(34,211,238,.08); }
+.badge-v { color: var(--u4); border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08); }
+.badge-o { color: var(--u2); border-color: rgba(249,115,22,.35); background: rgba(249,115,22,.08); }
+.badge-gold { color: var(--upred); border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.08); }
+.badge-g { color: var(--u5); border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.08); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; max-width: 100%; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  padding: 28px 18px;
+  border-right: 1px solid var(--border);
+  position: sticky; top: 44px;
+  height: calc(100vh - 44px);
+  overflow-y: auto; scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  flex-shrink: 0;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.sidebar-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-title { font-family: var(--mono); font-size: 10px; color: var(--u3); letter-spacing: 2px; text-transform: uppercase; }
+.sidebar-close {
+  display: none; background: none;
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--dim2); cursor: pointer;
+  padding: 2px 9px; font-family: var(--mono); font-size: 11px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 7px; cursor: pointer;
+  font-family: var(--head); font-size: clamp(12px,0.85vw,14px); font-weight: 600;
+  color: var(--dim2); transition: all .2s; margin-bottom: 3px;
+  text-decoration: none; line-height: 1.3;
+}
+.nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); }
+.nav-item.active { color: var(--u3); border-left: 2px solid var(--u3); padding-left: 10px; }
+.nav-imp {
+  margin-left: auto; font-family: var(--mono); font-size: 10px;
+  padding: 2px 7px; border-radius: 3px; background: var(--surface2);
+  white-space: nowrap;
+}
+.nav-imp.high { color: var(--u3); }
+.nav-imp.med { color: var(--upred); }
+.nav-imp.low { color: var(--u5); }
+
+.sidebar-toggle {
+  display: none; position: fixed; bottom: 22px; right: 22px; z-index: 1000;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--u3); border: none; cursor: pointer;
+  font-size: 22px; color: #fff; align-items: center; justify-content: center;
+  box-shadow: 0 4px 24px rgba(239,68,68,.45); transition: transform .2s;
+}
+.sidebar-toggle:hover { transform: scale(1.1); }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.75); z-index: 98; backdrop-filter: blur(3px);
+}
+.sidebar-overlay.visible { display: block; }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1;
+  padding: clamp(28px,3.5vw,56px) clamp(22px,4vw,80px);
+  max-width: calc(100% - var(--sidebar-w));
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+/* ── SECTION ── */
+.section { margin-bottom: 80px; scroll-margin-top: 64px; }
+.section-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 28px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.section-num {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--u3); background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  padding: 5px 10px; border-radius: 5px; min-width: 40px; text-align: center;
+}
+.section-title {
+  font-family: var(--head); font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 800; color: #fff;
+}
+.imp-pill { margin-left: auto; }
+
+/* ── THEORY BLOCKS ── */
+.theory-block {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: clamp(20px,2.5vw,32px); margin-bottom: 22px;
+}
+.theory-block h3 {
+  font-family: var(--head); font-size: clamp(16px, 1.6vw, 21px);
+  font-weight: 700; color: var(--u2); margin-bottom: 14px;
+}
+.theory-block h3.red { color: var(--u3); }
+.theory-block h3.cyan { color: var(--u1); }
+.theory-block h3.green { color: var(--u5); }
+.theory-block p { margin-bottom: 14px; font-size: clamp(15px,1vw,17px); line-height: 1.85; }
+.theory-block p:last-child { margin-bottom: 0; }
+.theory-block ul, .theory-block ol { padding-left: 24px; margin: 12px 0; }
+.theory-block li { margin-bottom: 9px; font-size: clamp(15px,1vw,17px); line-height: 1.75; }
+h4 { font-family: var(--head); font-size: clamp(14px,1vw,17px); font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+
+/* ── LAYMAN BOX ── */
+.layman {
+  background: rgba(239,68,68,.06);
+  border: 1px solid rgba(239,68,68,.2);
+  border-left: 3px solid var(--u3);
+  border-radius: 8px; padding: 16px 20px;
+  font-family: var(--mono); font-size: clamp(12px,0.8vw,14px);
+  color: #fca5a5; margin: 14px 0; line-height: 1.75;
+}
+.layman::before { content: '💬 LAYMAN: '; color: var(--u3); font-weight: 700; }
+
+/* ── FORMULA BOX ── */
+.formula-box {
+  background: #030c14;
+  border: 1px solid rgba(34,211,238,.22);
+  border-left: 3px solid var(--u1);
+  border-radius: 9px; padding: 18px 22px;
+  margin: 18px 0;
+  font-family: var(--mono); font-size: clamp(11px,0.78vw,14px);
+  color: #67e8f9; overflow-x: auto; line-height: 1.7;
+}
+.formula-box .label {
+  font-size: clamp(9px,0.65vw,11px); color: var(--dim);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 10px; display: block;
+}
+.formula-box .formula { color: #a5f3fc; font-size: clamp(12px,0.82vw,15px); }
+.formula-box .note { color: var(--dim2); font-size: clamp(11px,0.73vw,13px); margin-top: 8px; display: block; font-style: italic; }
+
+/* ── TIP BOXES ── */
+.tip-box {
+  border-radius: 9px; padding: 18px 20px;
+  margin: 16px 0; display: flex; gap: 14px;
+}
+.tip-box.trick { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.25); }
+.tip-box.validate { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25); }
+.tip-box.connect { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.25); }
+.tip-box.warning { background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.25); }
+.tip-box.pred { background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25); }
+.tip-icon { font-size: 21px; flex-shrink: 0; margin-top: 3px; }
+.tip-content { flex: 1; }
+.tip-title {
+  font-family: var(--head); font-size: clamp(11px,0.8vw,14px);
+  font-weight: 700; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.tip-box.trick .tip-title { color: var(--gold); }
+.tip-box.validate .tip-title { color: var(--u5); }
+.tip-box.connect .tip-title { color: var(--u4); }
+.tip-box.warning .tip-title { color: var(--u3); }
+.tip-box.pred .tip-title { color: var(--upred); }
+.tip-content p { font-size: clamp(13px,0.88vw,16px); color: var(--text); margin: 0; line-height: 1.75; }
+
+/* ── TABLES ── */
+.comp-table {
+  width: 100%; border-collapse: collapse;
+  margin: 18px 0; font-size: clamp(12px,0.85vw,15px);
+  display: block; overflow-x: auto;
+}
+.comp-table th {
+  background: var(--surface2); padding: 12px 16px;
+  text-align: left; font-family: var(--head);
+  font-weight: 700; color: var(--u1);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.comp-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--surface2); }
+
+/* ── IMPORTANCE BARS ── */
+.imp-bar-wrap { margin-bottom: 12px; }
+.imp-bar-label {
+  font-family: var(--mono); font-size: clamp(10px,0.73vw,13px);
+  color: var(--dim2); margin-bottom: 5px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.imp-bar { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.imp-bar-fill { height: 100%; border-radius: 4px; }
+.imp-high .imp-bar-fill { background: var(--u3); }
+.imp-med .imp-bar-fill { background: var(--upred); }
+.imp-low .imp-bar-fill { background: var(--u5); }
+
+/* ── STEPS ── */
+.steps { margin: 16px 0; }
+.step-item { display: flex; gap: 16px; margin-bottom: 14px; }
+.step-num {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--u3); color: #fff;
+  font-family: var(--mono); font-weight: 700; font-size: clamp(11px,0.78vw,14px);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-text { font-size: clamp(14px,1vw,17px); padding-top: 6px; line-height: 1.75; }
+
+/* ── DIAGRAM ── */
+.diagram-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 22px; margin: 18px 0; text-align: center;
+  overflow-x: auto;
+}
+.diagram-cap {
+  font-family: var(--mono); font-size: clamp(10px,0.72vw,12px);
+  color: var(--dim2); margin-top: 12px; text-align: center;
+}
+
+/* ── PREDICTION BANNER ── */
+.pred-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,.09), rgba(245,158,11,.03));
+  border: 1px solid rgba(245,158,11,.35);
+  border-left: 3px solid var(--upred);
+  border-radius: 9px; padding: 14px 18px;
+  margin: 16px 0; font-family: var(--mono);
+  font-size: clamp(11px,0.78vw,14px); color: var(--upred);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.pred-banner .pb-icon { flex-shrink: 0; font-size: 18px; }
+.pred-banner .pb-text { line-height: 1.7; }
+
+/* ── PYQ SECTION ── */
+.pyq-section {
+  background: #060f18; border: 1px solid rgba(245,158,11,.25);
+  border-radius: 12px; padding: clamp(18px,2.5vw,28px); margin-top: 26px;
+}
+.pyq-header {
+  font-family: var(--head); font-size: clamp(14px,1vw,17px);
+  font-weight: 700; color: var(--upred);
+  margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+}
+.pyq-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 9px; padding: 18px 20px; margin-bottom: 16px;
+}
+.pyq-q-text {
+  font-family: var(--head); font-size: clamp(14px,1vw,17px);
+  font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.45;
+}
+.pyq-meta {
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px); color: var(--dim2);
+  margin-bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap;
+}
+.topic-tag {
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+  color: var(--u3); padding: 2px 9px; border-radius: 4px;
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px);
+}
+.pred-tag {
+  background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25);
+  color: var(--upred); padding: 2px 9px; border-radius: 4px;
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px);
+}
+.pyq-toggle {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 16px; cursor: pointer;
+  font-family: var(--mono); font-size: clamp(10px,0.73vw,13px); color: var(--upred);
+  margin-top: 12px; transition: all .2s;
+}
+.pyq-toggle:hover { background: var(--upred); color: #000; }
+.answer-content { display: none; margin-top: 16px; font-size: clamp(14px,0.93vw,17px); line-height: 1.85; }
+.answer-content.open { display: block; }
+
+/* highlights */
+code { font-family: var(--mono); background: var(--surface2); padding: 2px 7px; border-radius: 4px; font-size: clamp(11px,0.78vw,14px); color: var(--u4); }
+.hl { color: var(--u1); font-weight: 600; }
+.hl-o { color: var(--u2); font-weight: 600; }
+.hl-r { color: var(--u3); font-weight: 600; }
+.hl-v { color: var(--u4); font-weight: 600; }
+.hl-g { color: var(--u5); font-weight: 600; }
+.hl-gold { color: var(--upred); font-weight: 600; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+/* ── PREDICTED PAPER ── */
+.predicted-section {
+  max-width: 100%; margin: 0 auto 60px;
+  padding: 0 clamp(22px,4vw,80px);
+}
+.pred-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 24px; }
+.pred-card {
+  background: var(--surface); border: 1px solid rgba(245,158,11,.2);
+  border-radius: 12px; padding: 20px 22px;
+  border-top: 3px solid var(--upred);
+}
+.pred-part { font-family: var(--mono); font-size: clamp(9px,0.72vw,12px); color: var(--dim2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.pred-q { font-family: var(--head); font-size: clamp(13px,0.95vw,16px); font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
+.pred-reason { font-size: clamp(12px,0.82vw,14px); color: var(--dim2); line-height: 1.7; margin-bottom: 10px; }
+.pred-conf { font-family: var(--mono); font-size: clamp(9px,0.7vw,12px); padding: 3px 10px; border-radius: 4px; }
+.pred-conf.high { color: var(--u3); background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); }
+.pred-conf.med { color: var(--upred); background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); }
+.pred-badge {
+  display: inline-block; font-family: var(--mono); font-size: clamp(10px,0.78vw,13px);
+  color: var(--upred); background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.3); padding: 5px 14px;
+  border-radius: 5px; margin-bottom: 14px;
+}
+.sec-header h2 {
+  font-family: var(--head); font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 800; color: #fff; margin-bottom: 6px;
+}
+.sec-header .sub { font-family: var(--mono); font-size: clamp(9px,0.72vw,12px); color: var(--dim2); letter-spacing: 1px; }
+
+/* ── FOOTER ── */
+.site-footer {
+  background: #030b10; border-top: 1px solid var(--border2);
+  padding: 28px 5vw; text-align: center;
+  font-family: var(--mono); font-size: clamp(10px,0.72vw,12px); color: var(--dim);
+}
+.site-footer a { color: var(--dim2); text-decoration: none; margin: 0 14px; transition: color .2s; }
+.site-footer a:hover { color: var(--u3); }
+.site-footer .footer-links { margin-bottom: 12px; }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 900px) {
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh;
+    z-index: 99; background: var(--bg);
+    transform: translateX(-100%);
+    border-right: 1px solid var(--border);
+    transition: transform .3s ease;
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 40px rgba(0,0,0,.9); }
+  .sidebar-close { display: block; }
+  .sidebar-toggle { display: flex; }
+  .content { max-width: 100%; padding: 28px 22px; }
+}
+@media(max-width: 600px) {
+  .hero { padding: 40px 18px 36px; }
+  .theory-block { padding: 18px; }
+  .pyq-section { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink" href="#">🏠 Home</a>
+  <a class="tnlink active" href="#">🔴 U1: Data & Register</a>
+  <a class="tnlink" href="#">⚙️ U2: CPU & ALU</a>
+  <a class="tnlink" href="#">🔢 U3: Arithmetic</a>
+  <a class="tnlink" href="#">💾 U4: Memory</a>
+  <a class="tnlink" href="#">🔗 U5: I/O & Multi</a>
+  <a class="tnlink pyq" href="#pyq-master">📋 All PYQs</a>
+  <a class="tnlink pred" href="#predicted">🔮 2026 Predicted</a>
+</nav>
+
+<!-- CREDIT -->
+<div class="credit-band">
+  <div class="credit-text">CAO Exam Prep · <span>RTU B.Tech VI Sem</span> · 6E7104 / 6E1554 / 610404</div>
+  <div class="credit-text">Made with ♥ for RTU Students</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📚 B.Tech VI Sem · RTU · Computer Architecture & Organization</div>
+    <h1>Unit 1: <span>Data Representation</span>,<br><em>Register Transfer</em> & Basic Computer</h1>
+    <p class="hero-sub">Complements, fixed/floating point, register transfer language, micro-operations (arithmetic/logic/shift), ALU design, instruction codes, instruction cycle — everything from scratch with layman explanations, formulas, diagrams, and every RTU PYQ (2022–2025) solved + 2026 predictions.</p>
+    <div class="hero-badges">
+      <span class="badge badge-r">🔥 Logic Micro-ops — 3 Consecutive Papers</span>
+      <span class="badge badge-gold">🔮 2026 Predicted Topics</span>
+      <span class="badge badge-c">Instruction Cycle — Guaranteed Part A</span>
+      <span class="badge badge-v">Common Bus System Diagram</span>
+      <span class="badge badge-o">Fixed/Floating Point Numericals</span>
+      <span class="badge badge-g">PYQs Solved 2022–2025</span>
+    </div>
+  </div>
+</section>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Unit 1 Topics</div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <a class="nav-item" href="#overview">📊 Overview & Importance</a>
+  <a class="nav-item" href="#intro">🖥️ Intro: Org vs Architecture<span class="nav-imp med">70%</span></a>
+  <a class="nav-item" href="#complements">🔢 Complements (1's & 2's)<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#fixed">📌 Fixed Point Representation<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#floating">🌊 Floating Point Representation<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#rtl">📡 Register Transfer Language<span class="nav-imp high">78%</span></a>
+  <a class="nav-item" href="#bus">🚌 Bus & Memory Transfers<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#arith-micro">➕ Arithmetic Micro-Ops<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#logic-micro">⚡ Logic Micro-Ops<span class="nav-imp high">92%</span></a>
+  <a class="nav-item" href="#shift-micro">↔️ Shift Micro-Ops<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#alu">🔧 ALU Design<span class="nav-imp med">70%</span></a>
+  <a class="nav-item" href="#instruction-codes">📋 Instruction Codes<span class="nav-imp high">78%</span></a>
+  <a class="nav-item" href="#registers">🗂️ Computer Registers<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#instruction-cycle">🔄 Instruction Cycle<span class="nav-imp high">90%</span></a>
+  <a class="nav-item" href="#predicted">🔮 2026 Predicted Paper</a>
+  <a class="nav-item" href="#pyq-master">📝 All PYQs Master List</a>
+</nav>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- ══ SECTION 00: OVERVIEW ══ -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">Topic Importance — Unit 1</h2>
+  </div>
+  <div class="theory-block">
+    <p>Unit 1 is a <strong>foundation unit</strong> — its concepts appear in Part A and Part B every year. The common bus system (Part C 2022, 2025), logical micro-operations (Part B 2024, 2025 — two consecutive years!), instruction cycle (Part A every year), and fixed/floating point (Part A 2025) are the highest-yield topics. Master these and you secure 15–20 marks from Unit 1 topics spread across all parts.</p>
+    <div class="imp-bar-wrap imp-high" style="margin-top:18px">
+      <div class="imp-bar-label"><span>Logic Micro-Operations (masking, selective-set, complement)</span><span style="color:#ef4444">92% 🔮 CERTAIN 2026</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:92%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Instruction Cycle (Fetch-Decode-Execute)</span><span style="color:#ef4444">90% Part A Permanent</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:90%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Common Bus System / Computer Registers</span><span style="color:#ef4444">88% Part B/C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Complements (1's and 2's) — Numericals</span><span style="color:#ef4444">85% Part A Q8</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Floating Point Representation — Numericals</span><span style="color:#ef4444">82%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Fixed Point Representation</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Arithmetic Micro-Operations</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Register Transfer Language (RTL notation)</span><span style="color:#ef4444">78%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:78%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Shift Micro-Operations / ALU Design</span><span style="color:#f59e0b">72%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:72%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Computer Org vs Architecture (Intro)</span><span style="color:#f59e0b">70%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:70%"></div></div>
+    </div>
+  </div>
+  <div class="tip-box trick">
+    <div class="tip-icon">⚡</div>
+    <div class="tip-content">
+      <div class="tip-title">Exam Strategy — Unit 1</div>
+      <p><strong>Three guaranteed topics:</strong> (1) Logical micro-operations appeared in Part B in 2024 and 2025 — prepare masking, selective-set, selective-complement with truth table and register examples. (2) Instruction cycle — always Part A, sometimes Part C (2023 Aug). Draw the fetch-decode-execute flow. (3) Common bus system with registers — Part C in 2022 and 2025. Draw the 8-register bus diagram. These three topics alone = 12–15 marks every exam.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 01: INTRO ══ -->
+<section class="section" id="intro">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Introduction: Computer Organization vs Architecture</h2>
+    <span class="imp-pill badge badge-o">70%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Computer Organization vs Computer Architecture</h3>
+    <p><span class="hl-o">Computer Organization</span> refers to the operational units and their interconnections that realize the architectural specifications — i.e., HOW things work internally (circuits, signals, hardware implementation).</p>
+    <p><span class="hl-r">Computer Architecture</span> refers to the attributes of a system as seen by the programmer — i.e., WHAT is visible to software (instruction set, data types, I/O mechanisms, addressing).</p>
+    <div class="layman">Architecture = the blueprint of a house (number of rooms, doors, windows — what the OWNER sees). Organization = the actual construction (how bricks are laid, which pipes go where — what the BUILDER does internally). Two computers can have the same architecture (run same programs) but very different organization (one uses different chips/circuits than the other).</div>
+    <div class="formula-box">
+      <span class="label">Key Distinction — RTU 2-mark Answer</span>
+      <div class="formula">Architecture = WHAT  (programmer's view — instruction set, data formats)</div>
+      <div class="formula">Organization = HOW   (designer's view — circuits, control signals, hardware)</div>
+      <div class="note">Example: IBM System/370 family — same architecture (same ISA, same programs run), different organizations (different chip implementations across models)</div>
+    </div>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Computer Architecture</th><th>Computer Organization</th></tr>
+      <tr><td>Definition</td><td>Attributes visible to programmer</td><td>Operational units and their interconnections</td></tr>
+      <tr><td>Concerns</td><td>Instruction set, data types, addressing modes, I/O</td><td>Control signals, interfaces, memory technology</td></tr>
+      <tr><td>Level</td><td>High level (logical)</td><td>Low level (physical/hardware)</td></tr>
+      <tr><td>Example</td><td>"The CPU has 32-bit registers"</td><td>"Register is implemented using D flip-flops"</td></tr>
+      <tr><td>Who uses it</td><td>Programmer / compiler designer</td><td>Hardware designer / engineer</td></tr>
+      <tr><td>Changes</td><td>Rarely — determines compatibility</td><td>Frequently — technology upgrades</td></tr>
+    </table>
+  </div>
+  <div class="theory-block">
+    <h3>What is a Computer? Functional Units</h3>
+    <p>A computer consists of five main functional units: <span class="hl-r">Input Unit</span>, <span class="hl-o">Memory Unit</span>, <span class="hl">ALU (Arithmetic Logic Unit)</span>, <span class="hl-g">Control Unit</span>, and <span class="hl-v">Output Unit</span>. Together, the ALU and Control Unit form the <strong>CPU (Central Processing Unit)</strong>.</p>
+    <div class="layman">Think of a computer like a kitchen: Input = raw ingredients coming in. Memory = refrigerator (stores things). ALU = the chef (does all the cooking/calculation). Control Unit = the head chef telling everyone what to do and when. Output = the final dish served. The CPU = head chef + chef together working as a team.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#ef4444" font-family="JetBrains Mono" font-size="10" font-weight="bold">Functional Units of a Computer</text>
+        <!-- Input -->
+        <rect x="10" y="30" width="90" height="50" rx="6" fill="#102534" stroke="#22d3ee" stroke-width="2"/>
+        <text x="55" y="53" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">INPUT</text>
+        <text x="55" y="66" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Keyboard/Mouse</text>
+        <!-- Memory -->
+        <rect x="215" y="30" width="110" height="50" rx="6" fill="#102534" stroke="#f97316" stroke-width="2"/>
+        <text x="270" y="53" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">MEMORY</text>
+        <text x="270" y="66" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">RAM / Cache</text>
+        <!-- CPU box -->
+        <rect x="195" y="100" width="150" height="85" rx="6" fill="#0a1820" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6,3"/>
+        <text x="270" y="120" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">CPU</text>
+        <!-- Control Unit -->
+        <rect x="200" y="125" width="60" height="45" rx="4" fill="#102534" stroke="#10b981" stroke-width="1.5"/>
+        <text x="230" y="147" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">CONTROL</text>
+        <text x="230" y="159" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">UNIT</text>
+        <!-- ALU -->
+        <rect x="275" y="125" width="60" height="45" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="305" y="147" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">ALU</text>
+        <text x="305" y="160" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Arithmetic</text>
+        <!-- Output -->
+        <rect x="440" y="30" width="100" height="50" rx="6" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="490" y="53" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">OUTPUT</text>
+        <text x="490" y="66" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Monitor/Printer</text>
+        <!-- Arrows -->
+        <line x1="100" y1="55" x2="215" y2="55" stroke="#22d3ee" stroke-width="2"/>
+        <polygon points="210,51 220,55 210,59" fill="#22d3ee"/>
+        <line x1="325" y1="55" x2="440" y2="55" stroke="#10b981" stroke-width="2"/>
+        <polygon points="435,51 445,55 435,59" fill="#10b981"/>
+        <line x1="270" y1="80" x2="270" y2="100" stroke="#f97316" stroke-width="2"/>
+        <polygon points="266,97 270,107 274,97" fill="#f97316"/>
+        <!-- Control arrows to memory/IO -->
+        <line x1="230" y1="125" x2="230" y2="90" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="270" y="192" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="8">Control signals flow to all units (dashed)</text>
+      </svg>
+      <div class="diagram-cap">Fig 1.1 — Functional Units of a Computer: Input → Memory ↔ CPU (Control Unit + ALU) → Output</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Introduction</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Differentiate computer organization and computer architecture.</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q2 · 2 marks ⭐⭐</span><span class="topic-tag">Org vs Arch</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Computer Architecture</strong> refers to the attributes of a computer system visible to a programmer — instruction set, data types, addressing modes, number of registers, I/O mechanisms. It defines WHAT the computer can do.<br><br>
+        <strong>Computer Organization</strong> refers to the operational units and interconnections that realize the architectural specification — control signals, data paths, memory technology, clock signals. It defines HOW the computer does it internally.<br><br>
+        <strong>Key difference:</strong> Architecture = programmer's view (logical). Organization = designer's view (physical/hardware). Two computers can share the same architecture (run same programs) but have completely different organizations (different hardware implementations).
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What do you mean by computer performance?</div>
+      <div class="pyq-meta"><span>2022 Part A Q1 · 2 marks ⭐</span><span class="topic-tag">Performance</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Computer Performance</strong> is a measure of how well a computer accomplishes a task — primarily measured as the speed of execution.<br><br>
+        Key performance metrics:<br>
+        • <strong>CPU Time:</strong> Time taken by CPU to execute a program = Instruction Count × CPI × Clock Cycle Time<br>
+        • <strong>MIPS (Million Instructions Per Second):</strong> MIPS = Clock Rate / (CPI × 10⁶)<br>
+        • <strong>Throughput:</strong> Number of tasks completed per unit time<br>
+        • <strong>Latency (Response time):</strong> Time to complete a single task<br><br>
+        Performance = 1 / Execution Time (faster computer → higher performance).
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 02: COMPLEMENTS ══ -->
+<section class="section" id="complements">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Complements — 1's and 2's Complement</h2>
+    <span class="imp-pill badge badge-r">85% — Numerical Q Every Year</span>
+  </div>
+  <div class="theory-block">
+    <h3>Why Complements? The Big Idea</h3>
+    <p>Complements are used in digital computers to <strong>simplify subtraction</strong>. Instead of building a separate subtraction circuit, we can represent negative numbers using complements and convert subtraction into addition. This is why all computers internally use 2's complement arithmetic.</p>
+    <div class="layman">Instead of teaching a child to subtract, you teach them to "add the negative." If you want 9 - 3 = 6, think of it as 9 + (−3). Computers do the same — they represent −3 in 2's complement and add it to 9, getting 6. No subtraction circuit needed! This saves enormous hardware complexity.</div>
+    <h3>1's Complement</h3>
+    <p>The <span class="hl-r">1's complement</span> of a binary number is obtained by <strong>flipping every bit</strong> — replacing 0 with 1 and 1 with 0. For a base-2 number N with n digits: 1's complement = (2ⁿ − 1) − N.</p>
+    <div class="formula-box">
+      <span class="label">1's Complement</span>
+      <div class="formula">Rule:  Flip every bit (0→1, 1→0)</div>
+      <div class="formula">Mathematical: (2ⁿ − 1) − N  where n = number of bits</div>
+      <div class="formula">Example: N = 1011 0110  (8 bits)</div>
+      <div class="formula">1's comp = 0100 1001  ← every bit flipped</div>
+      <div class="note">Weakness of 1's complement: Two representations of zero: 0000 0000 (+0) and 1111 1111 (−0). This complicates hardware.</div>
+    </div>
+    <h3>2's Complement</h3>
+    <p>The <span class="hl-r">2's complement</span> is obtained by adding 1 to the 1's complement. It is the <strong>standard representation for negative numbers in all modern computers</strong> because it has a unique zero and subtraction becomes addition.</p>
+    <div class="formula-box">
+      <span class="label">2's Complement — Two Methods</span>
+      <div class="formula">Method 1: 2's comp = 1's comp + 1</div>
+      <div class="formula">Method 2 (shortcut): Scan from RIGHT → copy bits until and INCLUDING the first 1, then flip all remaining bits to the LEFT.</div>
+      <div class="formula"></div>
+      <div class="formula">Example: N = 1011 0100</div>
+      <div class="formula">Step 1 — 1's comp: 0100 1011</div>
+      <div class="formula">Step 2 — Add 1:   0100 1011 + 1 = 0100 1100  ← 2's complement</div>
+      <div class="formula"></div>
+      <div class="formula">Shortcut verification: Start from right: 0,0 → copy. Next 1 → copy. Now flip rest: 1→0,1→0,0→1,1→0,0→1 = 0100 1100 ✓</div>
+      <div class="note">Mathematical: 2's complement = 2ⁿ − N</div>
+      <div class="note">Range for n-bit 2's complement: −2^(n-1) to +2^(n-1) − 1</div>
+      <div class="note">For 8 bits: −128 to +127 | For 16 bits: −32768 to +32767</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">2's Complement Fast Trick — "Copy right, flip rest"</div>
+        <p>Starting from the <strong>rightmost bit</strong>: copy all bits including the <strong>first 1 you encounter</strong>, then flip everything to the left of that first 1. Example: 1011 0100 → right scan: 0 (copy), 0 (copy), 1 (copy — this is the first 1!), now flip left: 1→0, 1→0, 0→1, 1→0, 0→1 → Result: 0100 1100. This is the fastest method in exams.</p>
+      </div>
+    </div>
+    <h3>Subtraction Using 2's Complement</h3>
+    <div class="formula-box">
+      <span class="label">A − B Using 2's Complement</span>
+      <div class="formula">Step 1: Take 2's complement of B</div>
+      <div class="formula">Step 2: Add A + (2's complement of B)</div>
+      <div class="formula">Step 3: If carry out = 1 → discard carry → result is positive</div>
+      <div class="formula">        If carry out = 0 → result is negative → take 2's complement of result for magnitude</div>
+      <div class="formula"></div>
+      <div class="formula">Example: 1010 − 0011 = ?</div>
+      <div class="formula">2's comp of 0011 = 1100 + 1 = 1101</div>
+      <div class="formula">1010 + 1101 = 1 0111  → carry = 1, discard → result = 0111 = +7 ✓</div>
+      <div class="note">Check: 10 − 3 = 7 ✓</div>
+    </div>
+    <h3>Signed Magnitude vs Complement Representations</h3>
+    <table class="comp-table">
+      <tr><th>Representation</th><th>Positive Numbers</th><th>Negative Numbers</th><th>Zero</th><th>Range (8-bit)</th></tr>
+      <tr><td><span class="hl-o">Signed Magnitude</span></td><td>MSB = 0, rest = magnitude</td><td>MSB = 1, rest = magnitude</td><td>Two zeros (+0 and -0)</td><td>-127 to +127</td></tr>
+      <tr><td><span class="hl">1's Complement</span></td><td>MSB = 0, rest = magnitude</td><td>Flip all bits of positive</td><td>Two zeros (0000 and 1111)</td><td>-127 to +127</td></tr>
+      <tr><td><span class="hl-r">2's Complement</span></td><td>MSB = 0, rest = magnitude</td><td>1's comp + 1</td><td>Only one zero (0000)</td><td>-128 to +127</td></tr>
+    </table>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Complements & Number Representation</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Represent (70)₁₀ in a signed magnitude format and one's complement form.</div>
+      <div class="pyq-meta"><span>2025 Part A Q8 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Complements</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Step 1: Convert 70 to binary</strong><br>
+        70 ÷ 2 = 35 R 0 | 35 ÷ 2 = 17 R 1 | 17 ÷ 2 = 8 R 1 | 8 ÷ 2 = 4 R 0 | 4 ÷ 2 = 2 R 0 | 2 ÷ 2 = 1 R 0 | 1 ÷ 2 = 0 R 1<br>
+        Reading remainders bottom-up: 70₁₀ = <strong>1000110₂</strong><br><br>
+        <strong>Signed Magnitude (8-bit):</strong><br>
+        For +70: MSB = 0 (positive), magnitude = 1000110<br>
+        +70 = <strong>0 1000110</strong><br><br>
+        <strong>1's Complement (8-bit):</strong><br>
+        Since 70 is positive, 1's complement of +70 = +70 itself = 0 1000110<br>
+        For −70 in 1's complement: flip all bits of 0 1000110 = <strong>1 0111001</strong><br><br>
+        <em>Note: If asked for −70: Signed magnitude = 1 1000110; 1's complement = 1 0111001; 2's complement = 1 0111010</em>
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Perform selective complement over A = 1011 0110 and B = 0110 1110.</div>
+      <div class="pyq-meta"><span>2022 Part A Q10 · 2 marks ⭐⭐</span><span class="topic-tag">Logic Micro-op</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Selective Complement:</strong> Where B = 1, complement the corresponding bit of A. Where B = 0, keep the bit of A unchanged.<br>
+        Operation: A XOR B<br><br>
+        A = 1011 0110<br>
+        B = 0110 1110<br>
+        ─────────────<br>
+        A XOR B = 1101 1000<br><br>
+        <strong>Explanation bit by bit:</strong><br>
+        1⊕0=1 | 0⊕1=1 | 1⊕1=0 | 1⊕0=1 | 0⊕1=1 | 1⊕1=0 | 1⊕1=0 | 0⊕0=0<br>
+        Result: <strong>1101 1000</strong><br><br>
+        The XOR operation selectively complements bits of A wherever B has a 1.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. If the memory is represented in 12 bits × 16 bits then how many words can be accommodated in the memory?</div>
+      <div class="pyq-meta"><span>2022 Part A Q2 · 2 marks ⭐</span><span class="topic-tag">Memory Representation</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        Memory is represented as: <strong>12 address bits × 16 data bits</strong><br><br>
+        Number of addressable locations (words) = 2^(number of address bits)<br>
+        = 2¹² = <strong>4096 words</strong><br><br>
+        Each word is 16 bits (2 bytes) wide.<br>
+        Total memory capacity = 4096 × 16 bits = 65,536 bits = 8 KB<br><br>
+        <em>General rule: If address bus has k bits → 2^k addressable locations (words)</em>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 03: FIXED POINT ══ -->
+<section class="section" id="fixed">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Fixed Point Representation</h2>
+    <span class="imp-pill badge badge-r">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Fixed Point Representation?</h3>
+    <p>In <span class="hl-r">fixed point representation</span>, the binary point (decimal point equivalent for binary) is assumed to be at a <strong>fixed position</strong> in the number — the programmer/hardware knows this position in advance. There is no explicit symbol for the binary point; its position is implied.</p>
+    <div class="layman">Imagine you're writing money amounts and you always assume there are exactly 2 decimal places — so 1234 really means $12.34. Fixed point works the same way — the binary point is always at the same position. The hardware never stores where the decimal is; it just agrees in advance where it sits.</div>
+    <div class="formula-box">
+      <span class="label">Fixed Point — Two Common Formats</span>
+      <div class="formula">Integer representation: binary point fixed at the RIGHT end</div>
+      <div class="formula">  e.g., 0 1011 0110 = integer 182 (MSB=sign, rest=magnitude)</div>
+      <div class="formula"></div>
+      <div class="formula">Fraction representation: binary point fixed at the LEFT of all magnitude bits</div>
+      <div class="formula">  e.g., 0.1011 0110 = 0×2⁻¹ + 1×2⁻² + 0×2⁻³ + ... (fraction less than 1)</div>
+      <div class="note">Sign bit: 0 = positive, 1 = negative (using 2's complement for negative)</div>
+      <div class="note">Range: depends on where binary point is placed and total bits used</div>
+    </div>
+    <h3>Signed Integer Representation in Fixed Point</h3>
+    <p>For a signed fixed-point integer with n bits (1 sign bit + n-1 magnitude bits):</p>
+    <table class="comp-table">
+      <tr><th>Format</th><th>+5 (4-bit example)</th><th>-5 (4-bit example)</th><th>Notes</th></tr>
+      <tr><td>Signed Magnitude</td><td>0 101</td><td>1 101</td><td>MSB = sign, rest = magnitude</td></tr>
+      <tr><td>1's Complement</td><td>0 101</td><td>1 010</td><td>Flip all bits for negative</td></tr>
+      <tr><td>2's Complement</td><td>0 101</td><td>1 011</td><td>1's comp + 1; used in modern CPUs</td></tr>
+    </table>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Complements → Fixed Point</div>
+        <p>The complement representations from Section 02 are the actual method by which fixed-point negative numbers are stored. When you see "represent -70 in fixed point," the answer is: use 2's complement — which you already know how to compute. The "fixed point" part just means the binary point is at the end (treating it as an integer).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Fixed Point</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain fixed point representation.</div>
+      <div class="pyq-meta"><span>2025 Part A Q6 · 2 marks ⭐⭐</span><span class="topic-tag">Fixed Point</span><span class="pred-tag">🔮 HIGH 2026</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        In <strong>fixed point representation</strong>, the position of the binary (decimal) point in the number is fixed at a predetermined, implied location — it does not move and is not explicitly stored.<br><br>
+        Two common formats:<br>
+        1. <strong>Integer fixed point:</strong> Binary point is at the rightmost end. The entire bit pattern represents an integer value. Example: 8-bit signed integer 0 1000110 = +70.<br>
+        2. <strong>Fraction fixed point:</strong> Binary point is at the left (after the sign bit). All values lie between -1 and +1. Example: 0.1000110 = +0.546875.<br><br>
+        <strong>Negative numbers</strong> are typically stored in 2's complement form.<br><br>
+        <strong>Advantage:</strong> Simple hardware implementation, fast arithmetic.<br>
+        <strong>Disadvantage:</strong> Limited range; cannot represent very large or very small numbers simultaneously. For this, floating point is used.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 04: FLOATING POINT ══ -->
+<section class="section" id="floating">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Floating Point Representation</h2>
+    <span class="imp-pill badge badge-r">82% — Numerical Guaranteed</span>
+  </div>
+  <div class="theory-block">
+    <h3>Why Floating Point?</h3>
+    <p>Fixed point cannot represent both very large numbers (like 3,200,000,000) and very small numbers (like 0.000000032) simultaneously in the same format. <span class="hl-r">Floating point</span> solves this by storing a number in scientific notation — a normalized form with a mantissa (fractional part) and an exponent.</p>
+    <div class="layman">Scientific notation for humans: 6.02 × 10²³ (Avogadro's number). Floating point is the binary equivalent: the number "floats" — the binary point can be at any position. Instead of fixing the decimal, you write mantissa × 2^exponent. This lets you represent both 0.000000001 and 1,000,000,000 in the same format.</div>
+    <div class="formula-box">
+      <span class="label">Floating Point Format</span>
+      <div class="formula">A floating point number has three components:</div>
+      <div class="formula">  Sign (S):    1 bit (0 = positive, 1 = negative)</div>
+      <div class="formula">  Exponent (E): e bits (biased/excess representation)</div>
+      <div class="formula">  Mantissa (M): m bits (normalized fraction)</div>
+      <div class="formula"></div>
+      <div class="formula">Value = (−1)^S × 1.M × 2^(E − bias)</div>
+      <div class="note">Normalization: In binary, a normalized number has the form 1.xxxxx × 2^n (leading 1 before binary point). The leading 1 is usually NOT stored (implicit/hidden bit) — saves 1 bit.</div>
+      <div class="note">IEEE 754 Single Precision (32-bit): 1 sign + 8 exponent + 23 mantissa | bias = 127</div>
+      <div class="note">IEEE 754 Double Precision (64-bit): 1 sign + 11 exponent + 52 mantissa | bias = 1023</div>
+    </div>
+    <h3>Converting a Decimal Number to Floating Point</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text">Convert the decimal number to binary (integer and fractional parts separately)</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text">Normalize: write as 1.xxxxx × 2^n (move binary point so there is exactly one 1 before it)</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text">Determine sign bit (0 for positive, 1 for negative)</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text">Calculate biased exponent = actual exponent + bias (127 for single precision)</div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-text">Store mantissa (the fractional part after the implicit 1.)</div></div>
+    </div>
+    <div class="formula-box">
+      <span class="label">Example — Convert +1001.11 to 32-bit IEEE 754</span>
+      <div class="formula">Step 1: Already in binary: 1001.11</div>
+      <div class="formula">Step 2: Normalize: 1.00111 × 2³  (moved point left 3 places → exponent = +3)</div>
+      <div class="formula">Step 3: Sign = 0 (positive)</div>
+      <div class="formula">Step 4: Biased exponent = 3 + 127 = 130 = 10000010 in binary</div>
+      <div class="formula">Step 5: Mantissa = 00111 (the fractional bits after 1.) padded to 23 bits = 00111 000...0</div>
+      <div class="formula">Result: 0 | 10000010 | 00111000000000000000000</div>
+      <div class="note">RTU 2022 Q8 asked: Convert +1001.11 in 8-bit fraction and 6-bit exponent → answer: sign=0, exp=00000011 (but store as excess-N/biased form as per the given format)</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Floating Point Exam Trick — RTU Format vs IEEE 754</div>
+        <p>RTU sometimes asks for non-standard formats like "8-bit fraction, 6-bit exponent." In that case: Sign (1 bit) + Exponent (given bits) + Mantissa (given bits). The bias = 2^(e-1) − 1 where e is exponent bits. For 6-bit exponent: bias = 2⁵ − 1 = 31. Always write: Sign | Biased Exponent | Mantissa — in that order, and clearly label each part.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Floating Point</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Convert +1001.11 in 8 bit fraction and 6 bit exponent as per floating point representation.</div>
+      <div class="pyq-meta"><span>2022 Part A Q8 · 2 marks ⭐⭐</span><span class="topic-tag">Floating Point</span><span class="pred-tag">🔮 MEDIUM 2026</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        The number is +1001.11 (already in binary).<br><br>
+        <strong>Normalize:</strong> 1001.11 = 1.00111 × 2³<br>
+        Exponent = +3, Mantissa fraction = .00111<br><br>
+        <strong>Format: 1 (sign) + 6 (exponent) + 8 (fraction)</strong><br>
+        Sign bit = 0 (positive)<br>
+        Biased exponent (bias = 2⁵-1 = 31): 3 + 31 = 34 = 100010 in binary<br>
+        8-bit mantissa (fractional part, MSB first): 00111000<br><br>
+        <strong>Final representation:</strong><br>
+        0 | 100010 | 00111000<br>
+        = 0 100010 00111000<br><br>
+        Sign=0, Exponent=100010 (=34), Fraction=00111000
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 05: RTL ══ -->
+<section class="section" id="rtl">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Register Transfer Language (RTL)</h2>
+    <span class="imp-pill badge badge-r">78%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Register Transfer Language?</h3>
+    <p><span class="hl-r">Register Transfer Language (RTL)</span> is a symbolic notation used to describe the micro-operations (primitive operations) performed on the data stored in registers. It specifies WHAT data is transferred and how it is manipulated between registers.</p>
+    <div class="layman">RTL is like a recipe notation for computers. Instead of saying "add the contents of the first bowl to the second bowl," a computer scientist writes R1 ← R1 + R2. It's a shorthand for "transfer data from one register to another, possibly with some operation in between."</div>
+    <div class="formula-box">
+      <span class="label">RTL Notation — Key Symbols</span>
+      <div class="formula">R1, R2, PC, AR    → Register names (PC = Program Counter, AR = Address Register)</div>
+      <div class="formula">←                → Transfer (copy) — the destination is on the LEFT</div>
+      <div class="formula">R1 ← R2          → Copy contents of R2 into R1 (R2 unchanged)</div>
+      <div class="formula">R1 ← R2 + R3     → Add R2 and R3, store result in R1</div>
+      <div class="formula">R1 ← R2, R3 ← R4 → Simultaneous transfers (comma = same clock cycle)</div>
+      <div class="formula">M[AR] ← R1       → Transfer R1 to Memory at address in AR</div>
+      <div class="formula">R1 ← M[AR]       → Read memory at address AR into R1</div>
+      <div class="note">Conditional RTL: P: R1 ← R2  → Transfer R2 to R1 ONLY IF control signal P = 1</div>
+      <div class="note">Example: If (P = 1) then (R1 ← R2) else if (Q = 1) then (R1 ← R3)</div>
+      <div class="note">RTL statement: P: R1 ← R2 | Q'P': R1 ← R3 (using control functions)</div>
+    </div>
+    <h3>Conditional Control in RTL — RTU PYQ Pattern</h3>
+    <p>RTU asks you to represent conditional register transfers using two register transfer statements with control functions. The key is that you can have multiple conditions as a Boolean expression attached to the transfer.</p>
+    <div class="formula-box">
+      <span class="label">Representing Conditional Statements</span>
+      <div class="formula">Given: If (P=1) then (R1←R2) else If (Q=1) then (R1←R3)</div>
+      <div class="formula">Statement 1: P: R1 ← R2        → R1 gets R2 when P=1</div>
+      <div class="formula">Statement 2: Q P': R1 ← R3     → R1 gets R3 when Q=1 AND P=0</div>
+      <div class="note">Q P' means Q AND NOT(P) — preventing both transfers simultaneously when both P and Q are 1</div>
+      <div class="note">Hardware implementation: two AND gates feeding a multiplexer — the control signals select which transfer happens</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — RTL</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Represent the conditional control statement by two register transfer statements with control functions: If (P=1) then (R1←R2) else If (Q=1) then (R1←R3)</div>
+      <div class="pyq-meta"><span>2023-Aug Part B Q2 · 8 marks ⭐⭐</span><span class="topic-tag">RTL Conditional</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        The conditional statement says: Transfer R2 to R1 if P=1; otherwise if Q=1, transfer R3 to R1.<br><br>
+        <strong>Two RTL Statements:</strong><br>
+        P: R1 ← R2<br>
+        QP': R1 ← R3<br><br>
+        <strong>Explanation:</strong><br>
+        • The first statement P: R1←R2 says: When control signal P is active, copy R2 into R1.<br>
+        • The second statement QP': R1←R3 says: When Q is active AND P is NOT active (P' = NOT P), copy R3 into R1.<br>
+        • The Q P' condition prevents conflict: if both P and Q are 1, only the P transfer happens (P takes priority).<br><br>
+        <strong>Hardware implementation:</strong><br>
+        Two AND gates:<br>
+        AND Gate 1: Input = P, Output feeds MUX select/load<br>
+        AND Gate 2: Inputs = Q, P' (NOT P), Output feeds MUX select/load<br>
+        MUX selects R2 or R3 based on which AND gate output is active, loads result into R1.<br><br>
+        [Draw: Two inputs R2 and R3 → 2×1 MUX → R1. MUX select controlled by P and QP' via AND gates]
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 06: BUS ══ -->
+<section class="section" id="bus">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Bus and Memory Transfers — Common Bus System</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part B/C Fixture</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — VERY HIGH:</strong> Common bus system appeared in Part C 2022 (8-register bus with multiplexers — full design) and Part C 2025 (explain different types of computer registers with common bus system). It alternates between Part C and Part B every other year. 2026 Part B or C will have the common bus diagram. Know the 8-register, 16-bit bus design with multiplexers.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is a Bus?</h3>
+    <p>A <span class="hl-r">bus</span> is a shared communication pathway — a set of conducting wires — through which data is transferred between components of a computer (CPU registers, memory, I/O). A bus carries data, addresses, and control signals.</p>
+    <div class="layman">Imagine a single highway in a city. All cars (data) must share this one road to travel between locations. The bus in a computer is this single shared road — instead of connecting every register to every other register (which would need n² wires for n registers), all registers share one bus (only n wires needed). Traffic lights (control signals) ensure only one car uses the road at a time.</div>
+    <div class="formula-box">
+      <span class="label">Types of Buses</span>
+      <div class="formula">Data Bus:     carries actual data between CPU, memory, I/O</div>
+      <div class="formula">Address Bus:  carries memory addresses (from CPU to memory/IO)</div>
+      <div class="formula">Control Bus:  carries control signals (read/write, clock, interrupt)</div>
+      <div class="note">Data bus is bidirectional (read and write). Address bus is usually unidirectional (CPU → memory).</div>
+    </div>
+    <h3>Common Bus System (8 Registers, 16-bit)</h3>
+    <p>The most important bus system in RTU CAO is the <span class="hl-o">common bus</span> for n registers using multiplexers. For 8 registers (R0 to R7), each 16 bits wide, the bus is constructed using 16 multiplexers of size 8×1 (8 inputs, 1 output).</p>
+    <div class="formula-box">
+      <span class="label">Common Bus Design — 8 Registers, 16 bits</span>
+      <div class="formula">Number of MUX needed: 16 (one per bit of the bus width)</div>
+      <div class="formula">MUX size: 8×1 (8 inputs — one from each register's same bit position)</div>
+      <div class="formula">Selection inputs: 3 bits (S₂S₁S₀) — 2³ = 8 register selections</div>
+      <div class="formula">S₂S₁S₀ = 000 → Bus gets R0 | 001 → R1 | 010 → R2 | ... | 111 → R7</div>
+      <div class="note">Three-state buffers: Another method uses tri-state buffers instead of MUX. Each register output connects to the bus through a tri-state buffer. Only one buffer is enabled at a time.</div>
+      <div class="note">RTU 2022 Part C Q2: "A digital computer has a common bus system for 8 registers, 16 bits each. The bus is constructed with multiplexers."</div>
+      <div class="note">→ Selection inputs = log₂(8) = 3 | Size of each MUX = 8×1 | Number of MUX = 16 (for 16 bits) | Size of multiplexers = 16-bit wide 8-to-1</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 280" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#ef4444" font-family="JetBrains Mono" font-size="10" font-weight="bold">Common Bus System — 8 Registers via 16 Multiplexers</text>
+        <!-- Registers R0-R7 (simplified to 4 visible) -->
+        <rect x="10" y="32" width="60" height="24" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="40" y="48" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">R0 (16b)</text>
+        <rect x="10" y="64" width="60" height="24" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="40" y="80" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">R1 (16b)</text>
+        <rect x="10" y="96" width="60" height="24" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="40" y="112" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">R2 (16b)</text>
+        <rect x="10" y="128" width="60" height="24" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="40" y="144" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">R3 (16b)</text>
+        <text x="40" y="168" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="9">· · ·</text>
+        <rect x="10" y="178" width="60" height="24" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="40" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">R7 (16b)</text>
+        <!-- Lines from registers to MUX -->
+        <line x1="70" y1="44" x2="200" y2="100" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="70" y1="76" x2="200" y2="110" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="70" y1="108" x2="200" y2="120" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="70" y1="140" x2="200" y2="130" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="70" y1="190" x2="200" y2="155" stroke="#a78bfa" stroke-width="1" stroke-dasharray="3,2"/>
+        <!-- MUX boxes (representing all 16) -->
+        <rect x="200" y="80" width="80" height="100" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="2.5"/>
+        <text x="240" y="118" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">16 MUX</text>
+        <text x="240" y="131" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">(8×1 each)</text>
+        <text x="240" y="145" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">One per bit</text>
+        <text x="240" y="158" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">S₂ S₁ S₀</text>
+        <!-- Selection input -->
+        <rect x="170" y="200" width="100" height="28" rx="4" fill="#0c1e28" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="220" y="218" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9">Select: S₂S₁S₀</text>
+        <line x1="220" y1="200" x2="240" y2="180" stroke="#f59e0b" stroke-width="1.5"/>
+        <!-- Bus line -->
+        <line x1="280" y1="130" x2="420" y2="130" stroke="#ef4444" stroke-width="4"/>
+        <text x="350" y="122" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">16-bit COMMON BUS</text>
+        <!-- Bus outputs to CPU/Memory -->
+        <rect x="420" y="100" width="120" height="35" rx="4" fill="#102534" stroke="#10b981" stroke-width="1.5"/>
+        <text x="480" y="122" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">CPU / ALU</text>
+        <rect x="420" y="148" width="120" height="35" rx="4" fill="#102534" stroke="#f97316" stroke-width="1.5"/>
+        <text x="480" y="170" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9">Memory Unit</text>
+        <line x1="420" y1="117" x2="410" y2="130" stroke="#10b981" stroke-width="1.5"/>
+        <line x1="420" y1="165" x2="410" y2="130" stroke="#f97316" stroke-width="1.5"/>
+        <!-- Key -->
+        <text x="10" y="248" fill="#3a5868" font-family="JetBrains Mono" font-size="8">8 registers × 16 bits → 16 multiplexers (8×1 each)</text>
+        <text x="10" y="262" fill="#3a5868" font-family="JetBrains Mono" font-size="8">3 selection bits (S₂S₁S₀) select which register drives the bus</text>
+        <text x="10" y="276" fill="#3a5868" font-family="JetBrains Mono" font-size="8">Only ONE register can drive the bus at any clock cycle</text>
+      </svg>
+      <div class="diagram-cap">Fig 6.1 — Common Bus System: 8 registers, 16 bits, 16 multiplexers (8×1), 3 selection lines S₂S₁S₀</div>
+    </div>
+    <h3>Three-State Bus Buffers</h3>
+    <p>An alternative to multiplexers is using <span class="hl-o">three-state buffers</span>. A three-state buffer has three possible output states: logic 0, logic 1, and <strong>high impedance (Hi-Z)</strong>. In the Hi-Z state, the output is effectively disconnected from the bus.</p>
+    <div class="formula-box">
+      <span class="label">Three-State Buffer Truth Table</span>
+      <div class="formula">Control (Enable) | Input | Output</div>
+      <div class="formula">       1          |   0   |   0     (normal LOW output)</div>
+      <div class="formula">       1          |   1   |   1     (normal HIGH output)</div>
+      <div class="formula">       0          |   X   |  Hi-Z   (disconnected — no drive)</div>
+      <div class="note">Only one register's tri-state buffer is enabled at a time. All others are Hi-Z. This allows multiple outputs to share the same bus wire.</div>
+    </div>
+    <h3>Memory Transfer Operations</h3>
+    <div class="formula-box">
+      <span class="label">Memory Read and Write in RTL</span>
+      <div class="formula">Memory Read:   DR ← M[AR]    (read memory at address in AR, store in Data Register)</div>
+      <div class="formula">Memory Write:  M[AR] ← R1    (write R1 into memory location pointed to by AR)</div>
+      <div class="note">AR = Address Register (holds the memory address), DR = Data Register (holds the data read/written)</div>
+      <div class="note">These two micro-operations are the foundation of all memory read/write cycles (part of instruction cycle)</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Bus System</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. A digital computer has a common bus system for 8 registers and 16 bits each. The bus is constructed with multiplexers. (a) How many selection inputs? (b) How many multiplexers? (c) What size of multiplexers? (d) Draw the diagram.</div>
+      <div class="pyq-meta"><span>2022 Part C Q2 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Common Bus</span><span class="pred-tag">🔮 VERY HIGH 2026 Part B/C</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>(a) Number of selection inputs:</strong><br>
+        We have 8 registers → need to select 1 of 8 → log₂(8) = <strong>3 selection inputs (S₂, S₁, S₀)</strong><br><br>
+        <strong>(b) Number of multiplexers:</strong><br>
+        Each MUX handles one bit of the bus. Bus is 16 bits wide → <strong>16 multiplexers</strong><br><br>
+        <strong>(c) Size of each multiplexer:</strong><br>
+        Each MUX has 8 inputs (one from each register's same bit position) and 1 output → <strong>8×1 MUX</strong><br><br>
+        <strong>(d) Explanation:</strong><br>
+        The common bus has 16 wires (for 16-bit data). Each wire is driven by one 8×1 MUX. The i-th MUX (for bit position i) takes bit i from all 8 registers as its 8 inputs. The same 3 selection lines S₂S₁S₀ control all 16 MUXes simultaneously — they all select the same register, passing its 16 bits to the bus in parallel.<br><br>
+        When S₂S₁S₀ = 000 → Bus = R0 (all 16 bits)<br>
+        When S₂S₁S₀ = 001 → Bus = R1<br>
+        ... and so on up to S₂S₁S₀ = 111 → Bus = R7<br><br>
+        [Draw: 8 registers on left → 16 MUX blocks (or one large symbol) in middle → 16-bit bus line → connects to ALU, memory, IR on right. S₂S₁S₀ lines enter from bottom of all MUX blocks.]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Define a bus. What are the types of buses in a computer?</div>
+      <div class="pyq-meta"><span>2024 Part A Q5 · 2 marks ⭐⭐</span><span class="topic-tag">Bus</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>bus</strong> is a shared communication pathway — a group of parallel wires/conductors used to transfer data, addresses, and control signals between components of a computer system.<br><br>
+        <strong>Three types of buses:</strong><br>
+        1. <strong>Data Bus:</strong> Transfers actual data between CPU, memory, and I/O devices. Bidirectional (read and write). Width determines how many bits are transferred simultaneously (8, 16, 32, 64-bit).<br>
+        2. <strong>Address Bus:</strong> Carries memory/IO addresses from CPU to memory and I/O. Unidirectional (CPU → peripherals). Width determines addressable memory: k-bit address bus → 2^k locations.<br>
+        3. <strong>Control Bus:</strong> Carries control signals — read/write signals, clock, interrupt, bus request/grant. Manages timing and direction of data flow on the bus.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is a micro-operation?</div>
+      <div class="pyq-meta"><span>2024 Part A Q6 · 2 marks ⭐⭐</span><span class="topic-tag">Micro-op</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>micro-operation</strong> is the most fundamental, elementary operation performed on the data stored in registers during one clock pulse. It is the smallest unit of processing in a digital computer.<br><br>
+        <strong>Types of micro-operations:</strong><br>
+        1. Register Transfer: R1 ← R2 (copy contents of one register to another)<br>
+        2. Arithmetic: R1 ← R1 + R2 (add, subtract, increment, decrement)<br>
+        3. Logic: R1 ← R1 AND R2 (AND, OR, XOR, NOT operations)<br>
+        4. Shift: R1 ← shl R1 (shift left, shift right, rotate)<br><br>
+        Each micro-operation takes one clock cycle. Complex operations like instruction execution are composed of sequences of micro-operations.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 07: ARITHMETIC MICRO-OPS ══ -->
+<section class="section" id="arith-micro">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Arithmetic Micro-Operations</h2>
+    <span class="imp-pill badge badge-r">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What are Arithmetic Micro-Operations?</h3>
+    <p><span class="hl-o">Arithmetic micro-operations</span> perform numeric computations on data stored in registers. The basic arithmetic micro-operations are: add, subtract, increment, decrement, and negate (2's complement). They are performed by the ALU.</p>
+    <div class="layman">Arithmetic micro-operations are the four basic math operations your calculator does — but at the binary level on registers. Add two registers, subtract one from another, add 1 (increment), subtract 1 (decrement), or flip the sign (negate). Each takes exactly one clock cycle.</div>
+    <div class="formula-box">
+      <span class="label">Arithmetic Micro-Operations — RTL Notation</span>
+      <div class="formula">Add:       R3 ← R1 + R2         (add contents of R1 and R2, store in R3)</div>
+      <div class="formula">Subtract:  R3 ← R1 + R2' + 1   (add R1, 1's comp of R2, and 1 → 2's comp subtraction)</div>
+      <div class="formula">Increment: R1 ← R1 + 1           (add 1 to R1)</div>
+      <div class="formula">Decrement: R1 ← R1 - 1           (subtract 1 from R1)</div>
+      <div class="formula">Negate:    R2 ← R1' + 1          (2's complement of R1)</div>
+      <div class="formula">Add with carry: R3 ← R1 + R2 + Cin</div>
+      <div class="note">Subtraction (R1 − R2) = R1 + (2's complement of R2) = R1 + R2' + 1</div>
+      <div class="note">This is why computers don't need separate subtraction hardware — they reuse the adder with complemented input!</div>
+    </div>
+    <table class="comp-table">
+      <tr><th>Operation</th><th>RTL Notation</th><th>Comment</th></tr>
+      <tr><td>Add</td><td>R3 ← R1 + R2</td><td>Binary addition</td></tr>
+      <tr><td>Subtract</td><td>R3 ← R1 − R2 = R1 + R2' + 1</td><td>Add 2's complement</td></tr>
+      <tr><td>Increment</td><td>R1 ← R1 + 1</td><td>Add 1 to register</td></tr>
+      <tr><td>Decrement</td><td>R1 ← R1 − 1</td><td>Subtract 1 from register</td></tr>
+      <tr><td>Add with Carry</td><td>R3 ← R1 + R2 + Cin</td><td>Multi-precision arithmetic</td></tr>
+      <tr><td>Subtract with Borrow</td><td>R3 ← R1 + R2' + Cin</td><td>Multi-precision subtraction</td></tr>
+      <tr><td>Transfer</td><td>R2 ← R1</td><td>Copy with no operation</td></tr>
+      <tr><td>Negate (2's comp)</td><td>R2 ← R1' + 1</td><td>Compute −R1</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══ SECTION 08: LOGIC MICRO-OPS ══ -->
+<section class="section" id="logic-micro">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Logic Micro-Operations</h2>
+    <span class="imp-pill badge badge-r">🔥 92% — Part B 2024 & 2025</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN:</strong> Logical micro-operations appeared in Part B in 2024 (Q4 — "write 4 logic micro-operations") and 2025 (Q3 — "explain + applications"). Two consecutive years. This is a permanent Part B fixture for 2026. Know the 4 operations AND, OR, XOR, COMPLEMENT with their applications: masking, selective-set, selective-complement, clear.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What are Logic Micro-Operations?</h3>
+    <p><span class="hl-r">Logic micro-operations</span> perform bit-wise Boolean operations on the data in registers. Unlike arithmetic operations that treat the register as a number, logic operations treat each bit independently. There are 16 possible Boolean functions of two binary variables, but 4 are most used: AND, OR, XOR, and Complement.</p>
+    <div class="layman">Logic micro-operations work on individual bits, one at a time. If arithmetic is about "how many," logic is about "which ones." AND keeps certain bits, OR sets certain bits, XOR flips certain bits, NOT flips all bits. These four operations let you manipulate any specific bits in a register without touching others — like using a surgical tool instead of a sledgehammer.</div>
+    <div class="formula-box">
+      <span class="label">Four Logic Micro-Operations</span>
+      <div class="formula">AND:        R3 ← R1 AND R2     (R1 ∧ R2)  — bit-wise AND</div>
+      <div class="formula">OR:         R3 ← R1 OR R2      (R1 ∨ R2)  — bit-wise OR</div>
+      <div class="formula">XOR:        R3 ← R1 XOR R2     (R1 ⊕ R2)  — bit-wise exclusive OR</div>
+      <div class="formula">Complement: R2 ← NOT R1        (R1')      — bit-wise inversion</div>
+      <div class="note">All 16 Boolean functions exist, but AND/OR/XOR/NOT are the ones implemented in hardware (any other function can be derived from these)</div>
+    </div>
+    <h3>Applications of Logic Micro-Operations — ⭐ Exam Focus</h3>
+    <p>The power of logic micro-operations lies in their applications for <strong>bit manipulation</strong>. These are the most important things to know for the exam:</p>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#22d3ee55">
+      <h3 class="cyan">1. Selective Complement (XOR)</h3>
+      <p>XOR a register with a <strong>mask</strong> to flip selected bits. Wherever the mask has 1, the corresponding bit of A is complemented. Wherever the mask has 0, the bit is unchanged.</p>
+      <div class="formula-box">
+        <span class="label">Selective Complement — XOR with Mask B</span>
+        <div class="formula">Operation: A ← A ⊕ B</div>
+        <div class="formula">Where B bit = 1 → complement that bit of A</div>
+        <div class="formula">Where B bit = 0 → keep that bit of A unchanged</div>
+        <div class="formula">Example: A = 1010 0110, B = 0000 1111</div>
+        <div class="formula">Result:    1010 1001  (lower 4 bits complemented, upper 4 unchanged)</div>
+      </div>
+      <h3 class="cyan">2. Selective Set (OR)</h3>
+      <p>OR a register with a mask to set selected bits to 1. Wherever the mask has 1, the corresponding bit is forced to 1. Wherever the mask has 0, the bit is unchanged.</p>
+      <div class="formula-box">
+        <span class="label">Selective Set — OR with Mask B</span>
+        <div class="formula">Operation: A ← A OR B</div>
+        <div class="formula">Where B bit = 1 → force that bit of A to 1 (set)</div>
+        <div class="formula">Where B bit = 0 → keep that bit of A unchanged</div>
+        <div class="formula">Example: A = 1010 0110, B = 0000 1111</div>
+        <div class="formula">Result:    1010 1111  (lower 4 bits all set to 1, upper 4 unchanged)</div>
+      </div>
+      <h3 class="cyan">3. Masking / Selective Clear (AND)</h3>
+      <p>AND a register with a mask to clear selected bits to 0. Wherever the mask has 0, the corresponding bit is forced to 0 (cleared/masked). Wherever the mask has 1, the bit is unchanged.</p>
+      <div class="formula-box">
+        <span class="label">Masking / Selective Clear — AND with Mask B</span>
+        <div class="formula">Operation: A ← A AND B</div>
+        <div class="formula">Where B bit = 0 → force that bit of A to 0 (clear/mask)</div>
+        <div class="formula">Where B bit = 1 → keep that bit of A unchanged</div>
+        <div class="formula">Example: A = 1010 0110, B = 1111 0000</div>
+        <div class="formula">Result:    1010 0000  (lower 4 bits cleared, upper 4 unchanged)</div>
+        <div class="note">Most common use: extract part of a word. E.g., mask = 0000 1111 applied to 8-bit number → extracts lower 4 bits</div>
+      </div>
+      <h3 class="cyan">4. Clearing Registers (XOR with Self)</h3>
+      <p>XOR a register with itself to clear all bits to 0. This is the fastest way to zero a register in assembly language.</p>
+      <div class="formula-box">
+        <span class="label">Clear Register — XOR with Self</span>
+        <div class="formula">Operation: R1 ← R1 ⊕ R1 = 0  (any bit XOR itself = 0)</div>
+        <div class="formula">Example: A = 1011 0110</div>
+        <div class="formula">A ⊕ A:    0000 0000  ← register cleared to zero</div>
+        <div class="note">In x86 assembly: XOR EAX, EAX is used to zero the EAX register — faster than MOV EAX, 0</div>
+      </div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Logic Micro-ops Memory Trick — "AND clears, OR sets, XOR flips"</div>
+        <p><strong>AND with 0 → clears bits (masking)</strong><br>
+        <strong>OR with 1 → sets bits (selective set)</strong><br>
+        <strong>XOR with 1 → flips bits (selective complement)</strong><br>
+        <strong>XOR with self → clears register</strong><br>
+        These four applications appear in EVERY logic micro-operations question. Write them all even if the question only asks for examples.</p>
+      </div>
+    </div>
+    <h3>Truth Tables for All 4 Logic Operations</h3>
+    <table class="comp-table">
+      <tr><th>A</th><th>B</th><th>A AND B</th><th>A OR B</th><th>A XOR B</th><th>NOT A</th></tr>
+      <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+      <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+      <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+      <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    </table>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Logic Micro-Operations</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What are logical microoperations? Explain about applications of logical microoperation.</div>
+      <div class="pyq-meta"><span>2025 Part B Q3 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Logic Micro-ops</span><span class="pred-tag">🔮 CERTAIN 2026 Part B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Logical Micro-Operations:</strong><br>
+        Logical micro-operations perform bit-wise Boolean operations on data stored in registers. Each bit is operated on independently.<br><br>
+        <strong>Four Basic Operations:</strong><br>
+        1. AND (R1 ∧ R2) — bit-wise AND<br>
+        2. OR (R1 ∨ R2) — bit-wise OR<br>
+        3. XOR (R1 ⊕ R2) — bit-wise exclusive OR<br>
+        4. Complement (NOT R1) — bit-wise inversion<br><br>
+        <strong>Applications:</strong><br><br>
+        <strong>1. Selective Complement (XOR):</strong><br>
+        A ← A ⊕ B: Wherever B=1, the corresponding bit of A is complemented. Wherever B=0, the bit is unchanged.<br>
+        Example: A=1010, B=0011 → A⊕B = 1001 (rightmost 2 bits complemented)<br><br>
+        <strong>2. Selective Set (OR):</strong><br>
+        A ← A OR B: Wherever B=1, the corresponding bit of A is forced to 1. Wherever B=0, unchanged.<br>
+        Example: A=1010, B=0011 → A OR B = 1011 (rightmost 2 bits set to 1)<br><br>
+        <strong>3. Masking / Selective Clear (AND):</strong><br>
+        A ← A AND B: Wherever B=0, the corresponding bit of A is cleared to 0. Wherever B=1, unchanged.<br>
+        Example: A=1010, B=1100 → A AND B = 1000 (lower 2 bits masked to 0)<br><br>
+        <strong>4. Clear Register (XOR with self):</strong><br>
+        A ← A ⊕ A = 0000: A register XOR'd with itself always gives 0.<br>
+        Used in assembly: XOR EAX, EAX to zero EAX without using MOV instruction.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Write 4 logic micro-operations.</div>
+      <div class="pyq-meta"><span>2024 Part B Q4 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Logic Micro-ops</span><span class="pred-tag">🔮 CERTAIN 2026</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Four Logic Micro-Operations with examples:</strong><br><br>
+        <strong>1. AND (Masking):</strong><br>
+        R3 ← R1 ∧ R2<br>
+        A=10110101, B=11110000 → AND result = 10110000<br>
+        Use: Clear (mask) lower bits while keeping upper bits<br><br>
+        <strong>2. OR (Selective Set):</strong><br>
+        R3 ← R1 ∨ R2<br>
+        A=10110101, B=00001111 → OR result = 10111111<br>
+        Use: Set specific bits to 1<br><br>
+        <strong>3. XOR (Selective Complement):</strong><br>
+        R3 ← R1 ⊕ R2<br>
+        A=10110101, B=00001111 → XOR result = 10111010<br>
+        Use: Complement specific bits<br><br>
+        <strong>4. Complement (NOT/Invert):</strong><br>
+        R2 ← (R1)'<br>
+        A=10110101 → NOT result = 01001010<br>
+        Use: Compute 1's complement; first step in 2's complement
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 09: SHIFT MICRO-OPS ══ -->
+<section class="section" id="shift-micro">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Shift Micro-Operations</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Types of Shift Micro-Operations</h3>
+    <p><span class="hl-o">Shift micro-operations</span> move the bits of a register left or right by one or more positions. They are used for multiplication/division by powers of 2, serial data transfer, and bit manipulation. There are three types.</p>
+    <div class="layman">Shift is like moving all digits in a number one place to the left or right. Shifting 1010 left becomes 10100 (multiplied by 2), shifting right becomes 0101 (divided by 2). Three varieties: logical shift (fills with 0), circular/rotate (bits wrap around), and arithmetic shift (preserves the sign bit).</div>
+    <div class="formula-box">
+      <span class="label">Three Types of Shift</span>
+      <div class="formula">1. Logical Shift:    shl R1 / shr R1</div>
+      <div class="formula">   Shift left:  0 enters at right end, leftmost bit lost</div>
+      <div class="formula">   Shift right: 0 enters at left end, rightmost bit lost</div>
+      <div class="formula">   Effect: shl multiplies by 2, shr divides by 2 (unsigned)</div>
+      <div class="formula"></div>
+      <div class="formula">2. Circular Shift (Rotate):  cil R1 / cir R1</div>
+      <div class="formula">   Rotate left:  leftmost bit wraps to rightmost</div>
+      <div class="formula">   Rotate right: rightmost bit wraps to leftmost</div>
+      <div class="formula">   No bits are lost</div>
+      <div class="formula"></div>
+      <div class="formula">3. Arithmetic Shift:   ashl R1 / ashr R1</div>
+      <div class="formula">   Shift left:  0 enters at right end (same as logical shl)</div>
+      <div class="formula">   Shift right: SIGN BIT propagated (extended) — negative stays negative</div>
+      <div class="formula">   Effect: ashr divides SIGNED number by 2 (preserves sign)</div>
+      <div class="note">Key difference: Logical shr fills with 0. Arithmetic ashr fills with sign bit. For -8 (11111000), logical shr → 01111100 (+124!), arithmetic ashr → 11111100 (-4 correct).</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">Three Types of Shift Operations on 8-bit register</text>
+        <!-- Logical Shift Left -->
+        <text x="10" y="40" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">Logical Shift Left (shl):</text>
+        <rect x="10" y="48" width="200" height="24" rx="4" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="110" y="64" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">b₇ b₆ b₅ b₄ b₃ b₂ b₁ b₀</text>
+        <line x1="210" y1="60" x2="235" y2="60" stroke="#22d3ee" stroke-width="2"/>
+        <polygon points="232,56 242,60 232,64" fill="#22d3ee"/>
+        <rect x="245" y="48" width="200" height="24" rx="4" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="345" y="64" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">b₆ b₅ b₄ b₃ b₂ b₁ b₀  0</text>
+        <text x="450" y="64" fill="#6090a8" font-family="JetBrains Mono" font-size="9"> ← 0</text>
+        <!-- Logical Shift Right -->
+        <text x="10" y="96" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">Logical Shift Right (shr):</text>
+        <rect x="10" y="104" width="200" height="24" rx="4" fill="#102534" stroke="#10b981" stroke-width="1.5"/>
+        <text x="110" y="120" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">b₇ b₆ b₅ b₄ b₃ b₂ b₁ b₀</text>
+        <line x1="210" y1="116" x2="235" y2="116" stroke="#10b981" stroke-width="2"/>
+        <polygon points="232,112 242,116 232,120" fill="#10b981"/>
+        <rect x="245" y="104" width="200" height="24" rx="4" fill="#102534" stroke="#10b981" stroke-width="1.5"/>
+        <text x="345" y="120" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">0  b₇ b₆ b₅ b₄ b₃ b₂ b₁</text>
+        <text x="247" y="120" fill="#6090a8" font-family="JetBrains Mono" font-size="9">0 →</text>
+        <!-- Circular shift right -->
+        <text x="10" y="152" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">Circular Shift Right (cir):</text>
+        <rect x="10" y="160" width="200" height="24" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="110" y="176" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9">b₇ b₆ b₅ b₄ b₃ b₂ b₁ b₀</text>
+        <line x1="210" y1="172" x2="235" y2="172" stroke="#a78bfa" stroke-width="2"/>
+        <polygon points="232,168 242,172 232,176" fill="#a78bfa"/>
+        <rect x="245" y="160" width="200" height="24" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="345" y="176" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9">b₀ b₇ b₆ b₅ b₄ b₃ b₂ b₁</text>
+        <!-- Wraparound arrow -->
+        <path d="M 447 172 Q 470 195 470 200 Q 470 205 244 200 Q 244 195 244 172" stroke="#a78bfa" fill="none" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="355" y="199" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">b₀ wraps to MSB</text>
+      </svg>
+      <div class="diagram-cap">Fig 9.1 — Shift Types: Logical (fills 0), Circular (wraps), Arithmetic (preserves sign)</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Shift Trick — Multiply/Divide by Powers of 2</div>
+        <p>Shifting left by k positions = multiply by 2^k (fast!). Shifting right by k positions = divide by 2^k. This is why compilers convert multiplication by powers of 2 into shift instructions — shifts execute in one clock cycle, multiplication takes several. Example: x × 8 = x shl 3 (shift left 3 times).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 10: ALU ══ -->
+<section class="section" id="alu">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Arithmetic Logic Shift Unit (ALU)</h2>
+    <span class="imp-pill badge badge-o">70%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is the ALU?</h3>
+    <p>The <span class="hl-o">Arithmetic Logic Unit (ALU)</span> is the component of the CPU that performs all arithmetic (add, subtract, increment, decrement) and logical (AND, OR, XOR, NOT) operations, plus shift operations. It is the computational heart of the computer.</p>
+    <div class="layman">The ALU is the calculator inside your CPU. It can add, subtract, AND, OR, XOR, shift — basically everything except memory access and control decisions. The Control Unit tells the ALU what operation to perform using a 4-bit or 5-bit select code, and the ALU performs it and puts the result on the output bus.</div>
+    <div class="formula-box">
+      <span class="label">ALU — Basic Structure</span>
+      <div class="formula">Inputs:  A (from register), B (from register or constant)</div>
+      <div class="formula">Control: S (operation select bits — determines which operation to perform)</div>
+      <div class="formula">Outputs: Result F, carry Cout, status flags (Zero, Negative, Overflow, Carry)</div>
+      <div class="formula"></div>
+      <div class="formula">F = function of (A, B, S):</div>
+      <div class="formula">  S = 0000 → F = A + B          (addition)</div>
+      <div class="formula">  S = 0001 → F = A + B + Cin    (add with carry)</div>
+      <div class="formula">  S = 0010 → F = A + B' + 1     (subtract = add 2's comp)</div>
+      <div class="formula">  S = 0100 → F = A AND B         (logic AND)</div>
+      <div class="formula">  S = 0101 → F = A OR B          (logic OR)</div>
+      <div class="formula">  S = 0110 → F = A XOR B         (logic XOR)</div>
+      <div class="formula">  S = 0111 → F = A' (complement)</div>
+      <div class="formula">  S = 1000 → F = shl A            (shift left)</div>
+      <div class="formula">  S = 1001 → F = shr A            (shift right)</div>
+    </div>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Micro-ops → ALU → Instruction Execution</div>
+        <p>Every section so far (arithmetic micro-ops, logic micro-ops, shift micro-ops) describes what the ALU can do. The ALU is the HARDWARE that implements all these micro-operations. The control unit selects the operation by setting the S bits of the ALU. In the next section (instruction cycle), you'll see HOW the control unit issues these ALU operations during instruction execution.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — ALU</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What do you mean by ALU?</div>
+      <div class="pyq-meta"><span>2024 Part A Q2 · 2 marks ⭐⭐</span><span class="topic-tag">ALU</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>ALU (Arithmetic Logic Unit)</strong> is the component of the CPU that performs all arithmetic and logical operations on data.<br><br>
+        <strong>Functions:</strong><br>
+        • Arithmetic: Addition, subtraction, increment, decrement, multiplication, division<br>
+        • Logical: AND, OR, XOR, NOT (complement)<br>
+        • Shift: Logical shift left/right, circular shift, arithmetic shift<br><br>
+        <strong>Structure:</strong><br>
+        Inputs: Two operands A and B (from registers)<br>
+        Control: Operation select bits (S₀, S₁, ...) that determine which operation to perform<br>
+        Output: Result F and status flags (Zero, Carry, Overflow, Negative)<br><br>
+        The ALU does NOT perform memory accesses or control flow decisions — those are handled by the control unit. The ALU purely computes.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 11: INSTRUCTION CODES ══ -->
+<section class="section" id="instruction-codes">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Instruction Codes & Computer Instructions</h2>
+    <span class="imp-pill badge badge-r">78%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an Instruction Code?</h3>
+    <p>An <span class="hl-r">instruction code</span> is a group of bits that instruct the computer to perform a specific operation. Every instruction stored in memory consists of an <strong>operation code (opcode)</strong> and optionally an <strong>address/operand</strong> field.</p>
+    <div class="layman">An instruction code is like a recipe card index. The opcode says WHAT to do ("boil," "chop," "mix") and the address says WHERE to find the ingredient (memory location of the data to operate on). The CPU reads these instruction cards one by one and executes them.</div>
+    <div class="formula-box">
+      <span class="label">Instruction Code Format (Basic Computer — 16-bit word)</span>
+      <div class="formula">Bit 15:       I    → Indirect address mode bit (1 = indirect, 0 = direct)</div>
+      <div class="formula">Bits 14-12:   Opcode (3 bits) → 7 Memory-Reference Instructions + 1 for non-MRI</div>
+      <div class="formula">Bits 11-0:    Address (12 bits) → can address 2¹² = 4096 memory locations</div>
+      <div class="formula"></div>
+      <div class="formula">Memory-Reference Instructions (I=0, direct; I=1, indirect):</div>
+      <div class="formula">  000 = AND  | 001 = ADD  | 010 = LDA  | 011 = STA</div>
+      <div class="formula">  100 = BUN  | 101 = BSA  | 110 = ISZ</div>
+      <div class="note">When opcode = 111 → Non-MRI instruction (Register or I/O reference instruction)</div>
+    </div>
+    <h3>Types of Computer Instructions</h3>
+    <table class="comp-table">
+      <tr><th>Type</th><th>Description</th><th>Examples (Basic Computer)</th></tr>
+      <tr><td><span class="hl-r">Memory-Reference (MRI)</span></td><td>Involves memory access — operand is in memory; address in instruction</td><td>AND, ADD, LDA, STA, BUN, BSA, ISZ</td></tr>
+      <tr><td><span class="hl-o">Register-Reference (RRI)</span></td><td>Operates on the Accumulator (AC) or other CPU registers; no memory access needed</td><td>CLA, CLE, CMA, CME, CIR, CIL, INC, SPA, SNA, SZA, SZE, HLT</td></tr>
+      <tr><td><span class="hl">Input-Output (IOI)</span></td><td>Handles I/O operations with I/O devices</td><td>INP, OUT, SKI, SKO, ION, IOF</td></tr>
+    </table>
+    <div class="formula-box">
+      <span class="label">Important Memory-Reference Instructions — RTU Exam</span>
+      <div class="formula">AND: AC ← AC ∧ M[EA]    (AND memory with accumulator)</div>
+      <div class="formula">ADD: AC ← AC + M[EA]    (add memory to accumulator, set E on overflow)</div>
+      <div class="formula">LDA: AC ← M[EA]         (load accumulator from memory)</div>
+      <div class="formula">STA: M[EA] ← AC         (store accumulator to memory)</div>
+      <div class="formula">BUN: PC ← EA            (branch unconditionally to EA)</div>
+      <div class="formula">BSA: M[EA] ← PC, PC ← EA+1  (branch and save return address)</div>
+      <div class="formula">ISZ: M[EA] ← M[EA]+1, if M[EA]=0 then PC ← PC+1 (increment & skip if zero)</div>
+      <div class="note">EA = Effective Address (computed from address field + indirect bit)</div>
+      <div class="note">AC = Accumulator, E = Carry bit, PC = Program Counter</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">MRI vs Non-MRI Quick Identification</div>
+        <p>MRI instructions: opcode 000–110, involve memory. Remember: "<strong>AND ADD Load Store Branch BSA ISZ</strong>" — 7 MRI instructions.<br>
+        Register-Reference: opcode 111, I=0 — operate on AC only, NO memory.<br>
+        I/O Reference: opcode 111, I=1 — handle I/O.<br>
+        The I-bit (bit 15) determines DIRECT vs INDIRECT addressing only for MRI instructions.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Instruction Codes</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Differentiate instruction code and operation code.</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q4 · 2 marks ⭐⭐</span><span class="topic-tag">Instruction Code</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Instruction Code:</strong> A group of bits that tells the computer to perform a specific operation. A complete instruction includes the operation code (opcode) plus an address/operand field. Example (16-bit): I(1) | Opcode(3) | Address(12).<br><br>
+        <strong>Operation Code (Opcode):</strong> The part of the instruction code that specifies WHICH operation is to be performed. It is a subset of the instruction code. For the basic computer, opcode = 3 bits → 8 possible operations.<br><br>
+        <strong>Key Difference:</strong><br>
+        Instruction Code = complete instruction (opcode + address + mode bits) stored in memory<br>
+        Operation Code = the specific field within the instruction that identifies the operation<br><br>
+        Analogy: Instruction = "Take two eggs from the fridge." | Opcode = "Take" (the action/verb)
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Differentiate memory reference and register reference computer instructions.</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q5 · 2 marks ⭐⭐</span><span class="topic-tag">MRI vs RRI</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Memory-Reference Instructions (MRI):</strong><br>
+        • Opcode: 000 to 110 (3-bit opcodes 0–6)<br>
+        • Require access to memory — the operand is located in memory<br>
+        • Have an address field (12 bits) specifying memory location<br>
+        • Examples: AND, ADD, LDA, STA, BUN, BSA, ISZ<br><br>
+        <strong>Register-Reference Instructions (RRI):</strong><br>
+        • Opcode: 111, I=0<br>
+        • Operate only on CPU registers (particularly the Accumulator AC)<br>
+        • NO memory access required<br>
+        • Examples: CLA (clear AC), CMA (complement AC), INC (increment AC), HLT (halt)<br><br>
+        <strong>Timing:</strong> MRI takes more clock cycles (needs memory read cycle). RRI is faster (no memory access).
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Show how the MRI and non-MRI tables can be stored in memory.</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q9 · 2 marks ⭐</span><span class="topic-tag">MRI Storage</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        Instructions are stored as 16-bit words in memory. The decoder and control logic determine type from the opcode and I-bit:<br><br>
+        <strong>MRI Table (stored in instruction decoder logic):</strong><br>
+        The control unit checks bits 14-12 (opcode). If 000–110 → MRI instruction. The I-bit (bit 15) then determines direct (0) or indirect (1) addressing.<br><br>
+        <strong>Non-MRI Table:</strong><br>
+        If opcode = 111: Check bit 15 (I-bit)<br>
+        • I=0: Register-reference instruction. Bits 11-0 identify specific operation (e.g., bit 11=CLA, bit 10=CLE, bit 9=CMA...)<br>
+        • I=1: I/O instruction. Bits 11-0 identify I/O operation (bit 11=INP, bit 10=OUT, bit 9=SKI...)<br><br>
+        In hardware: a 3-to-8 decoder takes the opcode bits → enables one of 8 output lines → each line activates the corresponding instruction's control sequence in the control unit.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 12: REGISTERS ══ -->
+<section class="section" id="registers">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Computer Registers</h2>
+    <span class="imp-pill badge badge-r">🔥 85% — Part B/C Every Year</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — VERY HIGH:</strong> "Explain different types of computer registers with common bus system with a neat diagram" appeared as Part C Q2 in 2025. This is the most likely Part C question type to repeat (or appear as Part B). Know all 7 registers, their bit widths, and functions. Draw the common bus diagram showing all registers.</div>
+  </div>
+  <div class="theory-block">
+    <h3>The 7 Registers of the Basic Computer</h3>
+    <p>The basic computer (as per Mano's textbook, which RTU follows) has 7 key registers. These are fast, small storage locations directly in the CPU — much faster than memory. Understanding their functions is essential for understanding the instruction cycle.</p>
+    <div class="layman">Registers are like the chef's workbench — a small area right in front of the chef (CPU) where ingredients (data) can be placed immediately for use. Memory (RAM) is the pantry — bigger but further away. The chef keeps the current recipe card (PC), the current ingredient being processed (AC), the address of the next ingredient (AR), etc., all right on the workbench.</div>
+    <table class="comp-table">
+      <tr><th>Register</th><th>Full Name</th><th>Size</th><th>Function</th></tr>
+      <tr><td><span class="hl-r">PC</span></td><td>Program Counter</td><td>12 bits</td><td>Holds address of the NEXT instruction to be fetched. Auto-incremented after each fetch.</td></tr>
+      <tr><td><span class="hl-o">AR</span></td><td>Address Register</td><td>12 bits</td><td>Holds the memory address for the current read/write operation. Connected to address bus.</td></tr>
+      <tr><td><span class="hl">DR</span></td><td>Data Register</td><td>16 bits</td><td>Temporary storage for data read from or written to memory. Connected to data bus.</td></tr>
+      <tr><td><span class="hl-r">AC</span></td><td>Accumulator</td><td>16 bits</td><td>Main working register — all arithmetic and logic results go here. Central to all computations.</td></tr>
+      <tr><td><span class="hl-v">IR</span></td><td>Instruction Register</td><td>16 bits</td><td>Holds the currently executing instruction after fetch. Decoded by the control unit.</td></tr>
+      <tr><td><span class="hl-g">TR</span></td><td>Temporary Register</td><td>16 bits</td><td>General temporary storage used during complex operations (interrupt handling, etc.).</td></tr>
+      <tr><td><span class="hl-gold">INPR</span></td><td>Input Register</td><td>8 bits</td><td>Holds character received from input device.</td></tr>
+      <tr><td><span class="hl-gold">OUTR</span></td><td>Output Register</td><td>8 bits</td><td>Holds character to be sent to output device.</td></tr>
+    </table>
+    <div class="formula-box">
+      <span class="label">Additional Flip-Flops (1-bit Registers)</span>
+      <div class="formula">E  = Carry flip-flop (extended AC — holds carry out from AC)</div>
+      <div class="formula">I  = Indirect address bit (part of decoded instruction)</div>
+      <div class="formula">S  = Start/Stop flip-flop (controls computer operation)</div>
+      <div class="formula">IEN = Interrupt Enable flip-flop (enables/disables interrupt system)</div>
+      <div class="formula">FGI = Input Flag (=1 when input device has data ready)</div>
+      <div class="formula">FGO = Output Flag (=1 when output device is ready to receive)</div>
+      <div class="formula">R  = Interrupt Request flip-flop (set when interrupt occurs)</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Registers Memory Trick — "PADATIT"</div>
+        <p><strong>P</strong>C (Program Counter, 12b) — <strong>A</strong>R (Address Register, 12b) — <strong>D</strong>R (Data Register, 16b) — <strong>A</strong>C (Accumulator, 16b) — <strong>T</strong>R (Temporary Register, 16b) — <strong>I</strong>R (Instruction Register, 16b) — <strong>I/O</strong> (INPR/OUTR, 8b each).<br>
+        Also remember: PC and AR are 12 bits (address size), all others are 16 bits (word size), I/O registers are 8 bits (character size).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Registers</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain different types of computer registers with common bus system with a neat diagram.</div>
+      <div class="pyq-meta"><span>2025 Part C Q2 · 10 marks ⭐⭐⭐</span><span class="topic-tag">Registers + Bus</span><span class="pred-tag">🔮 VERY HIGH 2026</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Computer Registers — Introduction:</strong><br>
+        Registers are small, fast storage units inside the CPU that hold data temporarily during processing. The basic computer has 7 main registers, connected via a common bus for data transfer.<br><br>
+        <strong>Registers and their functions:</strong><br><br>
+        1. <strong>PC (Program Counter, 12 bits):</strong> Holds address of the NEXT instruction. Incremented (PC←PC+1) after each instruction fetch.<br><br>
+        2. <strong>AR (Address Register, 12 bits):</strong> Holds the memory address used for current memory read/write. AR←PC (during fetch), or AR←DR(0-11) (for operand address).<br><br>
+        3. <strong>DR (Data Register, 16 bits):</strong> Temporary holder for memory read/write data. DR←M[AR] (on memory read) or M[AR]←DR (on memory write).<br><br>
+        4. <strong>AC (Accumulator, 16 bits):</strong> The primary working register. All ALU results are stored here. Connected to the ALU directly.<br><br>
+        5. <strong>IR (Instruction Register, 16 bits):</strong> Holds the current instruction after fetch. IR←DR, then decoded into opcode (IR[14-12]) and address (IR[11-0]).<br><br>
+        6. <strong>TR (Temporary Register, 16 bits):</strong> General temporary storage. Used during interrupt handling: TR←PC before jumping to interrupt routine.<br><br>
+        7. <strong>INPR/OUTR (8 bits each):</strong> Input/Output registers for character-based I/O.<br><br>
+        <strong>Common Bus System:</strong><br>
+        All registers (except INPR, OUTR) connect to the common bus. The bus is 16 bits wide. Multiplexers select which register drives the bus using select lines. Only one register can drive the bus at a time. Control signals x₁–x₇ determine which register receives the bus data (via LD control).<br><br>
+        [DRAW: All registers on left side → connecting to central 16-bit bus → ALU and memory unit on right. S₂S₁S₀ selection lines at bottom of MUX. Each register has LD (load) input. Label all registers with bit widths.]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is a register?</div>
+      <div class="pyq-meta"><span>2024 Part A Q9 · 2 marks ⭐⭐</span><span class="topic-tag">Register</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>register</strong> is a small, extremely fast storage element located inside the CPU (processor). It holds a fixed number of bits — typically 8, 16, 32, or 64 bits depending on the architecture.<br><br>
+        Registers store:<br>
+        • Data operands being processed<br>
+        • Memory addresses (like the Program Counter and Address Register)<br>
+        • Intermediate computation results<br>
+        • Control information (like status flags)<br><br>
+        Registers are implemented using flip-flops. They are the fastest form of computer storage — much faster than cache or RAM because they're directly on the CPU chip. The basic computer has 7 registers: PC, AR, DR, AC, IR, TR, INPR/OUTR.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SECTION 13: INSTRUCTION CYCLE ══ -->
+<section class="section" id="instruction-cycle">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2 class="section-title">Instruction Cycle (Fetch-Decode-Execute)</h2>
+    <span class="imp-pill badge badge-r">🔥 90% — Part A Every Year, Part C 2023</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN (Part A):</strong> Instruction cycle appeared in Part A Q4 in 2024. In 2023-Aug, a full Part C Q1 was "go over the instruction cycle for AND, ADD, LDA, STA, BUN." In 2025, instruction format was Part A Q2. The instruction cycle is guaranteed to appear in Part A 2026. For Part B, know all the RTL statements for each phase. For Part C, be able to trace through ALL MRI instructions cycle by cycle.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is the Instruction Cycle?</h3>
+    <p>The <span class="hl-r">instruction cycle</span> (also called the fetch-decode-execute cycle or machine cycle) is the sequence of operations a CPU performs to process one instruction. Every instruction, no matter how complex, is broken into these fundamental steps.</p>
+    <div class="layman">The instruction cycle is like reading and following a recipe: (1) Go to the recipe book, find the current page (FETCH the instruction from memory), (2) Read what it says — "beat 3 eggs" — understand the verb and the ingredient (DECODE), (3) Actually beat the eggs (EXECUTE). Then go to the next step and repeat. The CPU does this billions of times per second.</div>
+    <h3>Phase 1 — FETCH Cycle (Get the instruction)</h3>
+    <div class="formula-box">
+      <span class="label">FETCH Phase — RTL Statements (3 micro-operations)</span>
+      <div class="formula">T0: AR ← PC              (load address register with program counter)</div>
+      <div class="formula">T1: IR ← M[AR], PC ← PC+1  (read instruction from memory → IR; increment PC)</div>
+      <div class="formula">T2: AR ← IR(0-11), I ← IR(15), decoder  (decode: extract address from IR, get I-bit)</div>
+      <div class="note">T0, T1, T2 = timing states (clock cycles). Each micro-operation takes 1 clock cycle.</div>
+      <div class="note">After T2, the control unit knows the opcode and address. The I-bit tells if indirect addressing.</div>
+    </div>
+    <h3>Phase 2 — INDIRECT Cycle (for indirect addressing, if I=1)</h3>
+    <div class="formula-box">
+      <span class="label">INDIRECT Phase — One extra memory read</span>
+      <div class="formula">If I = 1 (indirect addressing):</div>
+      <div class="formula">T3: AR ← M[AR]           (read memory to get the ACTUAL address of the operand)</div>
+      <div class="note">If I = 0 (direct addressing): skip this phase, AR already has the operand's address</div>
+    </div>
+    <h3>Phase 3 — EXECUTE Cycle (for MRI instructions)</h3>
+    <div class="formula-box">
+      <span class="label">EXECUTE Phase — Different for each instruction</span>
+      <div class="formula">AND (D0=1):  AC ← AC ∧ M[AR]      (AND memory operand with AC)</div>
+      <div class="formula">ADD (D1=1):  AC ← AC + M[AR], if carry → E←1</div>
+      <div class="formula">LDA (D2=1):  AC ← M[AR]            (load memory into AC)</div>
+      <div class="formula">STA (D3=1):  M[AR] ← AC            (store AC to memory)</div>
+      <div class="formula">BUN (D4=1):  PC ← AR               (branch — jump to AR)</div>
+      <div class="formula">BSA (D5=1):  M[AR] ← PC, PC ← AR+1 (save return addr, jump)</div>
+      <div class="formula">ISZ (D6=1):  DR ← M[AR]+1, M[AR] ← DR, if DR=0 → PC←PC+1</div>
+      <div class="note">D0–D6 are decoder outputs, one per opcode. Only one is 1 at a time.</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 300" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#ef4444" font-family="JetBrains Mono" font-size="10" font-weight="bold">Instruction Cycle Flow (Draw This for Exam)</text>
+        <!-- Fetch -->
+        <rect x="190" y="28" width="160" height="55" rx="6" fill="#102534" stroke="#22d3ee" stroke-width="2.5"/>
+        <text x="270" y="51" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">FETCH CYCLE</text>
+        <text x="270" y="63" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">T0: AR←PC</text>
+        <text x="270" y="75" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">T1: IR←M[AR], PC←PC+1</text>
+        <!-- Arrow down -->
+        <line x1="270" y1="83" x2="270" y2="105" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="266,102 270,112 274,102" fill="#ef4444"/>
+        <!-- Decode -->
+        <rect x="190" y="112" width="160" height="45" rx="6" fill="#102534" stroke="#a78bfa" stroke-width="2.5"/>
+        <text x="270" y="133" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">DECODE</text>
+        <text x="270" y="148" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">T2: AR←IR(0-11), decode opcode</text>
+        <!-- Arrow down to diamond -->
+        <line x1="270" y1="157" x2="270" y2="178" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="266,175 270,185 274,175" fill="#ef4444"/>
+        <!-- Decision diamond -->
+        <polygon points="270,185 320,210 270,235 220,210" fill="#0a1820" stroke="#f59e0b" stroke-width="2"/>
+        <text x="270" y="208" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">I = 1?</text>
+        <!-- Yes arrow (right - indirect) -->
+        <line x1="320" y1="210" x2="400" y2="210" stroke="#f59e0b" stroke-width="1.5"/>
+        <rect x="400" y="195" width="140" height="30" rx="4" fill="#102534" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="470" y="214" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">INDIRECT: AR←M[AR]</text>
+        <text x="335" y="205" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">Yes (I=1)</text>
+        <line x1="470" y1="225" x2="470" y2="260" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="470" y1="260" x2="270" y2="260" stroke="#f59e0b" stroke-width="1.5"/>
+        <!-- No arrow (down - direct) -->
+        <line x1="270" y1="235" x2="270" y2="260" stroke="#ef4444" stroke-width="2"/>
+        <text x="240" y="250" fill="#ef4444" font-family="JetBrains Mono" font-size="8">No (I=0)</text>
+        <!-- Execute -->
+        <line x1="270" y1="260" x2="270" y2="275" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="266,272 270,282 274,272" fill="#ef4444"/>
+        <rect x="190" y="282" width="160" height="30" rx="6" fill="#102534" stroke="#10b981" stroke-width="2.5"/>
+        <text x="270" y="302" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">EXECUTE</text>
+        <!-- Loop back arrow -->
+        <line x1="190" y1="297" x2="140" y2="297" stroke="#10b981" stroke-width="1.5"/>
+        <line x1="140" y1="297" x2="140" y2="55" stroke="#10b981" stroke-width="1.5"/>
+        <line x1="140" y1="55" x2="190" y2="55" stroke="#10b981" stroke-width="1.5"/>
+        <polygon points="187,51 197,55 187,59" fill="#10b981"/>
+        <text x="105" y="180" fill="#10b981" font-family="JetBrains Mono" font-size="8">Next</text>
+        <text x="100" y="192" fill="#10b981" font-family="JetBrains Mono" font-size="8">Instruction</text>
+      </svg>
+      <div class="diagram-cap">Fig 13.1 — Instruction Cycle: Fetch (T0-T1) → Decode (T2) → Indirect if I=1 → Execute</div>
+    </div>
+    <h3>Detailed AND Instruction Trace — RTU Part C 2023-Aug Q1</h3>
+    <div class="formula-box">
+      <span class="label">AND Instruction at address 021 (hex): opcode=AND, I=0, address=083</span>
+      <div class="formula">T0: AR ← PC = 021                     (AR gets current PC value)</div>
+      <div class="formula">T1: IR ← M[021], PC ← 022            (fetch instruction word, advance PC)</div>
+      <div class="formula">    IR now contains: 0_000_000010000011  (I=0, opcode=000=AND, addr=083)</div>
+      <div class="formula">T2: AR ← IR(0-11) = 083, I ← 0, D0=1 (decode: address=083, AND operation)</div>
+      <div class="formula">    Since I=0: no indirect cycle</div>
+      <div class="formula">T3: DR ← M[083]                        (read operand from address 083 into DR)</div>
+      <div class="formula">    Given: M[083] = B8F2</div>
+      <div class="formula">T4: AC ← AC ∧ DR                      (AND accumulator with DR)</div>
+      <div class="formula">    Given: AC = A937. A937 AND B8F2 = A832 (bitwise AND)</div>
+      <div class="formula">Final state: PC=022, AR=083, DR=B8F2, AC=A832, IR=0 000 000010000011</div>
+      <div class="note">Verify: A937 = 1010 1001 0011 0111; B8F2 = 1011 1000 1111 0010; AND = 1010 1000 0011 0010 = A832</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Instruction Cycle</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. An instruction at address 021 has I=0, opcode=AND, address=083. Memory at 083 contains B8F2, AC=A937. Go over the instruction cycle and determine PC, AR, DR, AC, IR at end of execute phase.</div>
+      <div class="pyq-meta"><span>2023-Aug Part C Q1 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Instruction Cycle</span><span class="pred-tag">🔮 HIGH 2026 Part B/C</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        Given: Instruction at address 021(hex), I=0, opcode=AND(000), address field=083, M[083]=B8F2, AC=A937.<br><br>
+        <strong>FETCH CYCLE:</strong><br>
+        T0: AR ← PC → AR = 021<br>
+        T1: IR ← M[021] = 0 000 000010000011 (the instruction word), PC ← 022<br><br>
+        <strong>DECODE:</strong><br>
+        T2: AR ← IR(0-11) = 083; I ← IR(15) = 0; decoder: opcode 000 → D0 = 1 (AND instruction)<br>
+        Since I=0: No indirect cycle needed.<br><br>
+        <strong>EXECUTE (AND):</strong><br>
+        T3: DR ← M[AR] = M[083] = B8F2<br>
+        T4: AC ← AC ∧ DR = A937 ∧ B8F2<br><br>
+        Compute: A937 = 1010 1001 0011 0111<br>
+        B8F2 = 1011 1000 1111 0010<br>
+        AND  = 1010 1000 0011 0010 = A832<br><br>
+        <strong>Final Register Values:</strong><br>
+        PC = 022 | AR = 083 | DR = B8F2 | AC = A832 | IR = 0 000 000010000011
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is an instruction cycle?</div>
+      <div class="pyq-meta"><span>2024 Part A Q4 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Instruction Cycle</span><span class="pred-tag">🔮 CERTAIN 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        An <strong>instruction cycle</strong> (machine cycle / fetch-decode-execute cycle) is the complete sequence of steps performed by the CPU to fetch, decode, and execute one machine instruction.<br><br>
+        <strong>Phases:</strong><br>
+        1. <strong>Fetch:</strong> The CPU reads the instruction from memory at the address in PC. PC is incremented. (T0: AR←PC, T1: IR←M[AR], PC←PC+1)<br>
+        2. <strong>Decode:</strong> The control unit interprets the instruction — extracts opcode, address, and mode bit I. (T2: AR←IR(0-11), decode opcode)<br>
+        3. <strong>Indirect (if needed):</strong> If I=1 (indirect addressing), an extra memory read obtains the effective address. (T3: AR←M[AR])<br>
+        4. <strong>Execute:</strong> The actual operation is performed — memory read/write, ALU operation, branch, or I/O.<br><br>
+        The cycle then repeats for the next instruction. The CPU performs billions of instruction cycles per second.
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- ══ 2026 PREDICTED PAPER ══ -->
+<div style="background:#060e14;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:clamp(40px,6vw,70px) 5vw;" id="predicted">
+  <div style="max-width:var(--content-max);margin:0 auto;">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Based on 2022–2025 CAO PYQ Pattern + 2026 DIP, ML & ISS Paper Analysis</div>
+    <div class="sec-header" style="margin-bottom:14px">
+      <h2>CAO — Predicted Paper 2026</h2>
+      <span class="sub">CROSS-REFERENCED WITH 2026 DIP, ML, ISS PAPERS + 4-PAPER CAO PYQ PATTERN (2022–2025)</span>
+    </div>
+    <p style="font-family:var(--mono);font-size:clamp(11px,0.78vw,14px);color:var(--dim2);margin-bottom:14px;line-height:1.75;">Based on analysis of all available CAO papers (2022, 2023-Aug, 2024, 2025) and cross-referencing with the 2026 DIP, ML, and ISS paper patterns. RTU follows strong rotation patterns: topics absent in 2025 return in 2026. Booth's Algorithm is in 100% of papers. DMA and Flynn's taxonomy appeared in 2024 and 2025 both. Topics from Unit 1 (logic micro-ops, registers, bus, instruction cycle) are permanent fixtures.</p>
+    <div class="tip-box warning" style="margin-bottom:24px">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-content">
+        <div class="tip-title">Disclaimer</div>
+        <p>Predictions are based on historical patterns. Actual paper may differ. Use this to prioritize study time — don't skip unpredicted topics entirely.</p>
+      </div>
+    </div>
+    <div class="pred-grid">
+      <!-- PART A -->
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q1)</div>
+        <div class="pred-q">What is meant by RISC? Differentiate RISC and CISC.</div>
+        <div class="pred-reason">RISC was Q1 in 2024 but completely absent in 2025. The 2026 ML, DIP, and ISS papers all confirmed RTU strongly rotates topics skipped in the previous year. RISC is the single most likely Q1 candidate for 2026.</div>
+        <span class="pred-conf high">VERY HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q2)</div>
+        <div class="pred-q">What are the most common fields of an Instruction format? (OR Describe instruction format.)</div>
+        <div class="pred-reason">Instruction format appeared as Q2 in 2025 (6E7104). Before that, ALU appeared in 2024 Q2. For 2026, a variation of instruction format/codes is expected — covering opcode field, address field, mode bit (I). Also possibly: "What is an instruction code?"</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q3)</div>
+        <div class="pred-q">What is immediate addressing mode? (OR Describe register addressing mode.)</div>
+        <div class="pred-reason">Immediate addressing mode was Q3 in 2025. Based on 2026 ISS pattern of retaining recent new topics in Part A, this phrasing may repeat or a related addressing mode (direct, indirect, register) will appear. Addressing modes rotate but remain in Q3-Q4 range.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q4)</div>
+        <div class="pred-q">What are the major characteristics of a pipeline?</div>
+        <div class="pred-reason">Pipeline characteristics was Q4 in 2025. Based on the 2026 DIP and ML patterns where new 2025 Part A topics are retained in 2026, pipeline characteristics is likely to remain in Part A Q3-Q5 area.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q5)</div>
+        <div class="pred-q">Define a bus. What are the types of buses in a computer?</div>
+        <div class="pred-reason">Bus was Q5 in 2024, absent in 2025. RTU rotation strongly suggests bus returns in 2026. In 2023-Aug, bus and multiplexer questions featured in Part B/C. After a one-year gap, bus types is a near-certain Part A return.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q6)</div>
+        <div class="pred-q">What is a micro-operation? Give examples of register transfer micro-operations.</div>
+        <div class="pred-reason">Micro-operation was Q6 in 2024, absent in 2025. Strongly due for return. The 2023-Aug paper also had extensive register transfer hardware in Part B. Micro-operations are fundamental CAO vocabulary — always tested in Part A in some form.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q7)</div>
+        <div class="pred-q">Explain fixed point representation. (OR Represent a decimal number in 2's complement.)</div>
+        <div class="pred-reason">Fixed point representation was Q6 in 2025. The 2022 paper had floating point (Q8) and signed magnitude/1's complement (Q8, 2025). For 2026, a number representation question (fixed point, floating point, or complement representation numerical) is guaranteed in Q6-Q8 range.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q8)</div>
+        <div class="pred-q">What is parallel processing? (OR Define multi-processing.)</div>
+        <div class="pred-reason">Parallel processing appeared in 2022 (Q6) and 2024 (Q8) — skipping 2023 and 2025. Multiprocessing was 2025 Q7. For 2026, one of these will appear in Q7-Q9 range. The 2026 ISS paper confirmed that multiprocessor topics return every alternate year.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q9)</div>
+        <div class="pred-q">Write a quick note on subroutine. What is the role of a stack in subroutine calls?</div>
+        <div class="pred-reason">Subroutine appeared in 2022 (Q3) and 2025 (Q9). Two non-consecutive papers. This consistent appearance makes subroutine a near-certain 2026 Part A question in Q9-Q10 area.</div>
+        <span class="pred-conf high">VERY HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q10)</div>
+        <div class="pred-q">What is cache memory? What is Hit Ratio?</div>
+        <div class="pred-reason">Hit Ratio in cache appeared in 2022 (Q4) and 2025 Part B Q6 (explain need + hit ratio). Cache memory is the most tested CAO topic across ALL parts in all years. A Part A question on cache or hit ratio is certain for 2026.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <!-- PART B -->
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q1)</div>
+        <div class="pred-q">Explain the functional units of an architecture of computer with diagram.</div>
+        <div class="pred-reason">Functional units appeared in 2022 Part B Q4 and 2025 Part B Q1. Two papers, one-year gap pattern. The 2026 ISS paper confirmed such topics with recent reappearance tend to stick. Always draw: Input, Memory, ALU, Control Unit, Output with arrows.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q2)</div>
+        <div class="pred-q">Explain set-associative mapping with a suitable example.</div>
+        <div class="pred-reason">Set-associative mapping appeared as Part B Q2 in 2024, absent in 2025 Part B. After one-year gap, strongly due to return in 2026. Include address division into tag+set+word, and draw the lookup diagram.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q3)</div>
+        <div class="pred-q">What are logical microoperations? Explain applications of logical microoperations.</div>
+        <div class="pred-reason">CERTAIN — Appeared in Part B 2024 (Q4) and 2025 (Q3), two consecutive years. This is now a permanent Part B fixture. Cover all four operations with truth tables AND all four applications (masking/AND, selective-set/OR, selective-complement/XOR, clear/XOR-self).</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q4)</div>
+        <div class="pred-q">Differentiate between hardwired and microprogrammed control unit.</div>
+        <div class="pred-reason">Hardwired vs microprogrammed appeared in 2022 Part B Q6 and 2025 Part B Q4. Also appeared as Part A Q10 in 2023-Aug. Consistently tested every exam cycle. 2026 will have this as a Part B question.</div>
+        <span class="pred-conf high">VERY HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q5)</div>
+        <div class="pred-q">Explain serial communication with an example.</div>
+        <div class="pred-reason">Serial communication appeared in Part B in 2024 (Q6) and 2025 (Q5) — two consecutive years. It's now a confirmed anchor topic for Part B Q5-Q6. Cover synchronous (no start/stop bits), asynchronous (with start/stop bits), and baud rate calculation.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q6)</div>
+        <div class="pred-q">Explain the need of cache memory. Also explain Hit Ratio.</div>
+        <div class="pred-reason">Cache memory + Hit Ratio as standalone Part B question appeared in 2025 Q6. Combined with cache memory Part A history (2022), this topic is certain in Part B 2026. Cover temporal/spatial locality, hit time, miss penalty, Hit Ratio formula H = th/(th + tm×(1-h)).</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q7)</div>
+        <div class="pred-q">Explain arithmetic pipeline with an example. (OR Describe integer division algorithm.)</div>
+        <div class="pred-reason">Arithmetic pipeline was 2024 Part B Q7, absent in 2025. Integer division was 2025 Part B Q7. For 2026, arithmetic pipeline is more likely (one-year absence). Prepare a 4-stage floating-point adder pipeline with timing diagram.</div>
+        <span class="pred-conf med">MEDIUM-HIGH confidence</span>
+      </div>
+      <!-- PART C -->
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q1)</div>
+        <div class="pred-q">Define parallel processing and explain Flynn's classification of computers with suitable diagram.</div>
+        <div class="pred-reason">Flynn's taxonomy appeared in Part C in 2024 (Q3) and 2025 (Q1) — two consecutive years. Most certain Part C prediction. Mandatory: draw all four SISD/SIMD/MISD/MIMD categories with block diagrams and examples (SISD=single PC, SIMD=GPU/vector, MISD=pipeline, MIMD=multiprocessors).</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q2)</div>
+        <div class="pred-q">What is DMA? Draw block diagram of DMA controller and explain it.</div>
+        <div class="pred-reason">DMA appeared as Part C Q1 in 2024 and Part C Q4 in 2025 — two consecutive papers. The most consistently tested Part C topic alongside Booth's Algorithm. Draw the complete DMA controller: DMA address register, word count register, control register, cycle-stealing mechanism, address and data bus connections.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q3)</div>
+        <div class="pred-q">Explain Booth's Algorithm with flowchart. Perform multiplication of (−11) × (+6) using Booth's Algorithm.</div>
+        <div class="pred-reason">CERTAIN — Booth's Algorithm appeared in EVERY CAO paper: 2022 (-13×+9), 2024 (8×-8), 2025 (-13×+9). New values will be used in 2026 — do NOT memorize one example. Master the flowchart and step-by-step register method (A register, Q register, Q₋₁ bit, add/subtract/shift rules).</div>
+        <span class="pred-conf high">CERTAIN — 100% of all papers</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q4)</div>
+        <div class="pred-q">Explain the need of cache memory. Elaborate over the three types of mapping with neat diagrams.</div>
+        <div class="pred-reason">All three cache mapping types as one Part C question appeared in 2022 but was absent from 2023-2025 — three-year absence. The 2026 DIP paper brought back topics dormant since 2022. Cover direct mapping (tag+index+block offset), fully associative, and set-associative with worked address examples.</div>
+        <span class="pred-conf high">HIGH confidence — overdue after 3-year absence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q5)</div>
+        <div class="pred-q">Q5(i) How many 128×8 RAM chips needed for 4096 bytes? (ii) Address bus lines? (iii) Chip select lines? (iv) Decoder size?</div>
+        <div class="pred-reason">This exact RAM chip design problem appeared in both 2022 and 2025 Part C Q5 with the SAME values (2048 bytes). For 2026, memory size will change (predicted 4096 bytes or 8192 bytes). Method is identical: #chips = total/chip size, address lines = log₂(total words), chip select lines = log₂(#chips), decoder = #cs lines × #chips.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+    </div>
+    <div class="tip-box validate" style="margin-top:28px">
+      <div class="tip-icon">✅</div>
+      <div class="tip-content">
+        <div class="tip-title">2026 Quick Preparation — Unit 1 Specific Focus</div>
+        <p><strong>MUST prepare from Unit 1 (Part B + Part A):</strong><br>
+        • Logical micro-operations (CERTAIN Part B Q3) — all 4 ops + all 4 applications with examples<br>
+        • Hardwired vs microprogrammed CU (VERY HIGH Part B Q4) — comparison table<br>
+        • Computer registers (VERY HIGH Part B/C) — all 7 registers, bit widths, functions + common bus diagram<br>
+        • Instruction cycle (CERTAIN Part A Q4) — Fetch-Decode-Execute RTL statements<br>
+        • Common bus system (HIGH Part C) — 8-register MUX-based bus diagram with answers to: how many MUX, what size, how many selection inputs<br><br>
+        <strong>Part A from Unit 1 (25 words each):</strong><br>
+        Bus types (Q5), Micro-operation (Q6), Fixed point (Q7), Instruction cycle (Q4), Register definition (Q9).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALL PYQs MASTER LIST -->
+<div class="layout">
+<div style="width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;"></div>
+<div class="content">
+<section class="section" id="pyq-master" style="margin-top:40px">
+  <div class="section-header">
+    <span class="section-num">M</span>
+    <h2 class="section-title">All PYQs — Unit 1 Master List</h2>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📋 Complete PYQ Reference — Unit 1 Topics (All Years)</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Full Unit 1 PYQ Coverage — Click to Expand</div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full List</button>
+      <div class="answer-content">
+        <strong>PART A — Unit 1 Related Questions:</strong><br><br>
+        2022 (6E1554): Q1: Computer performance | Q2: Memory in 12×16 bits | Q3: Subroutine | Q4: Hit Ratio | Q6: Parallel processing | Q8: Floating point +1001.11 | Q9: 16-bit instruction format 3 fields | Q10: Selective component A=1011 0110, B=0110 1110<br><br>
+        2023-Aug (610404): Q1: Buffer gate purpose | Q2: Computer org vs architecture | Q3: Buffer gate | Q4: Instruction code vs operation code | Q5: Memory reference vs register reference | Q6: Direct vs indirect address | Q7: Two instructions to set E flip-flop | Q8: Assembly vs machine language | Q9: MRI/non-MRI tables in memory | Q10: Hardwired vs microprogrammed<br><br>
+        2024 (6E7104): Q1: RISC | Q2: ALU | Q3: Control memory | Q4: Instruction cycle | Q5: Bus | Q6: Micro-operation | Q7: Multicomputer | Q8: Parallel processing | Q9: Register | Q10: Auxiliary memory<br><br>
+        2025 (6E7104): Q1: Priority interrupt | Q2: Instruction format | Q3: Immediate addressing | Q4: Pipeline characteristics | Q5: Latency time | Q6: Fixed point | Q7: Multi-processing | Q8: (70)₁₀ signed magnitude + 1's complement | Q9: Subroutine | Q10: Superscalar processor<br><br>
+        <strong>PART B — Unit 1 Related:</strong><br><br>
+        2022: B-Q1: Hardware flow diagram for X+yz:AR←AR+BR | B-Q4: Functional units with diagram | B-Q6: Hardwired vs microprogrammed | B-Q7: Common bus registers with significance<br><br>
+        2023-Aug: B-Q1: Dual 4-to-1-line MUX block diagram | B-Q2: RTL conditional statements If(P=1)→R1←R2 | B-Q3: Timing diagram SC cleared at T3 when C₇ active | B-Q4: Interrupt output program at address 230 | B-Q5: Instruction format — 256K×32 bit memory, 4 fields, 7 addressing modes, 60 registers<br><br>
+        2024: B-Q4: Write 4 logic micro-operations | B-Q5: Memory hierarchy<br><br>
+        2025: B-Q1: Functional units diagram | B-Q3: Logical microoperations + applications | B-Q4: Hardwired vs microprogrammed CU<br><br>
+        <strong>PART C — Unit 1 Related:</strong><br><br>
+        2022: C-Q2: Common bus for 8 registers 16 bits (MUX design) | C-Q1: Booth's -13×+9<br><br>
+        2023-Aug: C-Q1: AND instruction cycle (address 021, M[083]=B8F2, AC=A937) — full trace including ADD, LDA, STA as well | C-Q2: Arithmetic statement X=(A-B+C*(D*E-F))/(G+H*K) using general register 3-address, 2-address, accumulator 1-address, stack 0-address | C-Q3: RISC I instructions for decrement/complement/negate/clear/divide-by-4/NOP<br><br>
+        2025: C-Q2: Computer registers with common bus system diagram<br><br>
+        <strong>KEY PATTERNS:</strong><br>
+        Logic micro-ops: Part B 2024 and 2025 (both years)<br>
+        Common bus/registers: Part C 2022 and 2025<br>
+        Instruction cycle: Part A 2024, Part C 2023-Aug<br>
+        Hardwired vs microprogrammed: Part B 2022, Part A 2023-Aug, Part B 2025<br>
+        Bus/micro-operation: Part A 2024 (Q5, Q6), absent 2025 → due 2026
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<!-- FLOATING TOGGLE -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="#">🏠 Home</a>
+    <a href="#">⚙️ Unit 2: CPU & Pipeline</a>
+    <a href="#">🔢 Unit 3: Computer Arithmetic</a>
+    <a href="#">💾 Unit 4: Memory Organization</a>
+    <a href="#">🔗 Unit 5: I/O & Multiprocessors</a>
+    <a href="#pyq-master" style="color:var(--upred)">📋 All PYQs</a>
+  </div>
+  © 2026 RTU CAO Study Guide · Unit 1 — Data Representation, Register Transfer & Basic Computer · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans = btn.nextElementSibling;
+  if(ans.classList.contains('open')){
+    ans.classList.remove('open');
+    btn.textContent = btn.textContent.replace('▲','▼');
+  } else {
+    ans.classList.add('open');
+    btn.textContent = btn.textContent.replace('▼','▲');
+  }
+}
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('visible');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      navItems.forEach(n => {
+        n.classList.remove('active');
+        if(n.getAttribute('href') === '#' + e.target.id) n.classList.add('active');
+      });
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

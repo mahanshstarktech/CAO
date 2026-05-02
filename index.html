@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO — Computer Architecture & Organization | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+:root {
+  --bg:#050d10;--bg2:#071520;--surface:#0c1e28;--surface2:#102534;
+  --border:#1a3545;--border2:#0e2030;
+  --cao:#f97316;--cao2:#fb923c;
+  --u1:#22d3ee;--u2:#f97316;--u3:#ef4444;--u4:#a78bfa;--u5:#10b981;--u6:#3b82f6;
+  --upred:#f59e0b;--gold:#fbbf24;--text:#dde8f2;--dim:#3a5868;--dim2:#6090a8;
+  --mono:'JetBrains Mono',monospace;--head:'Fraunces',serif;--body:'Outfit',sans-serif;
+  --content-max:1400px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:18px;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.8;overflow-x:hidden;}
+@media(min-width:1400px){html{font-size:19px;}}
+@media(min-width:1800px){html{font-size:20px;}}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* NAV */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(5,13,16,.96);backdrop-filter:blur(24px);border-bottom:1px solid var(--border2);padding:0 28px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.topnav::-webkit-scrollbar{display:none;}
+.tnlabel{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--cao);padding:15px 14px 15px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;flex-shrink:0;}
+.tnlink{font-family:var(--mono);font-size:11.5px;padding:8px 14px;border-radius:6px;text-decoration:none;color:var(--dim2);white-space:nowrap;flex-shrink:0;transition:all .18s;border:1px solid transparent;}
+.tnlink:hover{color:var(--text);background:var(--surface2);}
+.tnlink.active{color:var(--cao);background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);}
+.tnlink.pyq{color:var(--upred);background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.22);}
+
+/* CREDIT */
+.credit-band{background:#060e14;border-bottom:1px solid var(--border2);padding:11px 32px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.credit-text{font-family:var(--mono);font-size:11.5px;color:var(--dim2);}
+.credit-text span{color:var(--cao);font-weight:600;}
+.credit-link{font-family:var(--mono);font-size:11px;padding:4px 14px;border-radius:5px;border:1px solid var(--border);color:var(--dim2);text-decoration:none;transition:all .2s;}
+.credit-link:hover{border-color:var(--cao);color:var(--cao);}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:72px 5vw 60px;background:var(--bg);}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(249,115,22,.09) 1px,transparent 1px),radial-gradient(circle,rgba(34,211,238,.05) 1px,transparent 1px);background-size:44px 44px,88px 88px;background-position:0 0,22px 22px;animation:dotDrift 30s linear infinite;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 10% 50%,rgba(249,115,22,.08) 0%,transparent 65%),radial-gradient(ellipse 45% 50% at 85% 15%,rgba(34,211,238,.05) 0%,transparent 60%);pointer-events:none;}
+@keyframes dotDrift{0%{transform:translate(0,0);}100%{transform:translate(44px,44px);}}
+.hero-inner{position:relative;z-index:1;max-width:var(--content-max);margin:0 auto;}
+.hero-tag{font-family:var(--mono);font-size:12px;color:var(--cao);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:var(--cao);box-shadow:0 0 14px var(--cao);animation:blink 2.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-family:var(--head);font-weight:800;font-size:clamp(34px,5.5vw,72px);line-height:1.02;color:#fff;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 span{color:var(--cao);}
+.hero h1 em{color:var(--u1);font-style:normal;}
+.hero-sub{color:var(--dim2);font-size:clamp(16px,1.6vw,19px);max-width:700px;line-height:1.8;margin-bottom:22px;}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.badge{font-family:var(--mono);font-size:12px;padding:5px 14px;border-radius:5px;border:1px solid;}
+.badge-o{color:var(--cao);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08);}
+.badge-r{color:var(--u3);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);}
+.badge-c{color:var(--u1);border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.08);}
+.badge-v{color:var(--u4);border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08);}
+.badge-g{color:var(--u5);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08);}
+.badge-gold{color:var(--upred);border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);}
+.crafted-by{display:flex;align-items:center;gap:12px;}
+.crafted-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;}
+.crafted-name{font-family:var(--head);font-size:15px;font-weight:700;color:var(--text);font-style:italic;}
+.crafted-links{display:flex;gap:6px;}
+.crafted-link{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:5px;text-decoration:none;color:var(--dim2);background:var(--surface);border:1px solid var(--border);transition:all .18s;}
+.crafted-link:hover{color:var(--cao);border-color:var(--cao);}
+.crafted-link svg{width:12px;height:12px;fill:currentColor;}
+
+/* PAGE WRAP */
+.page-wrap{max-width:var(--content-max);margin:0 auto;padding:0 clamp(20px,4vw,80px);}
+
+/* STATS STRIP */
+.stats-strip{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stats-inner{max-width:var(--content-max);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));padding:28px clamp(20px,4vw,80px);}
+.stat-item{text-align:center;padding:8px 0;}
+.stat-num{font-family:var(--head);font-size:clamp(28px,4vw,42px);font-weight:800;color:var(--cao);line-height:1;display:block;margin-bottom:5px;}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--dim2);text-transform:uppercase;letter-spacing:1.5px;}
+
+/* SECTION WRAP */
+.section-wrap{padding:56px 0;}
+.section-head{margin-bottom:28px;}
+.section-head h2{font-family:var(--head);font-size:clamp(22px,3vw,32px);font-weight:800;color:#fff;margin-bottom:6px;}
+.section-head .sub{font-family:var(--mono);font-size:.72rem;color:var(--dim2);letter-spacing:1px;}
+
+/* IMPORTANCE BARS */
+.imp-grid{display:flex;flex-direction:column;gap:12px;}
+.imp-row{display:grid;grid-template-columns:clamp(160px,20vw,240px) 1fr 54px;align-items:center;gap:14px;}
+.imp-label{font-family:var(--mono);font-size:.73rem;color:var(--dim2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.imp-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.imp-bar-fill{height:100%;border-radius:4px;animation:barGrow 1.2s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--bar-delay,0s);}
+@keyframes barGrow{from{width:0!important;}}
+.fill-hot{background:var(--u3);}
+.fill-high{background:var(--cao);}
+.fill-med{background:var(--upred);}
+.fill-low{background:var(--u5);}
+.imp-pct{font-family:var(--mono);font-size:.73rem;font-weight:700;text-align:right;}
+.pct-hot{color:var(--u3);}
+.pct-high{color:var(--cao);}
+.pct-med{color:var(--upred);}
+
+/* UNIT CARDS */
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;}
+.unit-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;text-decoration:none;transition:all .22s;display:block;position:relative;overflow:hidden;}
+.unit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.unit-card.u1::before{background:var(--u1);}
+.unit-card.u2::before{background:var(--cao);}
+.unit-card.u3::before{background:var(--u3);}
+.unit-card.u4::before{background:var(--u4);}
+.unit-card.u5::before{background:var(--u5);}
+.unit-card.u6::before{background:var(--u6);}
+.unit-card:hover{transform:translateY(-4px);border-color:var(--cao);box-shadow:0 12px 40px rgba(249,115,22,.18);}
+.unit-num{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim2);margin-bottom:10px;}
+.unit-name{font-family:var(--head);font-size:clamp(17px,2vw,22px);font-weight:800;color:#fff;margin-bottom:10px;line-height:1.25;}
+.unit-topics{font-size:.85rem;color:var(--dim2);line-height:1.75;margin-bottom:16px;}
+.unit-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border2);}
+.unit-go{font-family:var(--mono);font-size:11px;color:var(--cao);transition:gap .2s;display:flex;align-items:center;gap:5px;}
+.unit-card:hover .unit-go{gap:9px;}
+.unit-tag{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);}
+.unit-tag.hot{color:var(--u3);border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.07);}
+.unit-tag.mid{color:var(--upred);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.07);}
+.unit-tag.ok{color:var(--u5);border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.07);}
+
+/* PYQ SECTION */
+.pyq-header-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+.pyq-view-all{font-family:var(--mono);font-size:11px;color:var(--upred);text-decoration:none;display:flex;align-items:center;gap:5px;transition:gap .2s;}
+.pyq-view-all:hover{gap:8px;}
+.pyq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.pyq-card{background:var(--surface);border:1px solid rgba(245,158,11,.22);border-radius:12px;padding:22px;text-decoration:none;transition:all .2s;display:block;}
+.pyq-card:hover{border-color:var(--upred);transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,.1);}
+.pyq-card.latest{background:linear-gradient(135deg,var(--surface) 0%,rgba(249,115,22,.04) 100%);}
+.pyq-year-badge{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--upred);margin-bottom:8px;}
+.pyq-title{font-family:var(--head);font-size:clamp(20px,2.5vw,28px);font-weight:800;color:#fff;margin-bottom:6px;line-height:1;}
+.pyq-code{font-family:var(--mono);font-size:.72rem;color:var(--dim2);margin-bottom:10px;}
+.pyq-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.pyq-tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--dim2);}
+.pyq-go{font-family:var(--mono);font-size:11px;color:var(--upred);margin-top:auto;}
+
+/* PREDICTED PAPER */
+.predicted-section{background:linear-gradient(135deg,var(--bg2) 0%,rgba(249,115,22,.04) 100%);border-top:1px solid rgba(249,115,22,.2);border-bottom:1px solid rgba(249,115,22,.2);}
+.pred-inner{max-width:var(--content-max);margin:0 auto;padding:64px clamp(20px,4vw,80px);}
+.pred-badge{display:inline-block;font-family:var(--mono);font-size:.78rem;color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);padding:5px 14px;border-radius:5px;margin-bottom:14px;}
+.pred-sec-title{font-family:var(--head);font-size:clamp(22px,3vw,32px);font-weight:800;color:#fff;margin-bottom:6px;}
+.pred-sec-sub{font-family:var(--mono);font-size:.72rem;color:var(--dim2);letter-spacing:1px;margin-bottom:14px;}
+.pred-intro{font-family:var(--mono);font-size:.78rem;color:var(--dim2);line-height:1.75;margin-bottom:20px;max-width:900px;}
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;margin-top:24px;}
+.pred-card{background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:12px;border-top:3px solid var(--upred);overflow:hidden;}
+.pred-card-head{padding:20px 22px 14px;}
+.pred-part{font-family:var(--mono);font-size:.68rem;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.pred-q{font-family:var(--head);font-size:1rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:8px;}
+.pred-reason{font-size:.84rem;color:var(--dim2);line-height:1.7;margin-bottom:10px;}
+.pred-conf{font-family:var(--mono);font-size:.7rem;padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:14px;}
+.pred-conf.high{color:var(--u3);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);}
+.pred-conf.med{color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
+.pred-answer-toggle{width:100%;padding:11px 22px;background:var(--surface2);border:none;border-top:1px solid var(--border);cursor:pointer;font-family:var(--mono);font-size:.73rem;color:var(--cao);text-align:left;transition:all .2s;}
+.pred-answer-toggle:hover{background:var(--cao);color:#000;}
+.pred-answer{display:none;padding:20px 22px;border-top:1px solid var(--border);background:var(--bg);}
+.pred-answer.open{display:block;}
+.pred-answer p{font-size:.88rem;line-height:1.88;margin-bottom:12px;}
+.pred-answer strong{color:var(--cao);}
+.pred-answer ul,.pred-answer ol{padding-left:22px;margin:8px 0;}
+.pred-answer li{font-size:.88rem;margin-bottom:7px;line-height:1.75;}
+
+/* FORMULA & DIAGRAM BOXES */
+.fbox{background:#030c14;border:1px solid rgba(34,211,238,.22);border-left:3px solid var(--u1);border-radius:8px;padding:14px 18px;margin:12px 0;font-family:var(--mono);font-size:.76rem;color:#67e8f9;overflow-x:auto;line-height:1.7;}
+.fbox .flbl{font-size:.63rem;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;display:block;}
+.fbox .fl{color:#a5f3fc;font-size:.8rem;}
+.fbox .fn{color:var(--dim2);font-size:.72rem;margin-top:6px;display:block;font-style:italic;}
+.dbox{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;text-align:center;overflow-x:auto;}
+.dcap{font-family:var(--mono);font-size:.7rem;color:var(--dim2);margin-top:8px;}
+
+/* TIP BOXES */
+.tip-box{border-radius:8px;padding:14px 16px;margin:12px 0;display:flex;gap:12px;}
+.tip-box.trick{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);}
+.tip-box.warn{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);}
+.tip-box.note{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.25);}
+.tip-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.tip-content p{font-size:.85rem;color:var(--text);margin:0;line-height:1.72;}
+.tip-title{font-family:var(--head);font-size:.75rem;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;}
+.trick .tip-title{color:var(--gold);}
+.warn .tip-title{color:var(--u3);}
+.note .tip-title{color:var(--u1);}
+
+/* HIGHLIGHTS */
+.hl-o{color:var(--cao);font-weight:600;}
+.hl-r{color:var(--u3);font-weight:600;}
+.hl-g{color:var(--u5);font-weight:600;}
+.hl-v{color:var(--u4);font-weight:600;}
+.hl-c{color:var(--u1);font-weight:600;}
+
+/* QUICK PREP BOX */
+.prep-box{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.25);border-radius:10px;padding:22px 26px;margin-top:28px;}
+.prep-box h3{font-family:var(--head);font-size:1.1rem;font-weight:700;color:var(--u1);margin-bottom:14px;}
+.prep-box p{font-size:.88rem;line-height:1.85;}
+.prep-box strong{color:#fff;}
+
+/* DISCLAIMER */
+.disc-box{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:14px 18px;margin-bottom:22px;display:flex;gap:10px;}
+.disc-box p{font-size:.84rem;color:var(--text);}
+
+/* FOOTER */
+.site-footer{background:#030b10;border-top:1px solid var(--border2);padding:28px 5vw;text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--dim);}
+.site-footer a{color:var(--dim2);text-decoration:none;margin:0 12px;transition:color .2s;}
+.site-footer a:hover{color:var(--cao);}
+.footer-links{margin-bottom:12px;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .pred-grid{grid-template-columns:1fr;}
+  .unit-grid{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .hero{padding:44px 18px 40px;}
+  .pred-inner{padding:44px 18px;}
+  .section-wrap{padding:36px 0;}
+  .imp-row{grid-template-columns:1fr 1fr 48px;}
+  .imp-label{white-space:normal;overflow:visible;text-overflow:unset;font-size:.7rem;}
+}
+@media(max-width:600px){
+  html{font-size:17px;}
+  .page-wrap{padding:0 16px;}
+  .stats-inner{padding:20px 16px;}
+  .pyq-grid{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .hero h1{font-size:clamp(30px,10vw,44px);}
+}
+@media(max-width:900px) and (orientation:landscape){
+  .hero{padding:36px 5vw;}
+  .hero h1{font-size:clamp(28px,7vw,44px);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink active" href="index.html">🏠 Home</a>
+  <a class="tnlink" href="unit1.html">🖥️ U1: Basics</a>
+  <a class="tnlink" href="unit2.html">🔢 U2: Arithmetic</a>
+  <a class="tnlink" href="unit3.html">💾 U3: Memory</a>
+  <a class="tnlink" href="unit4.html">⚡ U4: Pipeline</a>
+  <a class="tnlink" href="unit5.html">🔄 U5: Parallel</a>
+  <a class="tnlink" href="unit6.html">🎛️ U6: I/O</a>
+  <a class="tnlink pyq" href="pyq.html">📋 Solved PYQs</a>
+</nav>
+
+<!-- CREDIT -->
+<div class="credit-band">
+  <div class="credit-text">Crafted by <span>Mahansh Gaur</span> · B.Tech RTU Jaipur</div>
+  <a class="credit-link" href="https://www.instagram.com/mahaanshgaur_6513" target="_blank">📸 @mahaanshgaur_6513</a>
+  <a class="credit-link" href="https://github.com/mahanshstarktech" target="_blank">🐙 GitHub</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📐 B.Tech VI Sem · RTU Kota · 6E7104 / 6CAI4-04</div>
+    <h1>Computer <span>Architecture</span><br>&amp; <em>Organization</em></h1>
+    <p class="hero-sub">A complete exam-ready guide — Booth's Algorithm, DMA, Flynn's Taxonomy, Cache Mapping, Pipeline Speedup, Logical Microoperations — explained from scratch with all RTU PYQs 2022–2025 solved + predicted 2026 paper with full answers and diagrams.</p>
+    <div class="hero-badges">
+      <span class="badge badge-r">🔥 Booth's — Every Single Paper</span>
+      <span class="badge badge-gold">🔮 2026 Predicted + Full Answers</span>
+      <span class="badge badge-o">DMA, Cache, Flynn's — Solved</span>
+      <span class="badge badge-c">Diagrams = 3–4 Marks Each</span>
+      <span class="badge badge-v">Layman Explanations</span>
+      <span class="badge badge-g">RTU PYQs 2022–2025</span>
+    </div>
+    <div class="crafted-by">
+      <span class="crafted-label">crafted by</span>
+      <span class="crafted-name">Mahansh Gaur</span>
+      <div class="crafted-links">
+        <a class="crafted-link" href="https://github.com/mahanshstarktech" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          GitHub
+        </a>
+        <a class="crafted-link" href="https://www.instagram.com/mahaanshgaur_6513" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-item"><span class="stat-num">6</span><span class="stat-label">Units Covered</span></div>
+    <div class="stat-item"><span class="stat-num">4</span><span class="stat-label">Years PYQs</span></div>
+    <div class="stat-item"><span class="stat-num">40+</span><span class="stat-label">PYQ Solutions</span></div>
+    <div class="stat-item"><span class="stat-num">100%</span><span class="stat-label">Booth's — Every Paper</span></div>
+    <div class="stat-item"><span class="stat-num">20+</span><span class="stat-label">Block Diagrams</span></div>
+    <div class="stat-item"><span class="stat-num">70</span><span class="stat-label">Max Marks</span></div>
+  </div>
+</div>
+
+<!-- IMPORTANCE -->
+<div class="page-wrap">
+<div class="section-wrap">
+  <div class="section-head">
+    <h2>Topic Importance — RTU CAO Exam</h2>
+    <div class="sub">BASED ON 4-YEAR PYQ ANALYSIS (2022–2025) · 6E7104 / 6E1554 / 610404</div>
+  </div>
+  <div class="imp-grid">
+    <div class="imp-row"><span class="imp-label">Booth's Algorithm (Numerical)</span><div class="imp-bar"><div class="imp-bar-fill fill-hot" style="width:100%;--bar-delay:.05s"></div></div><span class="imp-pct pct-hot">100% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">DMA (Block Diagram + Explanation)</span><div class="imp-bar"><div class="imp-bar-fill fill-hot" style="width:95%;--bar-delay:.1s"></div></div><span class="imp-pct pct-hot">95% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Flynn's Taxonomy / Parallel Processing</span><div class="imp-bar"><div class="imp-bar-fill fill-hot" style="width:92%;--bar-delay:.15s"></div></div><span class="imp-pct pct-hot">92% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Cache Memory + Hit Ratio</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:90%;--bar-delay:.2s"></div></div><span class="imp-pct pct-high">90% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Hardwired vs Microprogrammed CU</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:88%;--bar-delay:.25s"></div></div><span class="imp-pct pct-high">88% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Logical Microoperations + Applications</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:85%;--bar-delay:.3s"></div></div><span class="imp-pct pct-high">85% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Serial Communication</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:82%;--bar-delay:.35s"></div></div><span class="imp-pct pct-high">82%</span></div>
+    <div class="imp-row"><span class="imp-label">RAM Chip Design (Numerical)</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:80%;--bar-delay:.4s"></div></div><span class="imp-pct pct-high">80% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Cache Mapping (Direct/Assoc/Set-Assoc)</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:78%;--bar-delay:.45s"></div></div><span class="imp-pct pct-high">78% 🔮</span></div>
+    <div class="imp-row"><span class="imp-label">Pipeline Speedup / Instruction Pipeline</span><div class="imp-bar"><div class="imp-bar-fill fill-high" style="width:75%;--bar-delay:.5s"></div></div><span class="imp-pct pct-high">75%</span></div>
+    <div class="imp-row"><span class="imp-label">Functional Units with Diagram</span><div class="imp-bar"><div class="imp-bar-fill fill-med" style="width:72%;--bar-delay:.55s"></div></div><span class="imp-pct pct-med">72%</span></div>
+    <div class="imp-row"><span class="imp-label">Set-Associative Cache Mapping</span><div class="imp-bar"><div class="imp-bar-fill fill-med" style="width:70%;--bar-delay:.6s"></div></div><span class="imp-pct pct-med">70%</span></div>
+    <div class="imp-row"><span class="imp-label">Computer Registers + Common Bus</span><div class="imp-bar"><div class="imp-bar-fill fill-med" style="width:68%;--bar-delay:.65s"></div></div><span class="imp-pct pct-med">68%</span></div>
+    <div class="imp-row"><span class="imp-label">RISC vs CISC / Instruction Cycle</span><div class="imp-bar"><div class="imp-bar-fill fill-med" style="width:65%;--bar-delay:.7s"></div></div><span class="imp-pct pct-med">65%</span></div>
+    <div class="imp-row"><span class="imp-label">Integer Division Algorithm</span><div class="imp-bar"><div class="imp-bar-fill fill-med" style="width:60%;--bar-delay:.75s"></div></div><span class="imp-pct pct-med">60%</span></div>
+  </div>
+</div>
+
+<!-- UNIT CARDS -->
+<div class="section-wrap">
+  <div class="section-head">
+    <h2>All Units at a Glance</h2>
+    <div class="sub">CLICK ANY UNIT TO OPEN THE FULL STUDY GUIDE</div>
+  </div>
+  <div class="unit-grid">
+    <a class="unit-card u1" href="unit1.html">
+      <div class="unit-num">Unit 01</div>
+      <div class="unit-name">Introduction &amp; Basic Computer Organisation</div>
+      <div class="unit-topics">Computer Organisation vs Architecture · Instruction Codes · Addressing Modes · Instruction Cycle · Register Transfer · Micro-operations · Bus Systems · Common Bus with Multiplexers</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag mid">65% importance</span></div>
+    </a>
+    <a class="unit-card u2" href="unit2.html">
+      <div class="unit-num">Unit 02</div>
+      <div class="unit-name">Arithmetic &amp; Logic Operations</div>
+      <div class="unit-topics">Signed Number Representation · Fixed &amp; Floating Point · Booth's Algorithm (Multiplication) · Integer Division · Logical Microoperations (AND/OR/XOR) · Applications</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag hot">🔥 Booth's = CERTAIN</span></div>
+    </a>
+    <a class="unit-card u3" href="unit3.html">
+      <div class="unit-num">Unit 03</div>
+      <div class="unit-name">Memory Organisation</div>
+      <div class="unit-topics">Memory Hierarchy · Cache Memory · Hit Ratio · Direct Mapping · Associative Mapping · Set-Associative Mapping · RAM Chip Design · Virtual Memory · Memory Interleaving</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag hot">🔥 90% importance</span></div>
+    </a>
+    <a class="unit-card u4" href="unit4.html">
+      <div class="unit-num">Unit 04</div>
+      <div class="unit-name">Instruction Pipeline &amp; Processor Design</div>
+      <div class="unit-topics">Pipelining Concept · Instruction Pipeline Stages · Speedup Formula · Arithmetic Pipeline · Hazards · RISC vs CISC · Superscalar Processor · Hardwired vs Microprogrammed Control</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag mid">75% importance</span></div>
+    </a>
+    <a class="unit-card u5" href="unit5.html">
+      <div class="unit-num">Unit 05</div>
+      <div class="unit-name">Parallel Processing</div>
+      <div class="unit-topics">Flynn's Taxonomy (SISD/SIMD/MISD/MIMD) · Multiprocessor Systems · Interconnection Networks · Cache Coherence · Interprocess Synchronization · Vector Processor · Multicomputer</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag hot">🔥 92% importance</span></div>
+    </a>
+    <a class="unit-card u6" href="unit6.html">
+      <div class="unit-num">Unit 06</div>
+      <div class="unit-name">Input/Output &amp; Communication</div>
+      <div class="unit-topics">I/O Interface · Interrupts · Priority Interrupts · Daisy Chaining · DMA Controller · Serial Communication (Synchronous/Asynchronous) · Memory-Mapped I/O</div>
+      <div class="unit-footer"><span class="unit-go">Open guide →</span><span class="unit-tag hot">🔥 DMA = CERTAIN</span></div>
+    </a>
+    <a class="unit-card" href="pyq.html" style="border-color:rgba(245,158,11,.3);">
+      <div class="unit-num" style="color:var(--upred)">Solved PYQs</div>
+      <div class="unit-name">Previous Year Questions — Fully Solved</div>
+      <div class="unit-topics">2025 · 2024 · 2023-Aug · 2022 · Step-by-step solutions · Booth's worked examples · Cache mapping numericals · RAM chip design</div>
+      <div class="unit-footer"><span class="unit-go" style="color:var(--upred)">Open PYQs →</span><span class="unit-tag mid">📋 4 Papers</span></div>
+    </a>
+  </div>
+</div>
+
+<!-- PYQ QUICK-PICK -->
+<div class="section-wrap">
+  <div class="pyq-header-row">
+    <div class="section-head" style="margin-bottom:0">
+      <h2>Solved Previous Year Papers</h2>
+    </div>
+    <a class="pyq-view-all" href="pyq.html">View all solutions →</a>
+  </div>
+  <div class="pyq-grid">
+    <a class="pyq-card latest" href="pyq.html#2025">
+      <div class="pyq-year-badge">LATEST · 2025</div>
+      <div class="pyq-title">2025</div>
+      <div class="pyq-code">6E7104 · May 2025 · AID/CS/IT/CAI</div>
+      <div class="pyq-tags">
+        <span class="pyq-tag">Priority Interrupt</span>
+        <span class="pyq-tag">Logical Microops</span>
+        <span class="pyq-tag">Cache + Hit Ratio</span>
+        <span class="pyq-tag">Booth's (-13)×(+9)</span>
+        <span class="pyq-tag">DMA Block Diagram</span>
+      </div>
+      <div class="pyq-go">Open solved paper →</div>
+    </a>
+    <a class="pyq-card" href="pyq.html#2024">
+      <div class="pyq-year-badge">2024</div>
+      <div class="pyq-title">2024</div>
+      <div class="pyq-code">6E7104 · 2024 · CS/IT/AID/CAI</div>
+      <div class="pyq-tags">
+        <span class="pyq-tag">RISC</span>
+        <span class="pyq-tag">Set-Assoc Mapping</span>
+        <span class="pyq-tag">Logic Micro-ops</span>
+        <span class="pyq-tag">Booth's 8×(-8)</span>
+        <span class="pyq-tag">Flynn's Taxonomy</span>
+      </div>
+      <div class="pyq-go">Open solved paper →</div>
+    </a>
+    <a class="pyq-card" href="pyq.html#2023">
+      <div class="pyq-year-badge">2023</div>
+      <div class="pyq-title">2023</div>
+      <div class="pyq-code">610404 · Aug 2023 · CS/IT/AI&amp;ML/DS</div>
+      <div class="pyq-tags">
+        <span class="pyq-tag">Buffer Gate</span>
+        <span class="pyq-tag">Register Transfer</span>
+        <span class="pyq-tag">Instruction Pipeline</span>
+        <span class="pyq-tag">AND Instruction Cycle</span>
+        <span class="pyq-tag">Serial Comm</span>
+      </div>
+      <div class="pyq-go">Open solved paper →</div>
+    </a>
+    <a class="pyq-card" href="pyq.html#2022">
+      <div class="pyq-year-badge">2022</div>
+      <div class="pyq-title">2022</div>
+      <div class="pyq-code">6E1554 · Jun 2022 · IT</div>
+      <div class="pyq-tags">
+        <span class="pyq-tag">Booth's (-13)×(+9)</span>
+        <span class="pyq-tag">Cache Mapping × 3</span>
+        <span class="pyq-tag">128×8 RAM Design</span>
+        <span class="pyq-tag">Common Bus</span>
+        <span class="pyq-tag">Hardwired vs μprog</span>
+      </div>
+      <div class="pyq-go">Open solved paper →</div>
+    </a>
+  </div>
+</div>
+</div><!-- /page-wrap -->
+
+<!-- ══════ PREDICTED PAPER 2026 ══════ -->
+<div class="predicted-section">
+  <div class="pred-inner">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Cross-referenced with DIP 2026, ML 2026, ISS 2026 Papers</div>
+    <div class="pred-sec-title">Predicted Paper — CAO 2026</div>
+    <div class="pred-sec-sub">BASED ON 4-YEAR CAO PYQ ANALYSIS + 2026 DIP, ML &amp; ISS PAPER PATTERNS</div>
+    <p class="pred-intro">Deep analysis of 4 CAO papers (2022–2025) cross-referenced with the actual 2026 DIP, ML, and ISS papers confirms RTU's rotation pattern. Booth's Algorithm has appeared in every single CAO paper — a numerical with new values is certain. Topics absent in 2025 (RISC, bus, instruction cycle, micro-operation, arithmetic pipeline, cache mapping types) are strongly due for return. DMA and Flynn's taxonomy appeared in two consecutive papers — they stay.</p>
+    <div class="disc-box">
+      <span style="font-size:18px;flex-shrink:0;">⚠️</span>
+      <p>Predictions are based on historical patterns. Actual paper may differ. Use this to prioritise study time — do not skip unpredicted topics entirely.</p>
+    </div>
+
+    <div class="pred-grid">
+
+      <!-- PART A -->
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q1)</div>
+          <div class="pred-q">What is meant by RISC? Differentiate RISC and CISC.</div>
+          <div class="pred-reason">RISC was Q1 in 2024. Completely absent in 2025. The 2026 ML, ISS, DIP papers all confirmed: topics skipped in 2025 return in 2026. RISC is the single strongest Q1 return candidate.</div>
+          <span class="pred-conf high">VERY HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer &amp; Diagram</button>
+        <div class="pred-answer">
+          <p><strong>RISC (Reduced Instruction Set Computer):</strong> A processor design philosophy that uses a small, highly optimised set of instructions that execute in one clock cycle. All instructions are fixed-length (32 bits), register-to-register, with separate load/store for memory access.</p>
+          <div class="fbox">
+            <span class="flbl">RISC vs CISC — Comparison Table (write in exam)</span>
+            <div class="fl">Feature        | RISC              | CISC</div>
+            <div class="fl">──────────────────────────────────────────────</div>
+            <div class="fl">Instruction set| Small, simple     | Large, complex</div>
+            <div class="fl">Instruction len| Fixed (32-bit)    | Variable length</div>
+            <div class="fl">Cycles/instr   | 1 cycle           | Multiple cycles</div>
+            <div class="fl">Memory access  | Load/Store only   | Any instruction</div>
+            <div class="fl">Registers      | Many (32+)        | Few (8–16)</div>
+            <div class="fl">Pipeline       | Easily pipelined  | Difficult to pipeline</div>
+            <div class="fl">Control unit   | Hardwired         | Microprogrammed</div>
+            <div class="fl">Examples       | ARM, MIPS, SPARC  | x86, 8051, VAX</div>
+          </div>
+          <p><strong>Layman:</strong> CISC is like a Swiss Army knife — many specialised tools but complex. RISC is like a plain sharp knife — fewer tools but ultra-fast at what it does.</p>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q2)</div>
+          <div class="pred-q">What is an instruction cycle? Explain its phases briefly.</div>
+          <div class="pred-reason">Instruction cycle appeared as Q4 in 2024 and was absent in 2025. Core Unit 1 concept — after one-year gap it is strongly due. The 2023-Aug paper had a full AND instruction cycle execution as Part C Q1.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p>The <strong>instruction cycle</strong> is the complete process a CPU follows to fetch, decode, and execute one instruction. It repeats for every instruction in a program.</p>
+          <div class="fbox">
+            <span class="flbl">Instruction Cycle — Phases</span>
+            <div class="fl">Phase 1 — FETCH:   PC → MAR; Memory[MAR] → MDR; MDR → IR; PC ← PC+1</div>
+            <div class="fl">Phase 2 — DECODE:  Control unit decodes opcode in IR</div>
+            <div class="fl">Phase 3 — EXECUTE: ALU performs operation; result stored in register/memory</div>
+            <div class="fl">Phase 4 — WRITE:   Result written back; interrupt check</div>
+            <div class="fn">PC=Program Counter | MAR=Memory Address Register | MDR=Memory Data Register | IR=Instruction Register</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q3)</div>
+          <div class="pred-q">What is immediate addressing mode? (OR Register addressing mode)</div>
+          <div class="pred-reason">Immediate addressing mode was Q3 in 2025 — may repeat in a different phrasing. Addressing modes are a consistent Part A theme. Prepare all 7 modes briefly.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Immediate Addressing Mode:</strong> The operand is contained directly within the instruction itself — no memory access needed for the operand.</p>
+          <div class="fbox">
+            <div class="fl">ADD R1, #25   ← #25 is the immediate operand (embedded in instruction)</div>
+            <div class="fl">Effective Address: Not applicable — operand IS the address field value</div>
+            <div class="fn">Advantage: Fast — no extra memory access | Disadvantage: Operand size limited to instruction field width</div>
+          </div>
+          <p><strong>All 7 Addressing Modes (memorise for Part A):</strong></p>
+          <ul>
+            <li><strong>Implied/Implicit:</strong> Operand implied by opcode (e.g., CLA — clear accumulator)</li>
+            <li><strong>Immediate:</strong> Operand in instruction (ADD #5)</li>
+            <li><strong>Register:</strong> Operand in a register (ADD R1, R2)</li>
+            <li><strong>Direct:</strong> Address field holds operand address (ADD 500)</li>
+            <li><strong>Indirect:</strong> Address field holds address of address (ADD @500)</li>
+            <li><strong>Relative:</strong> EA = PC + offset (used in branch instructions)</li>
+            <li><strong>Index:</strong> EA = Index Register + displacement</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q4)</div>
+          <div class="pred-q">What are the major characteristics of a pipeline?</div>
+          <div class="pred-reason">Present as Q4 in 2025. Pipelining is a central CAO topic tested in Part A (characteristics), Part B (arithmetic pipeline), and Part C (speedup calculations). This phrasing is likely retained in 2026.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p>A <strong>pipeline</strong> is a technique where multiple instructions are overlapped in execution, like an assembly line. Key characteristics:</p>
+          <ul>
+            <li><strong>Throughput:</strong> Number of tasks completed per unit time. Maximised when all stages are busy.</li>
+            <li><strong>Speedup:</strong> Ratio of non-pipelined time to pipelined time. Ideal speedup = number of stages k.</li>
+            <li><strong>Efficiency:</strong> Speedup / Number of stages. Ideal efficiency = 1 (100%).</li>
+            <li><strong>Latency:</strong> Time for one task to complete from start to finish = k × clock period.</li>
+            <li><strong>Hazards:</strong> Conditions that prevent next instruction from executing — Data, Structural, Control hazards.</li>
+          </ul>
+          <div class="fbox">
+            <span class="flbl">Pipeline Speedup Formula</span>
+            <div class="fl">Speedup  = (n × k) / (k + n - 1)</div>
+            <div class="fl">As n → ∞: Speedup → k   (ideal speedup = number of stages k)</div>
+            <div class="fn">n = number of tasks | k = number of pipeline stages</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q5)</div>
+          <div class="pred-q">Define a bus. What are the types of buses in a computer?</div>
+          <div class="pred-reason">Bus was Q5 in 2024 and absent in 2025. The 2022 paper covered bus system extensively in Part C (common bus with multiplexers). After one-year absence, bus returns in 2026.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p>A <strong>bus</strong> is a shared communication pathway consisting of multiple parallel wires connecting two or more functional units in a computer system. All devices share the same set of lines for communication.</p>
+          <ul>
+            <li><strong>Data Bus:</strong> Transfers actual data between processor, memory, and I/O devices. Bidirectional. Width = word size (8, 16, 32, or 64 bits).</li>
+            <li><strong>Address Bus:</strong> Carries memory addresses from CPU to memory/I/O. Unidirectional. Width determines addressable memory (2^n bytes for n-bit address bus).</li>
+            <li><strong>Control Bus:</strong> Carries control signals — Read/Write, Interrupt, Clock, Reset. Both directions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q6)</div>
+          <div class="pred-q">What is a micro-operation? Give examples of register transfer micro-operations.</div>
+          <div class="pred-reason">Micro-operation was Q6 in 2024 and absent in 2025. The 2022 paper had register transfer hardware diagram. Micro-operations are fundamental to RTU's CAO syllabus and strongly due after one-year gap.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p>A <strong>micro-operation</strong> is an elementary operation performed by a digital computer during one clock pulse on data stored in registers. It is the smallest unit of operation that can be controlled by the control unit.</p>
+          <div class="fbox">
+            <span class="flbl">Types of Micro-operations</span>
+            <div class="fl">1. Register Transfer:  R2 ← R1    (copy R1 into R2)</div>
+            <div class="fl">2. Arithmetic:         R3 ← R1 + R2   (add registers)</div>
+            <div class="fl">3. Logic:              R1 ← R1 XOR R2  (bitwise XOR)</div>
+            <div class="fl">4. Shift:              R1 ← shl R1  (shift left)</div>
+            <div class="fn">RTL Notation: Conditional — P: R1 ← R2 (execute only if control signal P = 1)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q7)</div>
+          <div class="pred-q">Explain fixed point representation (OR represent a number in 2's complement)</div>
+          <div class="pred-reason">Fixed point representation was Q6 in 2025. (70)₁₀ in signed magnitude/1's complement was Q8. Number representation consistently appears — 2026 may ask 2's complement form of a new number.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Fixed Point Representation:</strong> A number representation where the binary point (decimal point in binary) is assumed to be at a fixed position — either extreme left (fraction) or extreme right (integer).</p>
+          <div class="fbox">
+            <span class="flbl">Signed Number Representations — 3 Forms (for n-bit word)</span>
+            <div class="fl">Example: represent -13 in 8 bits</div>
+            <div class="fl">+13 in binary:      0 0001101</div>
+            <div class="fl">Signed Magnitude:   1 0001101  ← flip MSB to 1</div>
+            <div class="fl">1's Complement:     1 1110010  ← flip all bits</div>
+            <div class="fl">2's Complement:     1 1110011  ← flip all bits + add 1</div>
+            <div class="fn">2's Complement is used in all modern computers — it allows subtraction using addition and has only one representation of zero</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q8)</div>
+          <div class="pred-q">What do you mean by parallel processing?</div>
+          <div class="pred-reason">Parallel processing appeared in 2022 (Q6) and 2024 (Q8) but absent in 2025. With Flynn's taxonomy appearing in two consecutive Part C questions (2024, 2025), parallel processing in Part A is a natural companion question for 2026.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Parallel processing</strong> is a mode of computer operation in which multiple processors execute two or more tasks simultaneously, reducing overall execution time. It is the use of multiple processing elements concurrently to solve a problem faster.</p>
+          <ul>
+            <li><strong>Instruction-level parallelism:</strong> Pipeline multiple instructions simultaneously</li>
+            <li><strong>Data parallelism:</strong> Same operation on multiple data items (SIMD)</li>
+            <li><strong>Task parallelism:</strong> Different tasks executed on different processors simultaneously</li>
+          </ul>
+          <p>Classifications by Flynn's Taxonomy: SISD (single processor), SIMD (vector processors), MISD (rare), MIMD (multiprocessors — most common today).</p>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q9)</div>
+          <div class="pred-q">Describe a subroutine. What is the role of a stack in subroutine calls?</div>
+          <div class="pred-reason">Subroutine appeared in 2022 (Q3) and 2025 (Q9) — present in two non-consecutive papers. This alternating pattern and consistent presence makes subroutine a near-certain 2026 Part A question.</div>
+          <span class="pred-conf high">VERY HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p>A <strong>subroutine</strong> (also called a procedure or function) is a set of program instructions that performs a specific task and can be called from multiple points in a program. It saves memory and enables modular programming.</p>
+          <div class="fbox">
+            <span class="flbl">Stack Role in Subroutine Calls</span>
+            <div class="fl">CALL instruction: Push return address onto stack → Jump to subroutine</div>
+            <div class="fl">Inside subroutine: May push registers onto stack (to save caller state)</div>
+            <div class="fl">RETURN instruction: Pop return address from stack → Continue from caller</div>
+            <div class="fn">Stack = LIFO (Last In, First Out) structure. SP = Stack Pointer register. Enables nested subroutine calls because each call saves its return address independently.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📝 Part A — 2 marks (Q10)</div>
+          <div class="pred-q">What is cache memory? What is Hit Ratio?</div>
+          <div class="pred-reason">Hit Ratio appeared in 2022 (Q4) and cache memory was Part B Q6 in 2025. Cache is the most consistently tested CAO topic across all parts — it will appear somewhere in every 2026 paper.</div>
+          <span class="pred-conf high">CERTAIN</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Cache memory</strong> is a small, extremely fast (SRAM-based) memory placed between the CPU and main memory (DRAM). It stores copies of frequently accessed data and instructions so the CPU can access them quickly without waiting for slower main memory.</p>
+          <div class="fbox">
+            <span class="flbl">Hit Ratio Formula</span>
+            <div class="fl">H = Hit Ratio = (Number of cache hits) / (Total memory accesses)</div>
+            <div class="fl">T_avg = H × T_cache + (1−H) × T_main</div>
+            <div class="fl">Example: H=0.9, T_cache=10ns, T_main=100ns</div>
+            <div class="fl">T_avg = 0.9×10 + 0.1×100 = 9+10 = 19 ns</div>
+            <div class="fn">Hit = data found in cache | Miss = data not found → access main memory | Higher H → faster average access time</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PART B -->
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q1)</div>
+          <div class="pred-q">Explain the functional units of an architecture of a computer with diagram.</div>
+          <div class="pred-reason">Functional units appeared in 2022 (Part B Q4) and 2025 (Part B Q1). Two separate years with a gap. Now confirmed recurring anchor topic. Draw the CPU-Memory-I/O block diagram with buses labeled.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer &amp; Diagram</button>
+        <div class="pred-answer">
+          <p><strong>Functional Units of a Computer:</strong> A computer system consists of five fundamental units that work together:</p>
+          <ul>
+            <li><strong>Input Unit:</strong> Accepts data from user (keyboard, mouse, scanner). Converts to binary and sends to memory.</li>
+            <li><strong>Memory Unit:</strong> Stores programs and data. Primary (RAM/ROM) for active use; Secondary (HDD/SSD) for long-term storage.</li>
+            <li><strong>ALU (Arithmetic Logic Unit):</strong> Performs arithmetic (+, −, ×, ÷) and logic (AND, OR, NOT) operations. The computing heart of the CPU.</li>
+            <li><strong>Control Unit:</strong> Fetches, decodes, and executes instructions. Sends control signals to coordinate all units.</li>
+            <li><strong>Output Unit:</strong> Presents processed results to user (monitor, printer, speakers).</li>
+          </ul>
+          <div class="dbox">
+            <svg viewBox="0 0 520 220" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <text x="10" y="16" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">Functional Units of a Computer — Block Diagram</text>
+              <!-- Input -->
+              <rect x="10" y="40" width="90" height="40" rx="5" fill="#0c1e28" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="55" y="64" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">INPUT UNIT</text>
+              <!-- Memory -->
+              <rect x="200" y="30" width="120" height="60" rx="5" fill="#0c1e28" stroke="#f97316" stroke-width="2"/>
+              <text x="260" y="55" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9">MEMORY</text>
+              <text x="260" y="69" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">RAM / ROM</text>
+              <!-- CPU -->
+              <rect x="180" y="120" width="160" height="80" rx="6" fill="#102534" stroke="#f97316" stroke-width="2.5"/>
+              <text x="260" y="138" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">CPU</text>
+              <rect x="190" y="145" width="62" height="28" rx="3" fill="#0c1e28" stroke="#a78bfa" stroke-width="1.5"/>
+              <text x="221" y="163" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CONTROL UNIT</text>
+              <rect x="264" y="145" width="62" height="28" rx="3" fill="#0c1e28" stroke="#10b981" stroke-width="1.5"/>
+              <text x="295" y="163" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">ALU</text>
+              <!-- Output -->
+              <rect x="420" y="40" width="90" height="40" rx="5" fill="#0c1e28" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="465" y="64" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">OUTPUT UNIT</text>
+              <!-- Arrows -->
+              <line x1="100" y1="60" x2="200" y2="60" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr)"/>
+              <line x1="320" y1="60" x2="420" y2="60" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arr)"/>
+              <line x1="260" y1="90" x2="260" y2="120" stroke="#f97316" stroke-width="2" marker-end="url(#arr2)"/>
+              <line x1="260" y1="120" x2="260" y2="90" stroke="#f97316" stroke-width="2"/>
+              <!-- System Bus -->
+              <rect x="10" y="200" width="500" height="14" rx="3" fill="#152432" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="260" y="211" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">SYSTEM BUS (Data Bus + Address Bus + Control Bus)</text>
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#4ade80" stroke-width="1.5"/></marker>
+                <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#f97316" stroke-width="2"/></marker>
+              </defs>
+            </svg>
+            <div class="dcap">Fig — Five Functional Units with CPU containing CU and ALU, connected via System Bus</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q2)</div>
+          <div class="pred-q">Explain set-associative mapping with a suitable example.</div>
+          <div class="pred-reason">Set-associative mapping appeared in 2024 Part B Q2 and was absent in 2025. The 2022 paper covered all three mapping types in Part C. For 2026, set-associative as a standalone Part B question (as in 2024) is the predicted format.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer &amp; Example</button>
+        <div class="pred-answer">
+          <p><strong>Set-Associative Mapping</strong> is a compromise between direct mapping (simple but conflict-prone) and fully associative mapping (flexible but expensive). The cache is divided into sets, each containing k lines. A main memory block maps to exactly ONE set (like direct mapping) but can go into ANY of the k lines within that set (like associative).</p>
+          <div class="fbox">
+            <span class="flbl">Set-Associative Mapping — Address Division</span>
+            <div class="fl">Main Memory Address = Tag | Set Number | Block Offset</div>
+            <div class="fl">Number of sets (s) = Cache size / (k × block size)</div>
+            <div class="fl">Set number = (Block number) mod (number of sets)</div>
+            <div class="fl">Tag = remaining high-order bits of block number</div>
+            <div class="fn">k-way set associative = k lines per set | Common: 2-way, 4-way, 8-way</div>
+          </div>
+          <p><strong>Example — 2-way Set Associative:</strong></p>
+          <p>Cache: 8 lines total, organized as 4 sets × 2 lines each. Block size: 4 words. Main memory: 32 blocks.</p>
+          <ul>
+            <li>Address bits: 5-bit block number + 2-bit word offset = 7-bit address</li>
+            <li>Set index = block number mod 4 → 2 bits</li>
+            <li>Tag = remaining 3 bits</li>
+            <li>Block 5 (101): Set = 5 mod 4 = 1, Tag = 001 → goes to set 1, either line 0 or line 1</li>
+            <li>Block 9 (1001): Set = 9 mod 4 = 1, Tag = 010 → SAME set 1, other line — no conflict!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q3)</div>
+          <div class="pred-q">What are logical microoperations? Explain applications of logical microoperations.</div>
+          <div class="pred-reason">Logical micro-operations appeared in 2024 (Q4, write 4 logic micro-ops) and 2025 (Q3, explain + applications) — two consecutive years with increasing depth. This is a permanent Part B fixture for 2026.</div>
+          <span class="pred-conf high">CERTAIN</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Logical microoperations</strong> perform bitwise Boolean operations on data stored in registers. Unlike arithmetic operations (which treat the register as a number), logical operations treat each bit independently.</p>
+          <div class="fbox">
+            <span class="flbl">Four Logical Microoperations — Truth Table for each bit</span>
+            <div class="fl">AND:  F = A AND B   → 1 only if both bits = 1  | RTL: F ← A ∧ B</div>
+            <div class="fl">OR:   F = A OR  B   → 1 if at least one bit = 1 | RTL: F ← A ∨ B</div>
+            <div class="fl">XOR:  F = A XOR B  → 1 if bits differ         | RTL: F ← A ⊕ B</div>
+            <div class="fl">COMP: F = NOT A    → complement all bits       | RTL: F ← Ā</div>
+          </div>
+          <p><strong>Applications (know all 4 for exam):</strong></p>
+          <ul>
+            <li><strong>Selective Set (using OR):</strong> Set specific bits to 1 without affecting others. Mask has 1s where you want to set. Example: Set bits 0 and 2 of R1: R1 ← R1 OR 0101</li>
+            <li><strong>Selective Complement (using XOR):</strong> Flip specific bits. Mask has 1s where you want to flip. Example: Complement bits 3 and 5: R1 ← R1 XOR 0101000</li>
+            <li><strong>Selective Clear (using AND):</strong> Clear specific bits to 0. Mask has 0s where you want to clear. Example: Clear bits 1 and 3: R1 ← R1 AND 1111...10110101</li>
+            <li><strong>Masking:</strong> Isolate specific bits by AND-ing with a mask. Example: Extract lower 4 bits: R1 ← R1 AND 00001111</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q4)</div>
+          <div class="pred-q">Differentiate between hardwired control unit and microprogrammed control unit.</div>
+          <div class="pred-reason">Appeared in 2022 (Part B Q6), 2023-Aug Part A Q10, and 2025 (Part B Q4). Present in 3 of 4 papers in some form. Extremely consistent — CERTAIN for 2026. Know speed, flexibility, hardware vs ROM design, and modify-ability.</div>
+          <span class="pred-conf high">VERY HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <div class="fbox">
+            <span class="flbl">Hardwired vs Microprogrammed Control Unit — Comparison</span>
+            <div class="fl">Feature           | Hardwired CU           | Microprogrammed CU</div>
+            <div class="fl">─────────────────────────────────────────────────────────</div>
+            <div class="fl">Implementation    | Combinational logic     | Control memory (ROM)</div>
+            <div class="fl">Speed             | Fast (hardware-based)   | Slower (memory access)</div>
+            <div class="fl">Flexibility       | Rigid — hard to modify  | Easy to modify</div>
+            <div class="fl">Design complexity | Complex wiring          | Simpler hardware</div>
+            <div class="fl">Cost              | Higher (for complex ISA)| Lower (for CISC)</div>
+            <div class="fl">Modification      | Requires rewiring       | Just update ROM</div>
+            <div class="fl">Debugging         | Difficult               | Easy (software-like)</div>
+            <div class="fl">Used in           | RISC processors         | CISC processors</div>
+            <div class="fl">Examples          | ARM, MIPS               | Intel x86 (historically)</div>
+          </div>
+          <p><strong>Hardwired CU:</strong> Control signals generated directly by logic gates based on opcode bits and status flags. Like a digital circuit — state machine with flipflops and gates. Fast but inflexible.</p>
+          <p><strong>Microprogrammed CU:</strong> Stores control signals as microinstructions in a control memory (ROM). Each machine instruction → a sequence of microinstructions (microprogram). Flexible but slower due to ROM access time.</p>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q5)</div>
+          <div class="pred-q">Explain serial communication with an example.</div>
+          <div class="pred-reason">Serial communication appeared in Part B in BOTH 2024 (Q6) and 2025 (Q5) — two consecutive years. This is now a confirmed permanent Part B fixture. Cover synchronous vs asynchronous, start/stop bits, baud rate.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Serial communication</strong> transmits data one bit at a time over a single wire (one bit per clock cycle). It is slower than parallel but uses fewer wires and is used for long-distance communication (USB, RS-232, I²C, SPI).</p>
+          <p><strong>Asynchronous Serial Transmission:</strong> No shared clock between sender and receiver. Each character framed by start bit (0) and stop bit(s) (1). Receiver synchronises on start bit edge.</p>
+          <div class="fbox">
+            <span class="flbl">Asynchronous Frame Format (8-bit data, 1 stop bit)</span>
+            <div class="fl">| START | D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | STOP |</div>
+            <div class="fl">|   0   |    ← 8 data bits (LSB first) →    |   1  |</div>
+            <div class="fn">Total frame = 10 bits for 8 data bits | Overhead = 2 bits (20%)</div>
+          </div>
+          <p><strong>Example from 2023-Aug paper:</strong> A 1200-baud line transmits asynchronous with 1 stop bit:</p>
+          <ul>
+            <li>Frame = 1 start + 8 data + 1 stop = 10 bits</li>
+            <li>Characters per second = 1200 / 10 = <strong>120 characters/second</strong></li>
+            <li>With 2 stop bits: frame = 11 bits → 1200/11 ≈ 109 characters/second</li>
+            <li>Synchronous (no start/stop): frame = 8 bits → 1200/8 = 150 characters/second</li>
+          </ul>
+          <p><strong>Baud rate</strong> = number of signal changes per second. For binary: 1 baud = 1 bit/second.</p>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q6)</div>
+          <div class="pred-q">Explain the need of cache memory. Also explain Hit Ratio.</div>
+          <div class="pred-reason">Cache memory + Hit Ratio as a Part B question appeared in 2025 Part B Q6. The 2022 paper treated it in Part C. 2026 will test it in Part B again. Cover temporal/spatial locality, hit time, miss penalty.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer</button>
+        <div class="pred-answer">
+          <p><strong>Need of Cache Memory:</strong> Main memory (DRAM) is 10–100x slower than the CPU. Without cache, the CPU would wait idle for memory. Cache exploits two key principles:</p>
+          <ul>
+            <li><strong>Temporal Locality:</strong> Recently accessed data is likely to be accessed again soon (e.g., loop variables)</li>
+            <li><strong>Spatial Locality:</strong> Data near recently accessed data is likely to be accessed soon (e.g., array elements)</li>
+          </ul>
+          <div class="fbox">
+            <span class="flbl">Hit Ratio and Average Access Time</span>
+            <div class="fl">H = Cache Hit Ratio = Cache hits / Total accesses</div>
+            <div class="fl">T_avg = H × Tc + (1−H) × Tm        [simultaneous access model]</div>
+            <div class="fl">T_avg = H × Tc + (1−H) × (Tc + Tm)  [sequential access model]</div>
+            <div class="fn">Tc = Cache access time | Tm = Main memory access time | H typically 0.8–0.99</div>
+          </div>
+          <p><strong>Numerical Example:</strong> Tc = 5ns, Tm = 50ns, H = 0.9</p>
+          <ul>
+            <li>Simultaneous: T_avg = 0.9×5 + 0.1×50 = 4.5 + 5 = <strong>9.5 ns</strong></li>
+            <li>Sequential: T_avg = 0.9×5 + 0.1×(5+50) = 4.5 + 5.5 = <strong>10 ns</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📋 Part B — 4 marks (Q7)</div>
+          <div class="pred-q">Explain arithmetic pipeline with an example.</div>
+          <div class="pred-reason">Arithmetic pipeline appeared in 2024 Part B Q7 and was absent in 2025. Integer division appeared in 2025 Q7. For 2026, arithmetic pipeline is more likely given its one-year absence. Prepare a 4-stage floating-point adder pipeline.</div>
+          <span class="pred-conf med">MEDIUM-HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Answer &amp; Diagram</button>
+        <div class="pred-answer">
+          <p>An <strong>arithmetic pipeline</strong> is a pipeline specifically designed to perform arithmetic operations (addition, multiplication) on floating-point numbers in stages. Each stage performs part of the computation, and results flow through stages one clock cycle at a time.</p>
+          <p><strong>4-Stage Floating-Point Adder Pipeline:</strong></p>
+          <ul>
+            <li><strong>Stage 1 — Compare exponents:</strong> Subtract exponents: e1 − e2</li>
+            <li><strong>Stage 2 — Align mantissa:</strong> Shift mantissa of smaller number right by |e1−e2| bits</li>
+            <li><strong>Stage 3 — Add mantissas:</strong> Add aligned mantissas</li>
+            <li><strong>Stage 4 — Normalise result:</strong> Adjust result to normalised floating-point form</li>
+          </ul>
+          <div class="fbox">
+            <span class="flbl">Pipeline Speedup Example — 100 additions</span>
+            <div class="fl">Without pipeline: 100 × 4 = 400 clock cycles</div>
+            <div class="fl">With 4-stage pipeline: 4 + (100−1) = 103 clock cycles</div>
+            <div class="fl">Speedup = 400 / 103 ≈ 3.88× faster</div>
+            <div class="fn">Formula: Time = k + (n−1) clock cycles | k = stages | n = number of tasks</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PART C -->
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📖 Part C — 10 marks (Q1)</div>
+          <div class="pred-q">Define parallel processing and explain Flynn's classification with diagrams.</div>
+          <div class="pred-reason">Flynn's taxonomy appeared in Part C in 2024 (Q3) and 2025 (Q1) — two consecutive years. The 2026 ISS pattern confirmed topics in two consecutive Part C papers remain. Draw all 4 SISD/SIMD/MISD/MIMD categories.</div>
+          <span class="pred-conf high">VERY HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Full Answer &amp; Diagrams</button>
+        <div class="pred-answer">
+          <p><strong>Parallel Processing:</strong> Use of multiple processing units executing simultaneously to reduce computation time. Based on two types of streams: Instruction Stream (IS) and Data Stream (DS).</p>
+          <p><strong>Flynn's Taxonomy (1966)</strong> classifies computer architectures by the number of simultaneous instruction and data streams:</p>
+          <div class="fbox">
+            <span class="flbl">Flynn's Four Categories</span>
+            <div class="fl">SISD: Single Instruction stream, Single Data stream   → Traditional uniprocessor</div>
+            <div class="fl">SIMD: Single Instruction stream, Multiple Data streams → Vector/Array processor</div>
+            <div class="fl">MISD: Multiple Instruction, Single Data stream         → Theoretical (rare)</div>
+            <div class="fl">MIMD: Multiple Instruction, Multiple Data streams      → Multiprocessors, clusters</div>
+          </div>
+          <div class="dbox">
+            <svg viewBox="0 0 560 280" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <text x="10" y="16" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">Flynn's Taxonomy — All 4 Classifications</text>
+              <!-- SISD -->
+              <rect x="10" y="30" width="130" height="80" rx="6" fill="#0c1e28" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="75" y="48" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">SISD</text>
+              <text x="75" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">IS → [CU] → [PU] → DS</text>
+              <text x="75" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Single processor</text>
+              <text x="75" y="90" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Example: Basic CPU</text>
+              <text x="75" y="104" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Von Neumann arch</text>
+              <!-- SIMD -->
+              <rect x="155" y="30" width="130" height="80" rx="6" fill="#0c1e28" stroke="#10b981" stroke-width="1.5"/>
+              <text x="220" y="48" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">SIMD</text>
+              <text x="220" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">IS → [CU] → [PU₁..PUₙ]</text>
+              <text x="220" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Multiple data streams</text>
+              <text x="220" y="90" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Example: GPU, SSE/AVX</text>
+              <text x="220" y="104" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Vector processor</text>
+              <!-- MISD -->
+              <rect x="300" y="30" width="130" height="80" rx="6" fill="#0c1e28" stroke="#f97316" stroke-width="1.5"/>
+              <text x="365" y="48" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">MISD</text>
+              <text x="365" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">IS₁..ISₙ → [PU₁..PUₙ]</text>
+              <text x="365" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Same data, diff ops</text>
+              <text x="365" y="90" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Example: Fault-tolerant</text>
+              <text x="365" y="104" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">systems, cryptanalysis</text>
+              <!-- MIMD -->
+              <rect x="10" y="145" width="420" height="120" rx="6" fill="#0c1e28" stroke="#a78bfa" stroke-width="2"/>
+              <text x="220" y="163" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">MIMD — Most Common Modern Architecture</text>
+              <!-- Processor boxes -->
+              <rect x="30" y="175" width="60" height="30" rx="3" fill="#152432" stroke="#a78bfa" stroke-width="1"/>
+              <text x="60" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CPU₁+Mem₁</text>
+              <rect x="105" y="175" width="60" height="30" rx="3" fill="#152432" stroke="#a78bfa" stroke-width="1"/>
+              <text x="135" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CPU₂+Mem₂</text>
+              <rect x="180" y="175" width="60" height="30" rx="3" fill="#152432" stroke="#a78bfa" stroke-width="1"/>
+              <text x="210" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CPU₃+Mem₃</text>
+              <rect x="255" y="175" width="60" height="30" rx="3" fill="#152432" stroke="#a78bfa" stroke-width="1"/>
+              <text x="285" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CPU₄+Mem₄</text>
+              <rect x="330" y="175" width="80" height="30" rx="3" fill="#152432" stroke="#a78bfa" stroke-width="1"/>
+              <text x="370" y="194" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">CPU_n+Mem_n</text>
+              <!-- Interconnect -->
+              <rect x="30" y="220" width="380" height="18" rx="3" fill="#102534" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="220" y="232" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">Interconnection Network / Shared Memory Bus</text>
+              <text x="220" y="255" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Example: Multicore CPUs, Server clusters, Supercomputers</text>
+            </svg>
+            <div class="dcap">Fig — Flynn's Four Categories with MIMD showing multiprocessor architecture</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📖 Part C — 10 marks (Q2)</div>
+          <div class="pred-q">What is DMA? Draw the block diagram of DMA controller and explain it.</div>
+          <div class="pred-reason">DMA appeared as Part C Q1 in 2024 and Part C Q4 in 2025 — two consecutive papers. This is the most consistently tested Part C topic alongside Booth's. CERTAIN for 2026. Draw the full DMA controller diagram.</div>
+          <span class="pred-conf high">CERTAIN</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Full Answer &amp; Block Diagram</button>
+        <div class="pred-answer">
+          <p><strong>DMA (Direct Memory Access)</strong> is an I/O technique that allows I/O devices to transfer data directly to/from main memory without CPU involvement for each data word. The CPU only sets up the DMA transfer — then the DMA controller handles the actual byte-by-byte transfer, freeing the CPU for other tasks.</p>
+          <p><strong>Why DMA?</strong> Programmed I/O wastes CPU time waiting for I/O; interrupt-driven I/O still requires CPU for each word transfer. DMA handles entire blocks of data autonomously.</p>
+          <div class="dbox">
+            <svg viewBox="0 0 540 280" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <text x="10" y="16" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">DMA Controller — Block Diagram</text>
+              <!-- CPU -->
+              <rect x="10" y="40" width="100" height="50" rx="5" fill="#0c1e28" stroke="#a78bfa" stroke-width="2"/>
+              <text x="60" y="70" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">CPU</text>
+              <!-- DMA Controller -->
+              <rect x="180" y="30" width="180" height="200" rx="8" fill="#102534" stroke="#f97316" stroke-width="2.5"/>
+              <text x="270" y="52" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">DMA CONTROLLER</text>
+              <rect x="195" y="60" width="150" height="25" rx="3" fill="#0c1e28" stroke="#22d3ee" stroke-width="1.5"/>
+              <text x="270" y="77" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9">Address Register (MAR)</text>
+              <rect x="195" y="93" width="150" height="25" rx="3" fill="#0c1e28" stroke="#10b981" stroke-width="1.5"/>
+              <text x="270" y="110" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">Word Count Register (WC)</text>
+              <rect x="195" y="126" width="150" height="25" rx="3" fill="#0c1e28" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="270" y="143" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9">Control Register</text>
+              <rect x="195" y="159" width="150" height="25" rx="3" fill="#0c1e28" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="270" y="176" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9">Data Register (MDR)</text>
+              <text x="270" y="210" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Interrupt/Status Logic</text>
+              <!-- Memory -->
+              <rect x="420" y="40" width="110" height="50" rx="5" fill="#0c1e28" stroke="#22d3ee" stroke-width="2"/>
+              <text x="475" y="70" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="10">MAIN MEMORY</text>
+              <!-- I/O Device -->
+              <rect x="420" y="170" width="110" height="50" rx="5" fill="#0c1e28" stroke="#10b981" stroke-width="2"/>
+              <text x="475" y="195" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">I/O DEVICE</text>
+              <text x="475" y="210" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">(Disk/HDD/NIC)</text>
+              <!-- Buses -->
+              <line x1="110" y1="65" x2="180" y2="65" stroke="#a78bfa" stroke-width="2"/>
+              <text x="140" y="58" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">Setup</text>
+              <line x1="360" y1="65" x2="420" y2="65" stroke="#22d3ee" stroke-width="2"/>
+              <text x="390" y="58" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">Address Bus</text>
+              <line x1="360" y1="195" x2="420" y2="195" stroke="#10b981" stroke-width="2"/>
+              <text x="390" y="188" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8">Data Bus</text>
+              <!-- DMA to Memory arrow (data path) -->
+              <line x1="475" y1="90" x2="475" y2="170" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+              <text x="498" y="135" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">Direct</text>
+              <text x="498" y="148" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">Transfer</text>
+              <!-- Interrupt line -->
+              <line x1="60" y1="90" x2="60" y2="240" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <line x1="60" y1="240" x2="180" y2="240" stroke="#ef4444" stroke-width="1.5"/>
+              <text x="120" y="255" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Interrupt on completion</text>
+            </svg>
+            <div class="dcap">Fig — DMA Controller Block Diagram: CPU sets up registers; DMA autonomously transfers data between I/O device and main memory</div>
+          </div>
+          <p><strong>DMA Operation Steps:</strong></p>
+          <ul>
+            <li><strong>Step 1 — CPU Setup:</strong> CPU initialises DMA: loads starting memory address into MAR, word count into WC, direction (read/write) into Control Register. CPU then frees itself.</li>
+            <li><strong>Step 2 — DMA Request:</strong> I/O device signals DMA when ready to transfer. DMA requests bus control from CPU (HOLD/HLDA signals).</li>
+            <li><strong>Step 3 — Cycle Stealing:</strong> DMA steals one bus cycle at a time — CPU releases bus briefly, DMA transfers one word, returns bus to CPU. CPU continues with non-memory operations.</li>
+            <li><strong>Step 4 — Count Down:</strong> DMA decrements WC after each word transfer, increments MAR to next memory location.</li>
+            <li><strong>Step 5 — Completion Interrupt:</strong> When WC reaches 0, DMA signals CPU via interrupt. CPU resumes I/O control.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📖 Part C — 10 marks (Q3)</div>
+          <div class="pred-q">Explain Booth's Algorithm with flowchart. Perform multiplication of (-11) × (+6) using Booth's Algorithm.</div>
+          <div class="pred-reason">Booth's Algorithm has appeared in EVERY SINGLE CAO paper: 2022 (-13×+9), 2024 (8×-8), 2025 (-13×+9). New values will be used in 2026 — do NOT memorise one example. Master the flowchart and the step-by-step register method for any pair of signed numbers.</div>
+          <span class="pred-conf high">CERTAIN — 100% of all papers</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Full Answer with Worked Example</button>
+        <div class="pred-answer">
+          <p><strong>Booth's Algorithm</strong> is a hardware multiplication algorithm for signed (2's complement) binary numbers. It produces the correct 2n-bit product for two n-bit signed operands by examining pairs of multiplier bits and deciding whether to add, subtract, or do nothing to an accumulator.</p>
+          <div class="fbox">
+            <span class="flbl">Booth's Algorithm — Rules for Each Step</span>
+            <div class="fl">Examine (Qₙ, Qₙ₋₁) — current bit and previous bit of multiplier Q</div>
+            <div class="fl">00 → Arithmetic Shift Right (ASR) only — no add/subtract</div>
+            <div class="fl">01 → A ← A + M ; then ASR(A, Q, Qₙ₋₁)</div>
+            <div class="fl">10 → A ← A − M ; then ASR(A, Q, Qₙ₋₁) [subtract = add 2's complement]</div>
+            <div class="fl">11 → Arithmetic Shift Right (ASR) only — no add/subtract</div>
+            <div class="fn">Initial: A=0, Q=multiplier, Q₋₁=0, M=multiplicand | Repeat n times | Result in (A,Q)</div>
+          </div>
+          <p><strong>Worked Example: (-11) × (+6), using 5-bit representation</strong></p>
+          <ul>
+            <li>(-11) in 5-bit 2's complement: 10101 = Multiplicand M</li>
+            <li>(+6) in 5-bit: 00110 = Multiplier Q, initially Q₋₁ = 0</li>
+            <li>-M (for subtraction) = 01011</li>
+          </ul>
+          <div class="fbox">
+            <span class="flbl">Booth's Steps — (-11) × (+6), n=5 iterations</span>
+            <div class="fl">Init:   A=00000  Q=00110  Q₋₁=0  M=10101  -M=01011</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">Step 1: Q₁Q₋₁ = Q₀,Q₋₁ = 0,0 → ASR</div>
+            <div class="fl">        A=00000 Q=00011 Q₋₁=0</div>
+            <div class="fl">Step 2: Q₀Q₋₁ = 1,0 → A ← A+M = 00000+10101 = 10101</div>
+            <div class="fl">        ASR: A=11010 Q=10001 Q₋₁=1</div>
+            <div class="fl">Step 3: Q₀Q₋₁ = 1,1 → ASR only</div>
+            <div class="fl">        A=11101 Q=01000 Q₋₁=1</div>
+            <div class="fl">Step 4: Q₀Q₋₁ = 0,1 → A ← A-M = A+(-M) = 11101+01011 = 101000 → 01000</div>
+            <div class="fl">        ASR: A=00100 Q=00100 Q₋₁=0</div>
+            <div class="fl">Step 5: Q₀Q₋₁ = 0,0 → ASR only</div>
+            <div class="fl">        A=00010 Q=00010 Q₋₁=0</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">Result = (A,Q) = 00010 00010 = 0001000010 binary</div>
+            <div class="fl">Decimal check: -11 × +6 = -66 ✓ (0001000010 = -66 in signed)</div>
+          </div>
+          <div class="tip-box trick">
+            <div class="tip-icon">⚡</div>
+            <div class="tip-content">
+              <p><strong>Booth's Exam Trick:</strong> Always verify: convert your final binary result to decimal and check it equals multiplicand × multiplier. For (-11)×(+6) = -66 in decimal. If your binary answer in (A,Q) = -66, you are correct. Also: arithmetic shift right preserves the sign bit (replicate MSB), unlike logical shift right which fills with 0.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📖 Part C — 10 marks (Q4)</div>
+          <div class="pred-q">Explain the need of cache memory. Elaborate over the three types of mapping with neat diagrams.</div>
+          <div class="pred-reason">All three cache mapping types in one Part C question appeared in 2022 (Q3) — absent from 2023, 2024, 2025. A three-year absence makes this strongly overdue. The 2026 DIP paper brought back 2022-only topics. Cover all 3: direct, associative, set-associative with worked examples.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Full Answer with All 3 Mapping Types</button>
+        <div class="pred-answer">
+          <p><strong>Need of Cache Memory:</strong> CPU speed grows faster than DRAM speed — the "memory wall" problem. Cache bridges this gap using temporal and spatial locality.</p>
+          <p><strong>Three Cache Mapping Techniques:</strong></p>
+          <p><strong>1. Direct Mapping:</strong> Each main memory block maps to exactly ONE cache line. Simple and fast lookup, but suffers from conflict misses.</p>
+          <div class="fbox">
+            <div class="fl">Address = Tag | Line Number | Word Offset</div>
+            <div class="fl">Cache Line = Block number mod (Number of cache lines)</div>
+            <div class="fn">Hit check: compare address tag with stored tag at that line. If match → hit, else → miss + replace</div>
+          </div>
+          <p><strong>2. Fully Associative Mapping:</strong> Any main memory block can go into any cache line. Maximum flexibility, minimum conflict misses, but expensive comparison hardware (one comparator per line).</p>
+          <div class="fbox">
+            <div class="fl">Address = Tag | Word Offset</div>
+            <div class="fl">Hit check: Compare tag against ALL cache lines simultaneously (parallel comparison)</div>
+            <div class="fn">Replacement: LRU (Least Recently Used), FIFO, or Random</div>
+          </div>
+          <p><strong>3. Set-Associative Mapping:</strong> Compromise. Cache divided into s sets, each with k lines. Block maps to one set (direct) but any line within that set (associative). k-way set associative.</p>
+          <div class="fbox">
+            <div class="fl">Address = Tag | Set Number | Word Offset</div>
+            <div class="fl">Set = Block number mod (Number of sets)</div>
+            <div class="fn">Hit check: Check all k lines in the selected set (only k comparators needed) | Most used: 2-way, 4-way, 8-way</div>
+          </div>
+          <p><strong>Comparison Table:</strong></p>
+          <div class="fbox">
+            <div class="fl">Property        | Direct      | Associative | Set-Assoc</div>
+            <div class="fl">────────────────────────────────────────────────────</div>
+            <div class="fl">Flexibility     | Lowest      | Highest     | Middle</div>
+            <div class="fl">Conflict misses | High        | None        | Low</div>
+            <div class="fl">Hardware cost   | Lowest      | Highest     | Middle</div>
+            <div class="fl">Search time     | Fastest     | Slowest     | Fast</div>
+            <div class="fl">Usage           | Simple caches| TLBs       | Modern CPUs</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pred-card">
+        <div class="pred-card-head">
+          <div class="pred-part">📖 Part C — 10 marks (Q5)</div>
+          <div class="pred-q">How many 128×8 RAM chips are needed for a memory capacity of 4096 bytes? (+ address lines, chip select lines, decoder size)</div>
+          <div class="pred-reason">The 128×8 RAM chip design problem appeared in 2022 (Part C Q5, for 2048 bytes) and 2025 (Part C Q5, for 2048 bytes). For 2026, the memory size will change — predicted: 4096 bytes. The METHOD is identical — master it for any given size.</div>
+          <span class="pred-conf high">HIGH confidence</span>
+        </div>
+        <button class="pred-answer-toggle" onclick="toggle(this)">▼ Show Full Numerical Solution</button>
+        <div class="pred-answer">
+          <p><strong>Given:</strong> RAM chip size = 128 × 8 bits. Target memory = 4096 bytes.</p>
+          <div class="fbox">
+            <span class="flbl">RAM Chip Design — Step by Step (MEMORISE THIS METHOD)</span>
+            <div class="fl">Chip capacity = 128 × 8 = 128 bytes (128 words, 8 bits each)</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">(i) Number of chips = Total memory / Chip size</div>
+            <div class="fl">    = 4096 / 128 = 32 chips</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">(ii) Address bus lines = log₂(Total words) = log₂(4096) = 12 lines</div>
+            <div class="fl">    Chip address lines = log₂(128) = 7 lines (common to ALL chips)</div>
+            <div class="fl">    Chip select lines = 12 − 7 = 5 lines</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">(iii) Chip select lines needed for decoder = 5 lines</div>
+            <div class="fl">─────────────────────────────────────────────────</div>
+            <div class="fl">(iv) Decoder size = 5 × 32 (5-to-32 decoder)</div>
+            <div class="fl">     (5 input lines select 1 of 32 chips)</div>
+            <div class="fn">Verify: 32 chips × 128 bytes = 4096 bytes ✓ | 2^5 = 32 chips ✓ | 7+5=12 address lines ✓</div>
+          </div>
+          <div class="tip-box trick">
+            <div class="tip-icon">⚡</div>
+            <div class="tip-content">
+              <p><strong>Quick Formula for any RAM chip problem:</strong><br>
+              Chips = Target / Chip_size<br>
+              Total address bits = log₂(Target words)<br>
+              Chip address bits = log₂(Chip words)<br>
+              Chip select bits = Total − Chip = log₂(Number of chips)<br>
+              Decoder = (chip select bits) × (Number of chips)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pred-grid -->
+
+    <div class="prep-box">
+      <h3>✅ Quick Preparation Strategy — CAO 2026</h3>
+      <p><strong>MUST prepare completely (with diagrams and worked examples):</strong> Booth's Algorithm for any signed values (CERTAIN — in every paper), DMA block diagram and cycle-stealing explanation, Flynn's taxonomy all 4 categories with block diagrams, all 3 cache mapping techniques with worked address examples, RAM chip design calculation method for any given size.<br><br>
+      <strong>MUST prepare for Part B:</strong> Logical microoperations (AND/OR/XOR/COMP + 4 applications: selective set, selective complement, selective clear, masking), Hardwired vs Microprogrammed CU comparison table, Set-Associative mapping with example, Cache + Hit Ratio numerical, Serial communication baud rate calculation, Arithmetic pipeline speedup.<br><br>
+      <strong>Part A only (25 words max):</strong> RISC vs CISC key differences, Instruction cycle phases, Addressing modes (all 7, one line each), Pipeline characteristics and speedup formula, Bus types (data/address/control), Micro-operation definition, Fixed point vs 2's complement, Parallel processing types, Subroutine + stack role, Cache Hit Ratio formula.</p>
+    </div>
+  </div>
+</div><!-- /predicted-section -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="index.html">🏠 Home</a>
+    <a href="unit1.html">🖥️ U1: Basics</a>
+    <a href="unit2.html">🔢 U2: Arithmetic</a>
+    <a href="unit3.html">💾 U3: Memory</a>
+    <a href="unit4.html">⚡ U4: Pipeline</a>
+    <a href="unit5.html">🔄 U5: Parallel</a>
+    <a href="unit6.html">🎛️ U6: I/O</a>
+    <a href="pyq.html" style="color:var(--upred)">📋 Solved PYQs</a>
+  </div>
+  © 2026 Mahansh Gaur · CAO RTU Study Guide · 6E7104 / 6CAI4-04 · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans = btn.nextElementSibling;
+  if(ans.classList.contains('open')){
+    ans.classList.remove('open');
+    btn.textContent = btn.textContent.replace('▲','▼');
+  } else {
+    ans.classList.add('open');
+    btn.textContent = btn.textContent.replace('▼','▲');
+  }
+}
+</script>
+</body>
+</html>
