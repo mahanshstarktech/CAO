@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO Unit 3 — Programming the Basic Computer & Microprogrammed Control | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:       #050d10;
+  --bg2:      #071520;
+  --surface:  #0c1e28;
+  --surface2: #102534;
+  --border:   #1a3545;
+  --border2:  #0e2030;
+  --u1: #22d3ee;
+  --u2: #f97316;
+  --u3: #ef4444;
+  --u4: #a78bfa;
+  --u5: #10b981;
+  --u6: #3b82f6;
+  --upred: #f59e0b;
+  --gold: #fbbf24;
+  --text: #dde8f2;
+  --dim:  #3a5868;
+  --dim2: #6090a8;
+  --mono: 'JetBrains Mono', monospace;
+  --head: 'Fraunces', serif;
+  --body: 'Outfit', sans-serif;
+  --sidebar-w: 300px;
+  --content-max: 1400px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: clamp(16px, 1.1vw, 20px); }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  line-height: 1.82;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(5,13,16,0.97);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 28px;
+  display: flex; align-items: center; gap: 4px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.topnav::-webkit-scrollbar { display: none; }
+.tnlabel {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--u3);
+  padding: 15px 14px 15px 0;
+  border-right: 1px solid var(--border); margin-right: 8px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.tnlink {
+  font-family: var(--mono); font-size: 11.5px;
+  padding: 8px 14px; border-radius: 6px;
+  text-decoration: none; color: var(--dim2);
+  white-space: nowrap; flex-shrink: 0;
+  transition: all .18s; border: 1px solid transparent;
+}
+.tnlink:hover { color: var(--text); background: var(--surface2); }
+.tnlink.active { color: var(--u3); background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); }
+.tnlink.pyq { color: var(--upred); background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.22); }
+.tnlink.pred { color: var(--upred); background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.35); font-weight: 600; }
+
+.credit-band {
+  background: #060e14; border-bottom: 1px solid var(--border2);
+  padding: 11px 32px;
+  display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;
+}
+.credit-text { font-family: var(--mono); font-size: 11.5px; color: var(--dim2); }
+.credit-text span { color: var(--u3); font-weight: 600; }
+
+.hero {
+  position: relative; overflow: hidden;
+  padding: clamp(40px, 6vw, 80px) 5vw clamp(36px, 5vw, 64px);
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(167,139,250,.1) 1px, transparent 1px),
+    radial-gradient(circle, rgba(34,211,238,.05) 1px, transparent 1px);
+  background-size: 44px 44px, 88px 88px;
+  background-position: 0 0, 22px 22px;
+  animation: dotDrift 30s linear infinite;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 55% at 10% 50%, rgba(167,139,250,.08) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 50% at 85% 15%, rgba(34,211,238,.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+@keyframes dotDrift { 0%{transform:translate(0,0);} 100%{transform:translate(44px,44px);} }
+.hero-inner { position: relative; z-index: 1; max-width: var(--content-max); margin: 0 auto; }
+.hero-tag {
+  font-family: var(--mono); font-size: clamp(10px,0.75vw,12px); color: var(--u4);
+  letter-spacing: 3px; text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+.hero-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--u4); box-shadow: 0 0 14px var(--u4);
+  animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(.7);} }
+.hero h1 {
+  font-family: var(--head); font-weight: 800;
+  font-size: clamp(30px, 5vw, 72px);
+  line-height: 1.02; color: #fff; letter-spacing: -1.5px;
+  margin-bottom: 18px;
+}
+.hero h1 span { color: var(--u4); }
+.hero h1 em { color: var(--u1); font-style: normal; }
+.hero-sub {
+  color: var(--dim2); font-size: clamp(15px, 1.4vw, 19px);
+  max-width: 760px; line-height: 1.8; margin-bottom: 22px;
+}
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  font-family: var(--mono); font-size: clamp(10px,0.7vw,12px);
+  padding: 5px 14px; border-radius: 5px; border: 1px solid;
+}
+.badge-r { color: var(--u3); border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08); }
+.badge-c { color: var(--u1); border-color: rgba(34,211,238,.35); background: rgba(34,211,238,.08); }
+.badge-v { color: var(--u4); border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08); }
+.badge-o { color: var(--u2); border-color: rgba(249,115,22,.35); background: rgba(249,115,22,.08); }
+.badge-gold { color: var(--upred); border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.08); }
+.badge-g { color: var(--u5); border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.08); }
+
+.layout { display: flex; max-width: 100%; }
+
+.sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  padding: 28px 18px;
+  border-right: 1px solid var(--border);
+  position: sticky; top: 44px;
+  height: calc(100vh - 44px);
+  overflow-y: auto; scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  flex-shrink: 0;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.sidebar-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 18px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-title { font-family: var(--mono); font-size: 10px; color: var(--u4); letter-spacing: 2px; text-transform: uppercase; }
+.sidebar-close {
+  display: none; background: none;
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--dim2); cursor: pointer;
+  padding: 2px 9px; font-family: var(--mono); font-size: 11px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 7px; cursor: pointer;
+  font-family: var(--head); font-size: clamp(12px,0.85vw,14px); font-weight: 600;
+  color: var(--dim2); transition: all .2s; margin-bottom: 3px;
+  text-decoration: none; line-height: 1.3;
+}
+.nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); }
+.nav-item.active { color: var(--u4); border-left: 2px solid var(--u4); padding-left: 10px; }
+.nav-imp {
+  margin-left: auto; font-family: var(--mono); font-size: 10px;
+  padding: 2px 7px; border-radius: 3px; background: var(--surface2);
+  white-space: nowrap;
+}
+.nav-imp.high { color: var(--u3); }
+.nav-imp.med { color: var(--upred); }
+.nav-imp.low { color: var(--u5); }
+
+.sidebar-toggle {
+  display: none; position: fixed; bottom: 22px; right: 22px; z-index: 1000;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--u4); border: none; cursor: pointer;
+  font-size: 22px; color: #fff; align-items: center; justify-content: center;
+  box-shadow: 0 4px 24px rgba(167,139,250,.45); transition: transform .2s;
+}
+.sidebar-toggle:hover { transform: scale(1.1); }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.75); z-index: 98; backdrop-filter: blur(3px);
+}
+.sidebar-overlay.visible { display: block; }
+
+.content {
+  flex: 1;
+  padding: clamp(28px,3.5vw,56px) clamp(22px,4vw,80px);
+  max-width: calc(100% - var(--sidebar-w));
+  overflow-x: hidden; min-width: 0;
+}
+
+.section { margin-bottom: 80px; scroll-margin-top: 64px; }
+.section-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 28px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.section-num {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--u4); background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.3);
+  padding: 5px 10px; border-radius: 5px; min-width: 40px; text-align: center;
+}
+.section-title {
+  font-family: var(--head); font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 800; color: #fff;
+}
+.imp-pill { margin-left: auto; }
+
+.theory-block {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: clamp(20px,2.5vw,32px); margin-bottom: 22px;
+}
+.theory-block h3 {
+  font-family: var(--head); font-size: clamp(16px, 1.6vw, 21px);
+  font-weight: 700; color: var(--u2); margin-bottom: 14px;
+}
+.theory-block h3.red { color: var(--u3); }
+.theory-block h3.cyan { color: var(--u1); }
+.theory-block h3.violet { color: var(--u4); }
+.theory-block h3.green { color: var(--u5); }
+.theory-block p { margin-bottom: 14px; font-size: clamp(15px,1vw,17px); line-height: 1.85; }
+.theory-block p:last-child { margin-bottom: 0; }
+.theory-block ul, .theory-block ol { padding-left: 24px; margin: 12px 0; }
+.theory-block li { margin-bottom: 9px; font-size: clamp(15px,1vw,17px); line-height: 1.75; }
+h4 { font-family: var(--head); font-size: clamp(14px,1vw,17px); font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+
+.layman {
+  background: rgba(167,139,250,.06);
+  border: 1px solid rgba(167,139,250,.2);
+  border-left: 3px solid var(--u4);
+  border-radius: 8px; padding: 16px 20px;
+  font-family: var(--mono); font-size: clamp(12px,0.8vw,14px);
+  color: #c4b5fd; margin: 14px 0; line-height: 1.75;
+}
+.layman::before { content: '💬 LAYMAN: '; color: var(--u4); font-weight: 700; }
+
+.formula-box {
+  background: #030c14;
+  border: 1px solid rgba(34,211,238,.22);
+  border-left: 3px solid var(--u1);
+  border-radius: 9px; padding: 18px 22px;
+  margin: 18px 0;
+  font-family: var(--mono); font-size: clamp(11px,0.78vw,14px);
+  color: #67e8f9; overflow-x: auto; line-height: 1.7;
+}
+.formula-box .label {
+  font-size: clamp(9px,0.65vw,11px); color: var(--dim);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 10px; display: block;
+}
+.formula-box .formula { color: #a5f3fc; font-size: clamp(12px,0.82vw,15px); }
+.formula-box .note { color: var(--dim2); font-size: clamp(11px,0.73vw,13px); margin-top: 8px; display: block; font-style: italic; }
+
+.tip-box {
+  border-radius: 9px; padding: 18px 20px;
+  margin: 16px 0; display: flex; gap: 14px;
+}
+.tip-box.trick { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.25); }
+.tip-box.validate { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.25); }
+.tip-box.connect { background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.25); }
+.tip-box.warning { background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.25); }
+.tip-box.pred { background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25); }
+.tip-icon { font-size: 21px; flex-shrink: 0; margin-top: 3px; }
+.tip-content { flex: 1; }
+.tip-title {
+  font-family: var(--head); font-size: clamp(11px,0.8vw,14px);
+  font-weight: 700; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.tip-box.trick .tip-title { color: var(--gold); }
+.tip-box.validate .tip-title { color: var(--u5); }
+.tip-box.connect .tip-title { color: var(--u4); }
+.tip-box.warning .tip-title { color: var(--u3); }
+.tip-box.pred .tip-title { color: var(--upred); }
+.tip-content p { font-size: clamp(13px,0.88vw,16px); color: var(--text); margin: 0; line-height: 1.75; }
+
+.comp-table {
+  width: 100%; border-collapse: collapse;
+  margin: 18px 0; font-size: clamp(12px,0.85vw,15px);
+  display: block; overflow-x: auto;
+}
+.comp-table th {
+  background: var(--surface2); padding: 12px 16px;
+  text-align: left; font-family: var(--head);
+  font-weight: 700; color: var(--u1);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.comp-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--surface2); }
+
+.imp-bar-wrap { margin-bottom: 12px; }
+.imp-bar-label {
+  font-family: var(--mono); font-size: clamp(10px,0.73vw,13px);
+  color: var(--dim2); margin-bottom: 5px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.imp-bar { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.imp-bar-fill { height: 100%; border-radius: 4px; }
+.imp-high .imp-bar-fill { background: var(--u3); }
+.imp-med .imp-bar-fill { background: var(--upred); }
+.imp-low .imp-bar-fill { background: var(--u5); }
+
+.steps { margin: 16px 0; }
+.step-item { display: flex; gap: 16px; margin-bottom: 14px; }
+.step-num {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--u4); color: #fff;
+  font-family: var(--mono); font-weight: 700; font-size: clamp(11px,0.78vw,14px);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-text { font-size: clamp(14px,1vw,17px); padding-top: 6px; line-height: 1.75; }
+
+.diagram-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 22px; margin: 18px 0; text-align: center;
+  overflow-x: auto;
+}
+.diagram-cap {
+  font-family: var(--mono); font-size: clamp(10px,0.72vw,12px);
+  color: var(--dim2); margin-top: 12px; text-align: center;
+}
+
+.pred-banner {
+  background: linear-gradient(135deg, rgba(245,158,11,.09), rgba(245,158,11,.03));
+  border: 1px solid rgba(245,158,11,.35);
+  border-left: 3px solid var(--upred);
+  border-radius: 9px; padding: 14px 18px;
+  margin: 16px 0; font-family: var(--mono);
+  font-size: clamp(11px,0.78vw,14px); color: var(--upred);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.pred-banner .pb-icon { flex-shrink: 0; font-size: 18px; }
+.pred-banner .pb-text { line-height: 1.7; }
+
+.pyq-section {
+  background: #060f18; border: 1px solid rgba(245,158,11,.25);
+  border-radius: 12px; padding: clamp(18px,2.5vw,28px); margin-top: 26px;
+}
+.pyq-header {
+  font-family: var(--head); font-size: clamp(14px,1vw,17px);
+  font-weight: 700; color: var(--upred);
+  margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+}
+.pyq-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 9px; padding: 18px 20px; margin-bottom: 16px;
+}
+.pyq-q-text {
+  font-family: var(--head); font-size: clamp(14px,1vw,17px);
+  font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.45;
+}
+.pyq-meta {
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px); color: var(--dim2);
+  margin-bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap;
+}
+.topic-tag {
+  background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.25);
+  color: var(--u4); padding: 2px 9px; border-radius: 4px;
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px);
+}
+.pred-tag {
+  background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25);
+  color: var(--upred); padding: 2px 9px; border-radius: 4px;
+  font-family: var(--mono); font-size: clamp(9px,0.68vw,12px);
+}
+.pyq-toggle {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 16px; cursor: pointer;
+  font-family: var(--mono); font-size: clamp(10px,0.73vw,13px); color: var(--upred);
+  margin-top: 12px; transition: all .2s;
+}
+.pyq-toggle:hover { background: var(--upred); color: #000; }
+.answer-content { display: none; margin-top: 16px; font-size: clamp(14px,0.93vw,17px); line-height: 1.85; }
+.answer-content.open { display: block; }
+
+code { font-family: var(--mono); background: var(--surface2); padding: 2px 7px; border-radius: 4px; font-size: clamp(11px,0.78vw,14px); color: var(--u4); }
+.hl { color: var(--u1); font-weight: 600; }
+.hl-o { color: var(--u2); font-weight: 600; }
+.hl-r { color: var(--u3); font-weight: 600; }
+.hl-v { color: var(--u4); font-weight: 600; }
+.hl-g { color: var(--u5); font-weight: 600; }
+.hl-gold { color: var(--upred); font-weight: 600; }
+
+/* CODE BLOCKS */
+.code-block {
+  background: #030c14;
+  border: 1px solid rgba(167,139,250,.25);
+  border-left: 3px solid var(--u4);
+  border-radius: 9px; padding: 18px 22px;
+  margin: 18px 0;
+  font-family: var(--mono); font-size: clamp(11px,0.78vw,14px);
+  color: #c4b5fd; overflow-x: auto; line-height: 1.9;
+}
+.code-block .code-label {
+  font-size: clamp(9px,0.65vw,11px); color: var(--dim);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 12px; display: block;
+}
+.code-block .comment { color: var(--dim2); }
+.code-block .keyword { color: var(--u1); }
+.code-block .addr { color: var(--u2); }
+.code-block .instr { color: #c4b5fd; }
+.code-block .operand { color: var(--u5); }
+
+.pred-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 24px; }
+.pred-card {
+  background: var(--surface); border: 1px solid rgba(245,158,11,.2);
+  border-radius: 12px; padding: 20px 22px;
+  border-top: 3px solid var(--upred);
+}
+.pred-part { font-family: var(--mono); font-size: clamp(9px,0.72vw,12px); color: var(--dim2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.pred-q { font-family: var(--head); font-size: clamp(13px,0.95vw,16px); font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.4; }
+.pred-reason { font-size: clamp(12px,0.82vw,14px); color: var(--dim2); line-height: 1.7; margin-bottom: 10px; }
+.pred-conf { font-family: var(--mono); font-size: clamp(9px,0.7vw,12px); padding: 3px 10px; border-radius: 4px; }
+.pred-conf.high { color: var(--u3); background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); }
+.pred-conf.med { color: var(--upred); background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); }
+.pred-badge {
+  display: inline-block; font-family: var(--mono); font-size: clamp(10px,0.78vw,13px);
+  color: var(--upred); background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.3); padding: 5px 14px;
+  border-radius: 5px; margin-bottom: 14px;
+}
+.sec-header h2 {
+  font-family: var(--head); font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 800; color: #fff; margin-bottom: 6px;
+}
+.sec-header .sub { font-family: var(--mono); font-size: clamp(9px,0.72vw,12px); color: var(--dim2); letter-spacing: 1px; }
+
+.site-footer {
+  background: #030b10; border-top: 1px solid var(--border2);
+  padding: 28px 5vw; text-align: center;
+  font-family: var(--mono); font-size: clamp(10px,0.72vw,12px); color: var(--dim);
+}
+.site-footer a { color: var(--dim2); text-decoration: none; margin: 0 14px; transition: color .2s; }
+.site-footer a:hover { color: var(--u4); }
+.site-footer .footer-links { margin-bottom: 12px; }
+
+@media(max-width: 900px) {
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh;
+    z-index: 99; background: var(--bg);
+    transform: translateX(-100%);
+    transition: transform .3s ease;
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 40px rgba(0,0,0,.9); }
+  .sidebar-close { display: block; }
+  .sidebar-toggle { display: flex; }
+  .content { max-width: 100%; padding: 28px 22px; }
+}
+@media(max-width: 600px) {
+  .hero { padding: 40px 18px 36px; }
+  .theory-block { padding: 18px; }
+  .pyq-section { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink" href="#">🏠 Home</a>
+  <a class="tnlink" href="unit2.html">🔴 U2: Data & Register</a>
+  <a class="tnlink active" href="#">🟣 U3: Programming & Microprogramming</a>
+  <a class="tnlink" href="#">🔢 U4: CPU</a>
+  <a class="tnlink" href="#">💾 U5: Arithmetic & Memory</a>
+  <a class="tnlink" href="#">🔗 U6: I/O & Multi</a>
+  <a class="tnlink pyq" href="#pyq-master">📋 All PYQs</a>
+  <a class="tnlink pred" href="#predicted">🔮 2026 Predicted</a>
+</nav>
+
+<div class="credit-band">
+  <div class="credit-text">CAO Exam Prep · <span>RTU B.Tech VI Sem</span> · 6E7104 / 6E1554 / 610404</div>
+  <div class="credit-text">Made with ♥ for RTU Students</div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📚 B.Tech VI Sem · RTU · Computer Architecture & Organization</div>
+    <h1>Unit 3: <span>Programming</span> the<br>Basic Computer & <em>Microprogrammed Control</em></h1>
+    <p class="hero-sub">Machine language, assembly language, assembler, program loops, subroutines, I/O programming — then control memory, address sequencing, microprogramming, and hardwired vs microprogrammed control unit design. Everything from scratch with layman explanations, formulas, diagrams, and every RTU PYQ (2022–2025) solved + 2026 predictions.</p>
+    <div class="hero-badges">
+      <span class="badge badge-v">🔥 Hardwired vs Microprogrammed — Every Exam</span>
+      <span class="badge badge-gold">🔮 2026 Predicted Topics</span>
+      <span class="badge badge-r">Subroutine — Repeated 2022 & 2025</span>
+      <span class="badge badge-c">Control Memory & Address Sequencing</span>
+      <span class="badge badge-o">Assembly Language Program Examples</span>
+      <span class="badge badge-g">PYQs Solved 2022–2025</span>
+    </div>
+  </div>
+</section>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Unit 3 Topics</div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <a class="nav-item" href="#overview">📊 Overview & Importance</a>
+  <a class="nav-item" href="#machine-lang">💾 Machine Language<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#assembly-lang">⌨️ Assembly Language<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#assembler">🔧 Assembler<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#program-loops">🔁 Program Loops<span class="nav-imp high">78%</span></a>
+  <a class="nav-item" href="#arith-logic-prog">➕ Arithmetic & Logic Ops<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#subroutines">📦 Subroutines<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#io-programming">📡 I/O Programming<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#control-memory">🧠 Control Memory<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#address-seq">🗺️ Address Sequencing<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#microprogram">📝 Microprogram Example<span class="nav-imp med">75%</span></a>
+  <a class="nav-item" href="#hardwired-vs-micro">⚡ Hardwired vs Microprogrammed<span class="nav-imp high">92%</span></a>
+  <a class="nav-item" href="#predicted">🔮 2026 Predicted Paper</a>
+  <a class="nav-item" href="#pyq-master">📝 All PYQs Master List</a>
+</nav>
+
+<main class="content">
+
+<!-- SECTION 00: OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">Topic Importance — Unit 3</h2>
+  </div>
+  <div class="theory-block">
+    <p>Unit 3 covers the SOFTWARE side of the basic computer (programming) and the HARDWARE design of the control unit (microprogramming). The most critical topic — <strong>Hardwired vs Microprogrammed Control Unit</strong> — appears in almost every exam in some part. Subroutines appeared in Part A 2022 and 2025. Control memory appeared in Part A 2024. Assembly language vs machine language appeared in 2023-Aug. I/O programming appeared as a full Part B question in 2023-Aug.</p>
+    <div class="imp-bar-wrap imp-high" style="margin-top:18px">
+      <div class="imp-bar-label"><span>Hardwired vs Microprogrammed Control Unit</span><span style="color:#ef4444">92% 🔮 CERTAIN 2026 Part B</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:92%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Subroutine — Definition, BSA instruction, stack use</span><span style="color:#ef4444">88% — Part A 2022 & 2025</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Control Memory — Structure, words, fields</span><span style="color:#ef4444">85% — Part A 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Assembly Language vs Machine Language</span><span style="color:#ef4444">85% — Part A 2023-Aug</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>I/O Programming — Interrupt-driven, program-controlled</span><span style="color:#ef4444">82%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Address Sequencing in Microprogrammed Control</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Machine Language / Instruction Formats & Programs</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Program Loops / Arithmetic Programming</span><span style="color:#ef4444">78%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:78%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Microprogram Example / Design of Control Unit</span><span style="color:#f59e0b">75%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:75%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Assembler (two-pass process)</span><span style="color:#f59e0b">72%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:72%"></div></div>
+    </div>
+  </div>
+  <div class="tip-box trick">
+    <div class="tip-icon">⚡</div>
+    <div class="tip-content">
+      <div class="tip-title">Exam Strategy — Unit 3</div>
+      <p><strong>Two guaranteed topics from Unit 3:</strong> (1) Hardwired vs Microprogrammed CU — appeared in 2022 Part B Q6, 2023-Aug Part A Q10, 2025 Part B Q4. It's the most consistent Unit 3 topic. Prepare a full comparison table. (2) Subroutine — appeared in Part A in both 2022 and 2025. Know the BSA/BUN mechanism, stack usage, and RTL notation. These two topics = 4-6 marks secured.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 01: MACHINE LANGUAGE -->
+<section class="section" id="machine-lang">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Machine Language</h2>
+    <span class="imp-pill badge badge-v">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Machine Language?</h3>
+    <p><span class="hl-v">Machine language</span> is the lowest-level programming language — the only language a computer's CPU can directly understand and execute. It consists entirely of binary numbers (0s and 1s). Every instruction is a bit pattern that directly maps to a hardware operation.</p>
+    <div class="layman">Machine language is like talking directly to a machine in its own language — pure binary. If you tell the computer "0000 0000 0000 0011" (in the basic computer's format), it knows to do the AND operation on memory address 3. No translation needed — the CPU hardware understands this directly. The problem: extremely hard for humans to write or read!</div>
+    <div class="formula-box">
+      <span class="label">Machine Language Instruction — Basic Computer Format (16 bits)</span>
+      <div class="formula">Binary:   I | Opcode(3) | Address(12)</div>
+      <div class="formula">Example:  0 | 001 | 000000000011  = ADD (direct) memory location 3</div>
+      <div class="formula">          1 | 010 | 000000000101  = LDA (indirect) memory location 5</div>
+      <div class="note">Bit 15 (I): 0 = direct addressing, 1 = indirect addressing</div>
+      <div class="note">Bits 14-12 (Opcode): 000=AND, 001=ADD, 010=LDA, 011=STA, 100=BUN, 101=BSA, 110=ISZ</div>
+      <div class="note">Bits 11-0 (Address): 12-bit address → 4096 memory locations</div>
+    </div>
+    <h3>Three Types of Machine Language Instruction Formats</h3>
+    <table class="comp-table">
+      <tr><th>Type</th><th>Format</th><th>Description</th><th>Example</th></tr>
+      <tr><td><span class="hl-v">Memory-Reference</span></td><td>I(1) + Opcode(3) + Address(12)</td><td>Access memory — needs address field</td><td>AND, ADD, LDA, STA, BUN, BSA, ISZ</td></tr>
+      <tr><td><span class="hl-o">Register-Reference</span></td><td>0111 + Operation(12)</td><td>Operate on AC — no memory needed</td><td>CLA, CMA, INC, HLT</td></tr>
+      <tr><td><span class="hl-r">I/O Reference</span></td><td>1111 + Operation(12)</td><td>I/O device operations</td><td>INP, OUT, SKI, SKO, ION, IOF</td></tr>
+    </table>
+    <h3>Hexadecimal Representation</h3>
+    <p>Machine language is usually written in <span class="hl-o">hexadecimal</span> (base 16) to make it more compact. Each hex digit represents 4 bits. A 16-bit instruction becomes 4 hex digits.</p>
+    <div class="formula-box">
+      <span class="label">Binary to Hex Conversion for Instructions</span>
+      <div class="formula">Binary: 0 001 000000000011  →  4 groups of 4 bits: 0001 | 0000 | 0000 | 0011</div>
+      <div class="formula">Hex:    1    |    0    |    0    |    3   →   1003 (hex)</div>
+      <div class="formula">Meaning: I=0 (direct), Opcode=001 (ADD), Address=003</div>
+      <div class="formula"></div>
+      <div class="formula">Hex 7800: Binary 0111 1000 0000 0000 → Register-reference (opcode=111, I=0)</div>
+      <div class="formula">         Bit 11=1 → CLA (Clear Accumulator)</div>
+      <div class="note">RTU PYQ pattern: Hex addresses are used in instruction cycle problems (2023-Aug C-Q1 used hex 021, 083, B8F2, A937)</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Machine Language</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Describe the three fields (Mode, Opcode and Address field) of 16 bit instruction format.</div>
+      <div class="pyq-meta"><span>2022 Part A Q9 · 2 marks ⭐⭐</span><span class="topic-tag">Instruction Format</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A 16-bit instruction in the basic computer has three fields:<br><br>
+        <strong>1. Mode Bit (I) — Bit 15 (1 bit):</strong><br>
+        Determines the addressing mode. I=0 → Direct addressing (the address field directly gives the operand's memory address). I=1 → Indirect addressing (the address field gives the address of a memory location that CONTAINS the operand's address). Used only for Memory-Reference Instructions.<br><br>
+        <strong>2. Opcode Field — Bits 14–12 (3 bits):</strong><br>
+        Specifies which operation to perform. 3 bits → 8 possible operation codes.<br>
+        000=AND, 001=ADD, 010=LDA, 011=STA, 100=BUN, 101=BSA, 110=ISZ, 111=Non-MRI<br><br>
+        <strong>3. Address Field — Bits 11–0 (12 bits):</strong><br>
+        Specifies the memory address of the operand (for MRI) or contains the specific operation code (for Register/I-O reference when opcode=111). 12 bits → 2¹² = 4096 addressable locations.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Specify the instruction format and number of bits in each field if the memory unit has 256K × 32 bit, with instruction format having four fields: opcode, mode (7 addressing modes), register address (60 registers), and memory address, all in one memory word.</div>
+      <div class="pyq-meta"><span>2023-Aug Part B Q5 · 8 marks ⭐⭐</span><span class="topic-tag">Instruction Format Design</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Given:</strong><br>
+        Memory: 256K words × 32 bits → address needs log₂(256K) = log₂(2¹⁸) = <strong>18 bits</strong><br>
+        Word size: 32 bits (instruction must fit in one word)<br>
+        Fields: opcode + mode + register address + memory address<br><br>
+        <strong>Field sizes:</strong><br>
+        Mode field: 7 addressing modes → needs log₂(7) ≈ 3 bits (2³=8 ≥ 7) → <strong>3 bits</strong><br>
+        Register address: 60 registers → needs log₂(60) ≈ 6 bits (2⁶=64 ≥ 60) → <strong>6 bits</strong><br>
+        Memory address: 256K = 2¹⁸ locations → <strong>18 bits</strong><br>
+        Total for mode + register + memory = 3 + 6 + 18 = 27 bits<br>
+        Remaining for opcode: 32 − 27 = <strong>5 bits</strong> (allows 2⁵ = 32 operations)<br><br>
+        <strong>Final Instruction Format (32 bits):</strong><br>
+        | Opcode (5) | Mode (3) | Register (6) | Memory Address (18) |<br><br>
+        <strong>Verification:</strong> 5 + 3 + 6 + 18 = 32 bits ✓ (fits in one 32-bit word)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 02: ASSEMBLY LANGUAGE -->
+<section class="section" id="assembly-lang">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Assembly Language</h2>
+    <span class="imp-pill badge badge-v">85%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Assembly Language?</h3>
+    <p><span class="hl-v">Assembly language</span> is a low-level programming language that uses <strong>mnemonics</strong> (symbolic names) to represent machine language instructions. It is one level above machine language — instead of writing 0001 0000 0000 0011 (binary), you write <code>ADD 3</code>. An assembler then converts this to machine language.</p>
+    <div class="layman">Assembly language is like a cheat sheet for machine language. Instead of remembering that 001 means "ADD," you write "ADD." Instead of 010 for "LDA," you write "LDA." A helper program called the assembler translates your readable shortcuts (mnemonics) back into the binary that the CPU understands. It's still very close to hardware — no automatic memory management, no fancy features — just a thin layer of readability over machine code.</div>
+    <div class="formula-box">
+      <span class="label">Assembly Language — Basic Computer Mnemonics</span>
+      <div class="formula">Memory-Reference:  AND, ADD, LDA, STA, BUN, BSA, ISZ</div>
+      <div class="formula">Register-Reference: CLA, CLE, CMA, CME, CIR, CIL, INC, SPA, SNA, SZA, SZE, HLT</div>
+      <div class="formula">I/O Reference:     INP, OUT, SKI, SKO, ION, IOF</div>
+      <div class="formula">Pseudo-Ops:        ORG, END, DEC, HEX, BSS, BES</div>
+      <div class="note">ORG n: Origin — start storing at memory address n</div>
+      <div class="note">DEC n: Decimal constant — store the decimal value n</div>
+      <div class="note">HEX n: Hexadecimal constant</div>
+      <div class="note">END: End of program — assembler stops here</div>
+    </div>
+    <h3>Assembly Language Statement Format</h3>
+    <div class="formula-box">
+      <span class="label">Statement Structure</span>
+      <div class="formula">Label,    Instruction/Pseudoinstruction,    Comment</div>
+      <div class="formula">LBL,      AND X                               / AND contents of X with AC</div>
+      <div class="formula">X,        DEC -23                             / Variable X = -23</div>
+      <div class="note">Label: symbolic name for a memory address (optional). Ends with comma.</div>
+      <div class="note">Instruction: mnemonic + operand (for MRI) or just mnemonic (for RRI/IOI)</div>
+      <div class="note">Comment: everything after '/' is ignored by assembler</div>
+      <div class="note">Indirect addressing: put 'I' after instruction → e.g., "AND I X" means indirect AND with address in X</div>
+    </div>
+    <h3>Assembly Language vs Machine Language — RTU Guaranteed Q</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Machine Language</th><th>Assembly Language</th></tr>
+      <tr><td>Form</td><td>Binary (0s and 1s) or hexadecimal</td><td>Mnemonics and symbolic names</td></tr>
+      <tr><td>Readability</td><td>Extremely difficult for humans</td><td>Easier — readable symbolic form</td></tr>
+      <tr><td>Translation needed</td><td>None — CPU executes directly</td><td>Yes — assembler converts to machine code</td></tr>
+      <tr><td>Portability</td><td>Machine-specific (binary patterns differ)</td><td>Machine-specific (one ISA per assembly language)</td></tr>
+      <tr><td>Programming speed</td><td>Very slow and error-prone</td><td>Faster than machine language</td></tr>
+      <tr><td>Error detection</td><td>Nearly impossible visually</td><td>Easier — meaningful names help</td></tr>
+      <tr><td>Example</td><td>0010 000000000011 (hex: 2003)</td><td>LDA MIN</td></tr>
+      <tr><td>Level</td><td>Lowest level</td><td>Low level (one above machine)</td></tr>
+    </table>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Assembly Language</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Differentiate between assembly language and machine language.</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q8 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Assembly vs Machine</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Machine Language:</strong><br>
+        The lowest-level programming language consisting of binary (0s and 1s) instructions that the CPU directly executes. Each instruction is a specific bit pattern that maps to a hardware operation. Example: 0010 000000000011 (binary) or 2003 (hex).<br><br>
+        <strong>Assembly Language:</strong><br>
+        A low-level language that uses symbolic mnemonics (meaningful abbreviations) to represent machine language instructions. Requires an assembler to translate to machine code. Example: LDA 3 (equivalent to the above binary).<br><br>
+        <strong>Key Differences:</strong><br>
+        Machine language = pure binary, CPU understands directly, no translation needed, very hard to write.<br>
+        Assembly language = mnemonics, needs assembler translation, easier to read/write, one-to-one with machine instructions.<br>
+        Both are machine-specific — neither is portable across different CPU architectures.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 03: ASSEMBLER -->
+<section class="section" id="assembler">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Assembler — Two-Pass Process</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an Assembler?</h3>
+    <p>An <span class="hl-o">assembler</span> is a program that translates assembly language source code into machine language (binary/hex) object code. It processes the source file and produces a binary output that the CPU can execute.</p>
+    <div class="layman">The assembler is the translator. It reads your assembly source code (with mnemonics like LDA, ADD, STA) and converts each line into the corresponding binary machine instruction. It also resolves all symbolic labels to actual memory addresses. Think of it as a professional translator who converts your shorthand notes into the machine's native language.</div>
+    <h3>Two-Pass Assembler</h3>
+    <p>A <span class="hl-r">two-pass assembler</span> reads the source file twice. This is necessary because in the first pass, a label defined later in the program (forward reference) is not yet known. The two-pass approach solves this.</p>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Pass 1 — Symbol Table Construction:</strong> The assembler scans through the entire source code. For every label definition, it records the label name and its corresponding memory address in a <strong>Symbol Table</strong>. No machine code is generated yet. The Location Counter (LC) tracks the current address and is incremented for each instruction/data.</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Pass 2 — Code Generation:</strong> The assembler scans the source code again. Now it uses the Symbol Table to replace all label references with their actual memory addresses. It converts each mnemonic to its binary opcode and generates the final machine code output.</div></div>
+    </div>
+    <div class="formula-box">
+      <span class="label">Assembler Tables Used</span>
+      <div class="formula">Symbol Table:       Label | Address  (built during Pass 1)</div>
+      <div class="formula">  e.g., MIN  | 0006  (label MIN is at address 0006)</div>
+      <div class="formula">        LOOP | 0002  (label LOOP is at address 0002)</div>
+      <div class="formula"></div>
+      <div class="formula">Pseudo-instruction Table:  ORG, END, DEC, HEX, BSS</div>
+      <div class="formula">MRI Table:                 AND→000, ADD→001, LDA→010, STA→011...</div>
+      <div class="formula">Non-MRI Table:             CLA→7800, CLE→7400, CMA→7200...</div>
+    </div>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 2 Instruction Codes → Unit 3 Assembly Programming</div>
+        <p>In Unit 2, you learned the 7 MRI instructions (AND, ADD, LDA, STA, BUN, BSA, ISZ) and the register-reference instructions (CLA, CMA, etc.) as instruction codes with opcodes. In Unit 3, you now USE these same instructions in actual assembly language programs. The assembler converts the mnemonics back to the opcodes you learned in Unit 2. The connection is direct: assembly language is just a human-readable version of machine language instruction codes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 04: PROGRAM LOOPS -->
+<section class="section" id="program-loops">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Program Loops</h2>
+    <span class="imp-pill badge badge-v">78%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What are Program Loops?</h3>
+    <p>A <span class="hl-v">program loop</span> is a sequence of instructions that repeats a set of operations a fixed number of times. In the basic computer, loops are implemented using the <strong>ISZ (Increment and Skip if Zero)</strong> instruction as a counter mechanism.</p>
+    <div class="layman">A loop is like counting down from 5 to 0: do the action, subtract 1 from the counter, check if counter is zero — if not, go back and do it again. In the basic computer, ISZ does "increment and check if zero" — so you start with a negative counter (-N) and ISZ counts it UP to zero, at which point it skips the branch instruction and exits the loop.</div>
+    <div class="formula-box">
+      <span class="label">ISZ — Increment and Skip if Zero</span>
+      <div class="formula">ISZ X: M[X] ← M[X] + 1; if M[X] = 0 then PC ← PC + 1 (skip next instruction)</div>
+      <div class="note">Loop technique: Initialize counter to -N. Use ISZ to increment. Loop body comes before ISZ. BUN jumps back to start. When counter reaches 0, ISZ skips the BUN → loop exits.</div>
+    </div>
+    <h3>Loop Example — Add N Numbers</h3>
+    <div class="code-block">
+      <span class="code-label">Assembly Program — Sum of N Numbers (RTU Exam Pattern)</span>
+      <span class="comment">/ Program to add N numbers starting at address ADS</span>
+      <span class="addr">      ORG 100   </span><span class="comment">/ Start at address 100</span>
+LDA   <span class="operand">AD</span>           <span class="comment">/ Load base address of array into AC</span>
+STA   <span class="operand">PT</span>           <span class="comment">/ Store in pointer PT</span>
+LDA   <span class="operand">N</span>            <span class="comment">/ Load N (negative count) into AC</span>
+STA   <span class="operand">CTR</span>          <span class="comment">/ Store as counter</span>
+CLA               <span class="comment">/ Clear AC (will hold sum)</span>
+<span class="keyword">LOOP, LDA  I PT</span>  <span class="comment">/ Load next number indirectly via pointer</span>
+ADD   <span class="operand">SUM</span>          <span class="comment">/ Add to running sum</span>
+STA   <span class="operand">SUM</span>          <span class="comment">/ Store updated sum</span>
+ISZ   <span class="operand">PT</span>           <span class="comment">/ Increment pointer to next element</span>
+ISZ   <span class="operand">CTR</span>          <span class="comment">/ Increment counter; skip next if zero</span>
+BUN   <span class="keyword">LOOP</span>         <span class="comment">/ If not zero, branch back to LOOP</span>
+HLT               <span class="comment">/ Halt — sum is in SUM</span>
+AD,   <span class="operand">HEX 150</span>     <span class="comment">/ Starting address of array</span>
+N,    <span class="operand">DEC -100</span>    <span class="comment">/ Negative count (loop 100 times)</span>
+SUM,  <span class="operand">DEC 0</span>       <span class="comment">/ Accumulate sum here</span>
+PT,   <span class="operand">DEC 0</span>       <span class="comment">/ Pointer (changes each iteration)</span>
+CTR,  <span class="operand">DEC 0</span>       <span class="comment">/ Counter copy (changes each iteration)</span>
+      END
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">ISZ Loop Trick — Always Use Negative Counter</div>
+        <p>RTU loop programs always use ISZ with a <strong>negative counter</strong>. If you want to loop N times, initialize counter to -N. ISZ increments it toward 0. When it reaches 0, it skips the BUN → exits loop. Also remember: ISZ is used for both the counter AND the pointer (to advance through an array). Two ISZ instructions are common in loop programs: one for the counter, one for the pointer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 05: ARITHMETIC & LOGIC OPERATIONS -->
+<section class="section" id="arith-logic-prog">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Programming Arithmetic & Logic Operations</h2>
+    <span class="imp-pill badge badge-v">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Implementing Arithmetic with Basic Computer Instructions</h3>
+    <p>The basic computer has only ADD as an arithmetic instruction (plus CMA+INC for negation). More complex operations (multiplication, division, subtraction) must be programmed using these primitives.</p>
+    <div class="layman">The basic computer is like having only a few LEGO bricks — just ADD, AND, shift, and complement. But from these few pieces, you can build any arithmetic or logic operation. Subtraction = add the 2's complement. Multiplication = repeated addition. Division = repeated subtraction. This is called programming arithmetic operations.</div>
+    <h3>Subtraction Program</h3>
+    <div class="code-block">
+      <span class="code-label">Subtraction: A − B → D  (using 2's complement)</span>
+LDA   <span class="operand">B</span>            <span class="comment">/ AC ← B</span>
+CMA               <span class="comment">/ AC ← complement of B (1's complement)</span>
+INC               <span class="comment">/ AC ← AC + 1 (now AC = 2's complement of B = −B)</span>
+ADD   <span class="operand">A</span>            <span class="comment">/ AC ← AC + A = A + (−B) = A − B</span>
+STA   <span class="operand">D</span>            <span class="comment">/ D ← A − B</span>
+HLT
+A,    <span class="operand">DEC 85</span>      <span class="comment">/ First operand</span>
+B,    <span class="operand">DEC 23</span>      <span class="comment">/ Second operand to subtract</span>
+D,    <span class="operand">DEC 0</span>       <span class="comment">/ Result stored here</span>
+    </div>
+    <h3>Multiply Two Numbers (Repeated Addition)</h3>
+    <div class="code-block">
+      <span class="code-label">Multiplication: A × B → P  (using repeated addition)</span>
+LDA   <span class="operand">B</span>            <span class="comment">/ Load B (used as counter) — must be negative</span>
+CMA               <span class="comment">/ Complement B</span>
+INC               <span class="comment">/ 2's complement of B (−B as loop counter)</span>
+STA   <span class="operand">CTR</span>          <span class="comment">/ CTR = −B (loop B times)</span>
+CLA               <span class="comment">/ Clear product accumulator</span>
+STA   <span class="operand">P</span>            <span class="comment">/ P = 0 initially</span>
+<span class="keyword">LOOP, LDA  P</span>     <span class="comment">/ Load current partial product</span>
+ADD   <span class="operand">A</span>            <span class="comment">/ Add A to partial product</span>
+STA   <span class="operand">P</span>            <span class="comment">/ Store updated partial product</span>
+ISZ   <span class="operand">CTR</span>          <span class="comment">/ Increment counter; skip if zero</span>
+BUN   <span class="keyword">LOOP</span>         <span class="comment">/ If not done, repeat</span>
+HLT               <span class="comment">/ Product P = A × B</span>
+    </div>
+    <h3>Logic Operations in Assembly</h3>
+    <p>Logic operations use the AND instruction combined with complement and manipulation:</p>
+    <div class="code-block">
+      <span class="code-label">Implementing OR: A OR B (since basic computer only has AND)</span>
+<span class="comment">/ Use De Morgan's: A OR B = NOT(NOT A AND NOT B)</span>
+LDA   <span class="operand">A</span>            <span class="comment">/ AC ← A</span>
+CMA               <span class="comment">/ AC ← NOT A</span>
+STA   <span class="operand">TMP</span>          <span class="comment">/ TMP = NOT A</span>
+LDA   <span class="operand">B</span>            <span class="comment">/ AC ← B</span>
+CMA               <span class="comment">/ AC ← NOT B</span>
+AND   <span class="operand">TMP</span>          <span class="comment">/ AC ← NOT A AND NOT B</span>
+CMA               <span class="comment">/ AC ← NOT(NOT A AND NOT B) = A OR B</span>
+STA   <span class="operand">RESULT</span>       <span class="comment">/ Store result</span>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 06: SUBROUTINES -->
+<section class="section" id="subroutines">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Subroutines</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part A 2022 & 2025</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — VERY HIGH:</strong> Subroutine appeared in Part A Q3 in 2022 and Part A Q9 in 2025 — two non-consecutive years. This is one of the most consistently tested Part A definitions in CAO. For 2026, "Write a quick note on subroutine. What is the role of a stack in subroutine calls?" is the predicted form. Know the BSA/BUN mechanism, return address saving, and stack usage.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is a Subroutine?</h3>
+    <p>A <span class="hl-r">subroutine</span> (also called a procedure, function, or subprogram) is a self-contained sequence of instructions that performs a specific task and can be called from multiple places in a program. When called, control transfers to the subroutine; when it finishes, control returns to the calling point.</p>
+    <div class="layman">A subroutine is like a reusable recipe. Instead of writing out "boil water" every time you need it, you write it once as a named recipe ("boilWater") and just call it whenever needed. After boiling, the recipe "returns" to where it was called from. In computers, subroutines save memory (code written once, used many times) and make programs organized.</div>
+    <h3>BSA — Branch and Save Address (Subroutine Linkage)</h3>
+    <p>In the basic computer, subroutines are called using the <span class="hl-r">BSA</span> (Branch and Save Address) instruction. BSA saves the return address at the start of the subroutine's memory area and jumps to the instruction after it.</p>
+    <div class="formula-box">
+      <span class="label">BSA Instruction — RTL Operation</span>
+      <div class="formula">BSA X:  M[X] ← PC    (save return address at location X)</div>
+      <div class="formula">        PC ← X + 1    (jump to first instruction of subroutine at X+1)</div>
+      <div class="note">After BSA: M[X] holds the return address. PC points to first executable instruction of subroutine.</div>
+      <div class="note">Return: BUN I SUB  (indirect branch to address stored at SUB — this is the saved return address)</div>
+    </div>
+    <h3>Subroutine Example</h3>
+    <div class="code-block">
+      <span class="code-label">Calling a Subroutine (BSA) and Returning (BUN I)</span>
+<span class="comment">/ Main Program</span>
+      ORG 100
+LDA   <span class="operand">X</span>            <span class="comment">/ Load X into AC</span>
+BSA   <span class="keyword">SHR</span>          <span class="comment">/ Call subroutine SHR (shifts AC right)</span>
+                  <span class="comment">/ After return, AC holds shifted value</span>
+STA   <span class="operand">Y</span>            <span class="comment">/ Store result</span>
+HLT
+<span class="comment">/ --- Subroutine SHR: Shift AC right by 1 ---</span>
+<span class="keyword">SHR,  HEX 0</span>      <span class="comment">/ Return address stored here by BSA</span>
+      CIR           <span class="comment">/ Circular shift right</span>
+      BUN I <span class="keyword">SHR</span>    <span class="comment">/ Return: indirect branch to address saved at SHR</span>
+    </div>
+    <div class="formula-box">
+      <span class="label">Subroutine Execution Trace</span>
+      <div class="formula">Before BSA: PC = 102 (address of BSA instruction), SHR = 106 (subroutine location)</div>
+      <div class="formula">BSA executes: M[106] ← PC = 103 (save return address 103 at location 106)</div>
+      <div class="formula">             PC ← 107           (jump to first instruction of subroutine)</div>
+      <div class="formula">Subroutine executes: CIR (circular right shift)</div>
+      <div class="formula">BUN I SHR: reads M[106] = 103, sets PC ← 103 (returns to calling program)</div>
+      <div class="note">The key: BSA saves the NEXT address after BSA (the return point), not BSA's own address</div>
+    </div>
+    <h3>Role of the Stack in Subroutine Calls</h3>
+    <p>Modern computers use a <span class="hl-o">stack</span> (Last-In-First-Out data structure) for subroutine linkage instead of BSA. The stack automatically handles <strong>nested subroutines</strong> and <strong>recursion</strong> — something BSA alone cannot do (because BSA stores only one return address).</p>
+    <div class="formula-box">
+      <span class="label">Stack-Based Subroutine Mechanism</span>
+      <div class="formula">CALL instruction: PUSH PC (return address) onto stack, then JUMP to subroutine</div>
+      <div class="formula">RET instruction:  POP return address from stack, JUMP to it</div>
+      <div class="formula">SP (Stack Pointer): register pointing to top of stack, auto-decrements on PUSH, increments on POP</div>
+      <div class="note">Advantage: Stack can hold MANY return addresses (nested calls). Each CALL pushes one, each RET pops one. LIFO order ensures correct unwinding even for deeply nested or recursive calls.</div>
+      <div class="note">BSA limitation: Only one return address can be saved at location X. If subroutine calls another subroutine, return address is overwritten → cannot nest calls.</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Subroutine Exam Trick — "BSA saves, BUN I returns"</div>
+        <p><strong>BSA SUB</strong>: Branch and Save Address — saves PC at M[SUB], jumps to SUB+1.<br>
+        <strong>BUN I SUB</strong>: Indirect Branch — reads M[SUB] (the saved return address) and jumps there.<br>
+        The pattern is always: BSA at call site, BUN I at end of subroutine. The return address is ALWAYS stored at the FIRST location of the subroutine (label address). Draw this as: [Main] → BSA → [Subroutine starts with return address slot] → [code] → BUN I → [returns to Main].</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Subroutines</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Describe subroutine.</div>
+      <div class="pyq-meta"><span>2022 Part A Q3 · 2025 Part A Q9 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Subroutine</span><span class="pred-tag">🔮 VERY HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>subroutine</strong> (also called a procedure or function) is a self-contained group of instructions that performs a specific task and can be called from multiple locations in a program.<br><br>
+        <strong>Key features:</strong><br>
+        1. Written once, called multiple times — saves memory and reduces code duplication.<br>
+        2. When called, the CPU saves the return address (where to return after the subroutine finishes).<br>
+        3. After completing its task, the subroutine returns control to the calling program.<br><br>
+        <strong>In the basic computer:</strong><br>
+        The BSA (Branch and Save Address) instruction implements the subroutine call. BSA saves the return address at the first location of the subroutine and transfers control to the next location. To return, BUN I is used (indirect branch reads the saved return address).<br><br>
+        <strong>Role of Stack:</strong><br>
+        Modern processors use a stack (LIFO) to save return addresses. CALL pushes the return address; RET pops it. The stack allows nested and recursive subroutine calls (unlike BSA which can only save one return address per call).
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. An output program resides in memory starting from address 230. It is executed after the computer recognizes an interrupt when FGO becomes 1 (while IEN=1). (a) What instruction must be placed at address 1? (b) What must be the last two instructions of the output program?</div>
+      <div class="pyq-meta"><span>2023-Aug Part B Q4 · 8 marks ⭐⭐</span><span class="topic-tag">I/O + Interrupt</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Background:</strong> When an interrupt occurs (FGO=1 and IEN=1), the hardware automatically: saves PC at address 0 (M[0] ← PC), sets PC = 1 (jumps to interrupt vector address 1), clears IEN=0 (disables further interrupts), and clears R=0.<br><br>
+        <strong>(a) Instruction at address 1:</strong><br>
+        Address 1 should contain a BUN (Branch Unconditional) instruction to the interrupt service routine at address 230:<br>
+        <strong>BUN 230</strong> (or in binary: the BUN instruction with address field = 230)<br>
+        This redirects control from address 1 to the start of the output program at 230.<br><br>
+        <strong>(b) Last two instructions of the output program:</strong><br>
+        Before the output program returns to the interrupted main program, it must:<br>
+        1. Re-enable interrupts: <strong>ION</strong> (I/O enable — sets IEN=1 so future interrupts can occur)<br>
+        2. Return to the interrupted program: <strong>BUN I 0</strong> (indirect branch through address 0, which contains the saved return address = the address in the main program where execution was interrupted)<br><br>
+        Summary: Last two instructions = ION (re-enable interrupts) → BUN I 0 (return via saved PC at address 0)
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Write a program to evaluate the arithmetic statement: X = (A − B + C*(D*E − F)) / (G + H*K) using (a) 3-address, (b) 2-address, (c) 1-address (accumulator), (d) 0-address (stack)</div>
+      <div class="pyq-meta"><span>2023-Aug Part C Q2 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Instruction Formats</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Expression: X = (A − B + C*(D*E − F)) / (G + H*K)</strong><br><br>
+        <strong>(a) 3-Address Instructions (format: OP DST, SRC1, SRC2):</strong><br>
+        MUL T1, D, E       / T1 = D*E<br>
+        SUB T2, T1, F      / T2 = D*E − F<br>
+        MUL T3, C, T2      / T3 = C*(D*E − F)<br>
+        SUB T4, A, B       / T4 = A − B<br>
+        ADD T5, T4, T3     / T5 = A − B + C*(D*E − F)<br>
+        MUL T6, H, K       / T6 = H*K<br>
+        ADD T7, G, T6      / T7 = G + H*K<br>
+        DIV X, T5, T7      / X = T5 / T7 ✓<br><br>
+        <strong>(b) 2-Address Instructions (format: OP DST, SRC — DST is also source):</strong><br>
+        MOV T1, D | MUL T1, E  / T1 = D*E<br>
+        SUB T1, F              / T1 = D*E − F<br>
+        MUL T1, C              / T1 = C*(D*E − F)<br>
+        MOV T2, A | SUB T2, B  / T2 = A − B<br>
+        ADD T2, T1             / T2 = numerator<br>
+        MOV T3, H | MUL T3, K  / T3 = H*K<br>
+        ADD T3, G              / T3 = denominator<br>
+        DIV T2, T3             / T2 = result<br>
+        MOV X, T2              / Store result in X<br><br>
+        <strong>(c) 1-Address (Accumulator) — Basic computer style:</strong><br>
+        LDA D | MUL E → STA T1  / T1 = D*E<br>
+        LDA T1 | SUB F → STA T2 / T2 = D*E − F<br>
+        LDA C | MUL T2 → STA T3 / T3 = C*(D*E − F)<br>
+        LDA A | SUB B → ADD T3 → STA T4 / T4 = numerator<br>
+        LDA H | MUL K → ADD G → STA T5  / T5 = denominator<br>
+        LDA T4 | DIV T5 → STA X         / X = result<br><br>
+        <strong>(d) 0-Address (Stack — PUSH/POP only):</strong><br>
+        PUSH D | PUSH E | MUL    / TOS = D*E<br>
+        PUSH F | SUB            / TOS = D*E − F<br>
+        PUSH C | MUL            / TOS = C*(D*E − F)<br>
+        PUSH A | PUSH B | SUB   / TOS = A − B<br>
+        ADD                     / TOS = numerator<br>
+        PUSH H | PUSH K | MUL   / TOS = H*K<br>
+        PUSH G | ADD            / TOS = denominator<br>
+        DIV | POP X             / X = result
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 07: I/O PROGRAMMING -->
+<section class="section" id="io-programming">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">I/O Programming</h2>
+    <span class="imp-pill badge badge-r">82%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Three Methods of I/O Data Transfer</h3>
+    <p>The basic computer can interact with I/O devices using three methods. Understanding all three is important for RTU exams.</p>
+    <div class="layman">Three ways a computer can communicate with a keyboard or printer: (1) Keep asking "are you done yet?" (polling) — wasteful but simple. (2) Do other things and let the device TAP YOU on the shoulder when it's ready (interrupt) — efficient. (3) Let the device copy data DIRECTLY to memory without bothering the CPU (DMA) — fastest for large data. The basic computer uses the first two; DMA is covered in Unit 5/6.</div>
+    <h3>1. Programmed I/O (Polling / Busy-Wait)</h3>
+    <p>The CPU continuously checks the status flag of the I/O device (FGI or FGO) in a loop until the device is ready. Simple but <strong>wastes CPU time</strong> in the loop.</p>
+    <div class="code-block">
+      <span class="code-label">Input Program (Polling) — Read one character</span>
+<span class="keyword">START, SKI</span>       <span class="comment">/ Skip next if FGI=1 (input device ready)</span>
+BUN   <span class="keyword">START</span>        <span class="comment">/ FGI=0: loop back and check again</span>
+INP               <span class="comment">/ FGI=1: read character from INPR to AC</span>
+STA   <span class="operand">CH</span>           <span class="comment">/ Store character in memory</span>
+HLT
+    </div>
+    <div class="code-block">
+      <span class="code-label">Output Program (Polling) — Send one character</span>
+LDA   <span class="operand">CH</span>           <span class="comment">/ Load character to send into AC</span>
+<span class="keyword">START, SKO</span>       <span class="comment">/ Skip next if FGO=1 (output device ready)</span>
+BUN   <span class="keyword">START</span>        <span class="comment">/ FGO=0: loop back and wait</span>
+OUT               <span class="comment">/ FGO=1: send character from AC to OUTR</span>
+HLT
+    </div>
+    <h3>2. Interrupt-Driven I/O</h3>
+    <p>The CPU enables interrupts (ION) and continues executing the main program. When an I/O device is ready, it sends an <strong>interrupt signal</strong>. The CPU suspends the main program, saves the return address, and executes an interrupt service routine (ISR). After I/O, it returns to the main program.</p>
+    <div class="formula-box">
+      <span class="label">Interrupt Mechanism — Hardware Sequence</span>
+      <div class="formula">When interrupt occurs (R=1, IEN=1, at end of current instruction):</div>
+      <div class="formula">1. M[0] ← PC          (save return address at location 0)</div>
+      <div class="formula">2. PC ← 1              (jump to interrupt vector at address 1)</div>
+      <div class="formula">3. IEN ← 0             (disable further interrupts)</div>
+      <div class="formula">4. R ← 0               (clear interrupt request)</div>
+      <div class="note">Address 0: always contains a BUN to ISR location. Address 1: BUN to interrupt service routine.</div>
+      <div class="note">ISR ends with: ION (re-enable interrupts) + BUN I 0 (indirect return via saved address)</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">Interrupt-Driven I/O Flow</text>
+        <!-- Main program -->
+        <rect x="10" y="30" width="130" height="180" rx="6" fill="#0c1e28" stroke="#22d3ee" stroke-width="2"/>
+        <text x="75" y="52" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">MAIN PROGRAM</text>
+        <text x="75" y="70" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">ION (enable intrs)</text>
+        <rect x="25" y="78" width="100" height="20" rx="3" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="75" y="91" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Instruction A</text>
+        <rect x="25" y="102" width="100" height="20" rx="3" fill="#102534" stroke="#ef4444" stroke-width="2"/>
+        <text x="75" y="115" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">← INTERRUPT HERE</text>
+        <rect x="25" y="126" width="100" height="20" rx="3" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="75" y="139" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Instruction C (resume)</text>
+        <rect x="25" y="150" width="100" height="20" rx="3" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="75" y="163" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Instruction D</text>
+        <text x="75" y="185" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">HLT</text>
+        <!-- Arrow to ISR -->
+        <line x1="140" y1="112" x2="220" y2="60" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="216,57 225,55 221,66" fill="#ef4444"/>
+        <text x="165" y="78" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Interrupt!</text>
+        <!-- ISR box -->
+        <rect x="225" y="30" width="150" height="130" rx="6" fill="#0c1e28" stroke="#ef4444" stroke-width="2"/>
+        <text x="300" y="52" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">INTERRUPT SERVICE</text>
+        <text x="300" y="65" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">ROUTINE (ISR)</text>
+        <text x="300" y="82" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">M[0]←PC (hw saves)</text>
+        <text x="300" y="97" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">PC←1, IEN←0</text>
+        <text x="300" y="112" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">BUN to ISR</text>
+        <text x="300" y="127" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">OUT (send data)</text>
+        <text x="300" y="142" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8">ION (re-enable)</text>
+        <text x="300" y="155" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8">BUN I 0 (return)</text>
+        <!-- Arrow return -->
+        <line x1="225" y1="155" x2="140" y2="135" stroke="#10b981" stroke-width="2"/>
+        <polygon points="142,130 136,138 145,140" fill="#10b981"/>
+        <text x="165" y="155" fill="#10b981" font-family="JetBrains Mono" font-size="8">Returns to C</text>
+        <!-- I/O device -->
+        <rect x="400" y="60" width="140" height="60" rx="6" fill="#102534" stroke="#f97316" stroke-width="2"/>
+        <text x="470" y="86" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">I/O DEVICE</text>
+        <text x="470" y="102" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">FGO=1 → signals interrupt</text>
+        <line x1="400" y1="90" x2="375" y2="90" stroke="#f97316" stroke-width="2" stroke-dasharray="4,2"/>
+        <polygon points="378,86 368,90 378,94" fill="#f97316"/>
+        <!-- Legend -->
+        <text x="10" y="230" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">KEY: Hardware auto-saves PC at M[0], jumps to addr 1 → ISR</text>
+        <text x="10" y="245" fill="#10b981" font-family="JetBrains Mono" font-size="8">ISR ends: ION + BUN I 0 → restores IEN and returns to main</text>
+      </svg>
+      <div class="diagram-cap">Fig 7.1 — Interrupt-Driven I/O: Device interrupts CPU → ISR executes → returns to main program</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — I/O Programming</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What are the two instructions needed in the basic computer in order to set the E flip-flop to 1?</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q7 · 2 marks ⭐⭐</span><span class="topic-tag">Register-Reference Instructions</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        The E flip-flop (extended accumulator / carry bit) can be set to 1 using two instructions:<br><br>
+        <strong>Method 1:</strong><br>
+        1. <strong>CLE</strong> (Clear E) — first clear E to 0<br>
+        2. <strong>CME</strong> (Complement E) — then complement E → 0 becomes 1<br>
+        After CLE + CME: E = 1<br><br>
+        <strong>Method 2 (using arithmetic overflow):</strong><br>
+        Load the maximum positive value (0111...1) into AC, then execute INC — the carry out sets E=1.<br><br>
+        <strong>Most direct answer for RTU:</strong> CLE followed by CME. CLE sets E=0, CME flips it to E=1.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is the difference between a direct and an indirect address instruction?</div>
+      <div class="pyq-meta"><span>2023-Aug Part A Q6 · 2 marks ⭐⭐</span><span class="topic-tag">Addressing Modes</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Direct Address Instruction (I=0):</strong><br>
+        The address field of the instruction directly contains the EFFECTIVE ADDRESS of the operand. The CPU goes directly to that memory location to fetch the operand. One memory access needed.<br>
+        Example: LDA 200 — operand is at memory address 200.<br><br>
+        <strong>Indirect Address Instruction (I=1):</strong><br>
+        The address field contains the address of a POINTER — a memory location that contains the actual effective address. The CPU reads the pointer first, then uses that as the address to fetch the operand. Two memory accesses needed.<br>
+        Example: LDA I 200 — memory[200] contains the ACTUAL address of the operand.<br><br>
+        <strong>Key difference:</strong> Direct = 1 memory read for operand. Indirect = 2 memory reads (one for pointer, one for operand). Indirect adds flexibility (pointer can be changed at runtime) at the cost of one extra memory access.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 08: CONTROL MEMORY -->
+<section class="section" id="control-memory">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Control Memory (Microprogrammed Control)</h2>
+    <span class="imp-pill badge badge-r">🔥 85% — Part A 2024</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — HIGH:</strong> Control memory appeared as Part A Q3 in 2024 ("What is a control memory?"). This is likely to repeat or expand into Part B as "Explain control memory with its structure" in 2026. Know the address size, word size, microinstruction fields, and how it relates to microprogramming.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is Control Memory?</h3>
+    <p><span class="hl-r">Control memory</span> (also called Control Store or Microprogram Memory) is a small, fast memory inside the CPU that stores the <strong>microprogram</strong> — the sequence of microinstructions that implement each machine instruction. It is the core of a microprogrammed control unit.</p>
+    <div class="layman">Control memory is like a recipe book inside the control unit. Each "recipe" (microprogram) describes how to execute one machine instruction. When the CPU needs to execute LDA (Load Accumulator), it looks up the LDA recipe in the control memory and follows those micro-steps. Instead of hardwiring the control logic (like a fixed circuit), the microprogrammed approach reads from this memory book.</div>
+    <div class="formula-box">
+      <span class="label">Control Memory — Structure</span>
+      <div class="formula">Control Memory: 2^k words, each word is one microinstruction</div>
+      <div class="formula">Control Address Register (CAR): k bits — holds address of next microinstruction</div>
+      <div class="formula">Control Data Register (CDR):   n bits — holds current microinstruction</div>
+      <div class="formula">Each microinstruction word contains:
+  F1, F2, F3: Micro-operation fields (specify operations to perform)
+  CD:         Condition code (for branching)
+  BR:         Branch type (determines next address mechanism)
+  AD:         Next address field</div>
+      <div class="note">CAR is loaded with the address of the next microinstruction to execute — this is the address sequencing function</div>
+    </div>
+    <h3>Microinstruction Fields</h3>
+    <p>A typical microinstruction (as per Mano's basic computer) has 20 bits organized in fields:</p>
+    <table class="comp-table">
+      <tr><th>Field</th><th>Bits</th><th>Purpose</th></tr>
+      <tr><td><span class="hl-v">F1</span></td><td>3</td><td>Micro-operations on AC, TEMP, DR (e.g., AC←0, DR←AC)</td></tr>
+      <tr><td><span class="hl-v">F2</span></td><td>3</td><td>Micro-operations on AR, PC, DR (e.g., AR←PC, PC←PC+1)</td></tr>
+      <tr><td><span class="hl-v">F3</span></td><td>3</td><td>Micro-operations on IR, PC from DR, other ops</td></tr>
+      <tr><td><span class="hl-o">CD</span></td><td>2</td><td>Condition for branching (00=always, 01=I-bit, 10=Negative, 11=Zero)</td></tr>
+      <tr><td><span class="hl-r">BR</span></td><td>2</td><td>Branch type (00=increment CAR, 01=unconditional branch to AD, 10=call, 11=return)</td></tr>
+      <tr><td><span class="hl-g">AD</span></td><td>7</td><td>Next address (for branch target)</td></tr>
+    </table>
+    <div class="formula-box">
+      <span class="label">Control Memory — Size Calculation</span>
+      <div class="formula">Total bits per microinstruction word = F1 + F2 + F3 + CD + BR + AD</div>
+      <div class="formula">= 3 + 3 + 3 + 2 + 2 + 7 = 20 bits per word</div>
+      <div class="formula">Address space: 7-bit AD → 128 locations (2⁷ words in control memory)</div>
+      <div class="formula">Total control memory size = 128 × 20 = 2560 bits = 320 bytes</div>
+      <div class="note">Compare to RAM: RAM has 4096 × 16 bits = 65,536 bits. Control memory is MUCH smaller but faster.</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Control Memory</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is a control memory?</div>
+      <div class="pyq-meta"><span>2024 Part A Q3 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Control Memory</span><span class="pred-tag">🔮 HIGH 2026 Part A/B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Control memory</strong> (also called control store or microprogram memory) is a small, high-speed memory within the CPU that stores microprograms — sequences of microinstructions that implement each machine instruction.<br><br>
+        <strong>Structure:</strong><br>
+        • Each word in control memory = one microinstruction<br>
+        • A microinstruction specifies which micro-operations to perform in one clock cycle<br>
+        • The Control Address Register (CAR) holds the address of the current microinstruction<br>
+        • The Control Data Register (CDR) holds the current microinstruction being executed<br><br>
+        <strong>Key properties:</strong><br>
+        • Read-only in hardwired systems (ROM), read-write in writable control stores<br>
+        • Much smaller than main memory (e.g., 128 × 20 bits vs 4096 × 16 bits)<br>
+        • Much faster — accessed every clock cycle<br>
+        • Forms the basis of a microprogrammed control unit<br><br>
+        <strong>Relationship to instructions:</strong> When the CPU fetches a machine instruction (e.g., ADD), it maps the opcode to an address in control memory and executes the corresponding microprogram (sequence of microinstructions) to carry out the ADD operation.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 09: ADDRESS SEQUENCING -->
+<section class="section" id="address-seq">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Address Sequencing in Microprogrammed Control</h2>
+    <span class="imp-pill badge badge-v">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Address Sequencing?</h3>
+    <p><span class="hl-v">Address sequencing</span> is the mechanism by which the control unit determines the address of the NEXT microinstruction to execute. It answers: "After this microinstruction, which one runs next?"</p>
+    <div class="layman">Address sequencing is the GPS navigation system for the control memory. After executing one microinstruction (one step in a recipe), the control unit needs to know which step comes next. Sometimes it just goes to the next line (sequential), sometimes it skips to a different part of the recipe (branch), and sometimes it looks at the current instruction to decide which recipe to follow (mapping).</div>
+    <h3>Four Methods of Address Sequencing</h3>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#a78bfa55">
+      <h3 class="violet">1. Incrementing the Control Address Register (CAR)</h3>
+      <p>The simplest case: after executing the current microinstruction, increment CAR by 1 to go to the next sequential microinstruction. Like reading instructions on a list, one by one.</p>
+      <div class="formula-box">
+        <span class="label">Sequential Execution</span>
+        <div class="formula">CAR ← CAR + 1   (move to next microinstruction in control memory)</div>
+        <div class="note">BR field = 00: No branch — just increment CAR. Used for sequential micro-operations within one instruction's microprogram.</div>
+      </div>
+      <h3 class="violet">2. Unconditional Branch</h3>
+      <p>The BR field specifies an unconditional branch — load CAR with the AD field of the current microinstruction (jump to a specified address in control memory). Used to repeat a sequence or go to a fixed subroutine.</p>
+      <div class="formula-box">
+        <span class="label">Unconditional Branch</span>
+        <div class="formula">CAR ← AD field   (load CAR with the next address from the microinstruction)</div>
+        <div class="note">BR field = 01 (unconditional branch): always jump to AD, regardless of condition</div>
+      </div>
+      <h3 class="violet">3. Conditional Branch</h3>
+      <p>Based on a condition (specified by CD field), branch or continue sequential. The condition can be the I-bit, the sign of AC, the zero flag, etc.</p>
+      <div class="formula-box">
+        <span class="label">Conditional Branching</span>
+        <div class="formula">CD = 00: Always branch to AD (unconditional)</div>
+        <div class="formula">CD = 01: Branch if I = 1 (indirect bit of current instruction)</div>
+        <div class="formula">CD = 10: Branch if AC is negative (MSB = 1)</div>
+        <div class="formula">CD = 11: Branch if AC is zero</div>
+        <div class="note">If condition is true → CAR ← AD. If false → CAR ← CAR + 1 (continue sequential)</div>
+      </div>
+      <h3 class="violet">4. Mapping from Instruction</h3>
+      <p>When the CPU fetches a new machine instruction, it must find the starting address of that instruction's microprogram in control memory. This is done by MAPPING the opcode to a control memory address.</p>
+      <div class="formula-box">
+        <span class="label">Mapping Function (Opcode → Control Memory Address)</span>
+        <div class="formula">Machine instruction opcode: I(1) | Opcode(3) | Address(12)</div>
+        <div class="formula">Mapping: CAR ← 0 | Opcode | 0 0 (insert 0s around the 3-bit opcode to form 7-bit address)</div>
+        <div class="formula">Example: ADD opcode = 001 → CAR = 0 001 00 = 0000100 = address 4 (decimal)</div>
+        <div class="note">This puts each instruction's microprogram at a fixed, predictable location in control memory</div>
+        <div class="note">The mapping logic uses a ROM or decoder to convert opcode → starting address in control memory</div>
+      </div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 240" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">Address Sequencing — How Next Microinstruction Address is Determined</text>
+        <!-- Central CAR -->
+        <rect x="210" y="90" width="140" height="50" rx="6" fill="#102534" stroke="#a78bfa" stroke-width="2.5"/>
+        <text x="280" y="113" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">CAR (Control Address Reg)</text>
+        <text x="280" y="128" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Points to next microinstruction</text>
+        <!-- Four inputs -->
+        <!-- 1: Increment -->
+        <rect x="10" y="30" width="130" height="35" rx="5" fill="#0c1e28" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="75" y="46" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8" font-weight="bold">1. CAR + 1</text>
+        <text x="75" y="58" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Sequential execution</text>
+        <line x1="140" y1="47" x2="210" y2="105" stroke="#22d3ee" stroke-width="1.5"/>
+        <!-- 2: Branch AD -->
+        <rect x="10" y="90" width="130" height="35" rx="5" fill="#0c1e28" stroke="#f97316" stroke-width="1.5"/>
+        <text x="75" y="106" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8" font-weight="bold">2. AD Field</text>
+        <text x="75" y="118" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Unconditional/conditional branch</text>
+        <line x1="140" y1="107" x2="210" y2="115" stroke="#f97316" stroke-width="1.5"/>
+        <!-- 3: Mapping -->
+        <rect x="10" y="150" width="130" height="35" rx="5" fill="#0c1e28" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="75" y="166" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8" font-weight="bold">3. Opcode Mapping</text>
+        <text x="75" y="178" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Instruction opcode → CAR start</text>
+        <line x1="140" y1="167" x2="210" y2="128" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- 4: Subroutine return -->
+        <rect x="420" y="90" width="130" height="35" rx="5" fill="#0c1e28" stroke="#10b981" stroke-width="1.5"/>
+        <text x="485" y="106" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">4. SBR (Return Addr)</text>
+        <text x="485" y="118" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Microsubroutine return</text>
+        <line x1="420" y1="107" x2="350" y2="115" stroke="#10b981" stroke-width="1.5"/>
+        <!-- MUX in center -->
+        <rect x="350" y="100" width="50" height="30" rx="4" fill="#152432" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="375" y="119" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8">MUX</text>
+        <line x1="350" y1="115" x2="210" y2="115" stroke="#f59e0b" stroke-width="1.5"/>
+        <!-- Legend -->
+        <text x="10" y="210" fill="#6090a8" font-family="JetBrains Mono" font-size="8">BR field (2 bits) selects which input goes to CAR: 00=increment, 01=AD branch, 10=map, 11=return</text>
+        <text x="10" y="225" fill="#6090a8" font-family="JetBrains Mono" font-size="8">CD field (2 bits) determines IF branch is taken (for conditional branches)</text>
+      </svg>
+      <div class="diagram-cap">Fig 9.1 — Address Sequencing: CAR is loaded from one of four sources selected by BR field</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: MICROPROGRAM EXAMPLE -->
+<section class="section" id="microprogram">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Microprogram Example</h2>
+    <span class="imp-pill badge badge-o">75%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Microprogram for the Fetch Cycle</h3>
+    <p>Every machine instruction starts with the <strong>fetch cycle</strong>. In a microprogrammed control unit, this is implemented as a microprogram stored in control memory. The same fetch microprogram runs for every instruction.</p>
+    <div class="layman">Think of the fetch cycle microprogram as a standard breakfast routine — you always do the same thing first: wake up, brush teeth, etc. Similarly, every machine instruction starts with the same fetch microprogram: "go to the address in PC, read the instruction, bring it back to IR." After that, different instructions branch to their own specific microprograms.</div>
+    <div class="formula-box">
+      <span class="label">Fetch Cycle Microprogram — Control Memory Example</span>
+      <div class="formula">Address | F1 | F2 | F3 | CD | BR | AD  | Comment</div>
+      <div class="formula">  00    | 000 | 001 | 000 | 00 | 00 | 000 | AR←PC (F2: transfer PC to AR)</div>
+      <div class="formula">  01    | 000 | 010 | 001 | 00 | 00 | 000 | DR←M[AR], PC←PC+1 (F3: IR load; F2: PC incr)</div>
+      <div class="formula">  02    | 000 | 000 | 010 | 00 | 10 | 000 | AR←DR(0-11), decode, BRANCH on opcode</div>
+      <div class="note">At address 02: opcode mapping sends CAR to the correct microprogram for the current instruction</div>
+    </div>
+    <h3>Microprogram for ADD Instruction</h3>
+    <div class="formula-box">
+      <span class="label">ADD Microprogram (starts at address 4 if opcode=001→mapping gives addr 4)</span>
+      <div class="formula">Address | Microoperations               | BR type</div>
+      <div class="formula">  04    | DR←M[AR]                     | CAR+1 (sequential)</div>
+      <div class="formula">  05    | AC←AC+DR, if carry E←1       | Unconditional branch to 00 (back to fetch)</div>
+      <div class="note">ADD takes 2 microinstructions after fetch: read operand, then perform addition</div>
+      <div class="note">After ADD's microprogram ends (addr 05), BR field = unconditional branch → CAR ← 00 → start next fetch cycle</div>
+    </div>
+    <h3>Microprogramming vs High-Level Programming</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Microprogramming</th><th>Machine Language Programming</th></tr>
+      <tr><td>Level</td><td>Lowest — controls CPU hardware directly</td><td>Low — uses ISA instructions</td></tr>
+      <tr><td>Written by</td><td>CPU designer / manufacturer</td><td>Systems/application programmer</td></tr>
+      <tr><td>Stored in</td><td>Control memory (inside CPU)</td><td>Main memory (RAM)</td></tr>
+      <tr><td>Executed by</td><td>Control unit (microsequencer)</td><td>CPU (via control unit)</td></tr>
+      <tr><td>Instruction size</td><td>20-bit microinstruction word</td><td>16-bit machine instruction word</td></tr>
+      <tr><td>One-to-one?</td><td>One microinstruction = one micro-op (1 clock)</td><td>One machine instruction = multiple micro-ops</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 11: HARDWIRED VS MICROPROGRAMMED -->
+<section class="section" id="hardwired-vs-micro">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Hardwired vs Microprogrammed Control Unit</h2>
+    <span class="imp-pill badge badge-r">🔥 92% — EVERY EXAM</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part B:</strong> Hardwired vs Microprogrammed appeared in Part B Q6 (2022), Part A Q10 (2023-Aug), Part B Q4 (2025) — three different papers. It is the single most consistently tested Unit 3/4 comparison question. Draw both control unit structures and write a full comparison table. 4–8 marks depending on the part.</div>
+  </div>
+  <div class="theory-block">
+    <h3>Hardwired Control Unit</h3>
+    <p>In a <span class="hl-r">hardwired control unit</span>, the control logic is implemented entirely using combinational and sequential logic circuits (gates, flip-flops, decoders). The control signals are generated by fixed hardware — there is no memory or program; the logic is "wired in" permanently.</p>
+    <div class="layman">A hardwired control unit is like a microwave oven with physical buttons. Each button triggers a fixed, hardwired sequence of operations (heat for 1 min, buzz, stop). You can't change what the button does without opening the microwave and rewiring it. It's fast because the circuits are dedicated, but inflexible because changing behavior requires hardware modification.</div>
+    <div class="formula-box">
+      <span class="label">Hardwired Control — Generation of Control Signals</span>
+      <div class="formula">Control signal = f(instruction, timing state, condition flags)</div>
+      <div class="formula">Example: T3 ∙ D0 → signal to read memory (DR←M[AR]) for AND instruction</div>
+      <div class="formula">         T4 ∙ D0 → signal to AND AC with DR (AC←AC∧DR)</div>
+      <div class="note">T0..T7 = timing states | D0..D6 = decoder outputs (one per opcode) | Conditions: E, N, Z, etc.</div>
+      <div class="note">Implementation: Row Decoder + Combinational Logic + Encoder</div>
+    </div>
+    <h3>Microprogrammed Control Unit</h3>
+    <p>In a <span class="hl-v">microprogrammed control unit</span>, control signals are generated by reading microinstructions from a <strong>control memory</strong>. Each machine instruction is implemented as a sequence of microinstructions (a microprogram) stored in the control memory.</p>
+    <div class="layman">A microprogrammed control unit is like a programmable smart home system. Each "scene" (like "movie night") triggers a stored program of steps (dim lights, close blinds, turn on TV). You can add new scenes or change existing ones just by editing the program — no rewiring needed. The control memory IS the program; the hardware just reads and executes it.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 280" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">Microprogrammed Control Unit — Block Diagram</text>
+        <!-- Instruction Register -->
+        <rect x="10" y="40" width="120" height="40" rx="5" fill="#0c1e28" stroke="#f97316" stroke-width="1.5"/>
+        <text x="70" y="57" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8" font-weight="bold">Instruction Register</text>
+        <text x="70" y="70" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Opcode field</text>
+        <!-- Mapping Logic -->
+        <rect x="170" y="40" width="110" height="40" rx="5" fill="#0c1e28" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="225" y="57" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8" font-weight="bold">Mapping ROM</text>
+        <text x="225" y="70" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Opcode → CAR start addr</text>
+        <line x1="130" y1="60" x2="170" y2="60" stroke="#f97316" stroke-width="2"/>
+        <polygon points="167,56 177,60 167,64" fill="#f97316"/>
+        <!-- CAR -->
+        <rect x="330" y="40" width="120" height="40" rx="5" fill="#0c1e28" stroke="#a78bfa" stroke-width="2"/>
+        <text x="390" y="57" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8" font-weight="bold">CAR</text>
+        <text x="390" y="70" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Control Address Register</text>
+        <line x1="280" y1="60" x2="330" y2="60" stroke="#ef4444" stroke-width="2"/>
+        <polygon points="327,56 337,60 327,64" fill="#ef4444"/>
+        <!-- Control Memory -->
+        <rect x="200" y="120" width="200" height="60" rx="6" fill="#102534" stroke="#22d3ee" stroke-width="2.5"/>
+        <text x="300" y="148" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">CONTROL MEMORY</text>
+        <text x="300" y="163" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">128 × 20-bit microinstructions</text>
+        <line x1="390" y1="80" x2="390" y2="120" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="390" y1="100" x2="300" y2="100" stroke="#a78bfa" stroke-width="1.5"/>
+        <line x1="300" y1="100" x2="300" y2="120" stroke="#a78bfa" stroke-width="1.5"/>
+        <polygon points="296,117 300,127 304,117" fill="#a78bfa"/>
+        <!-- CDR -->
+        <rect x="200" y="208" width="200" height="40" rx="5" fill="#0c1e28" stroke="#10b981" stroke-width="2"/>
+        <text x="300" y="227" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">CDR — Current Microinstruction</text>
+        <text x="300" y="240" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">F1 F2 F3 CD BR AD fields</text>
+        <line x1="300" y1="180" x2="300" y2="208" stroke="#22d3ee" stroke-width="2"/>
+        <polygon points="296,205 300,215 304,205" fill="#22d3ee"/>
+        <!-- Control signals output -->
+        <line x1="300" y1="248" x2="300" y2="265" stroke="#10b981" stroke-width="2"/>
+        <polygon points="296,262 300,272 304,262" fill="#10b981"/>
+        <text x="300" y="280" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8">Control signals to datapath</text>
+        <!-- Next address logic -->
+        <rect x="420" y="120" width="130" height="50" rx="5" fill="#0c1e28" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="485" y="140" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8" font-weight="bold">Address Sequencer</text>
+        <text x="485" y="155" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">CAR+1 / Branch / Map / Return</text>
+        <line x1="400" y1="145" x2="420" y2="145" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="485" y1="120" x2="485" y2="60" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="485" y1="60" x2="450" y2="60" stroke="#f59e0b" stroke-width="1.5"/>
+        <polygon points="453,56 443,60 453,64" fill="#f59e0b"/>
+        <text x="430" y="56" fill="#f59e0b" font-family="JetBrains Mono" font-size="7">Next addr → CAR</text>
+      </svg>
+      <div class="diagram-cap">Fig 11.1 — Microprogrammed Control Unit: IR→Mapping→CAR→Control Memory→CDR→Control Signals; Address Sequencer updates CAR</div>
+    </div>
+    <h3>Master Comparison Table — RTU Exam Answer</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Hardwired Control Unit</th><th>Microprogrammed Control Unit</th></tr>
+      <tr><td><strong>Implementation</strong></td><td>Logic gates, flip-flops, decoders — fixed hardware circuits</td><td>Control memory (ROM/RAM) + microsequencer — software-like</td></tr>
+      <tr><td><strong>Speed</strong></td><td>✅ FASTER — direct hardware logic, no memory access per cycle</td><td>❌ Slower — must access control memory for each microinstruction</td></tr>
+      <tr><td><strong>Flexibility</strong></td><td>❌ Inflexible — changing behavior requires redesigning hardware</td><td>✅ Flexible — modify control memory to add/change instructions</td></tr>
+      <tr><td><strong>Complexity</strong></td><td>Difficult to design, verify, and debug for complex ISA</td><td>Easier to design, test, and modify</td></tr>
+      <tr><td><strong>Cost</strong></td><td>Lower for simple, fixed instruction sets</td><td>Higher due to control memory cost</td></tr>
+      <tr><td><strong>Fault tolerance</strong></td><td>Hard to fix bugs — requires hardware changes</td><td>Easier — fix microcode bugs by updating memory</td></tr>
+      <tr><td><strong>New instructions</strong></td><td>Cannot add — hardware must be redesigned</td><td>✅ Can add new instructions by adding microprograms</td></tr>
+      <tr><td><strong>Power</strong></td><td>Generally lower power</td><td>Higher power (memory access)</td></tr>
+      <tr><td><strong>Used in</strong></td><td>RISC processors (ARM, MIPS) — simple, regular ISA</td><td>CISC processors (x86) — complex, many instructions</td></tr>
+      <tr><td><strong>Design time</strong></td><td>Longer — must verify all hardware paths</td><td>Shorter — iterative microcode development</td></tr>
+      <tr><td><strong>Example</strong></td><td>Intel 8085, MIPS, ARM Cortex-M</td><td>Intel 8086, IBM System/360</td></tr>
+    </table>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Hardwired vs Microprogrammed — Memory Trick</div>
+        <p><strong>HARDWIRED</strong> = Hard to change, Fast to run, Hardware gates only, RISC<br>
+        <strong>MICROPROGRAMMED</strong> = Micro = Memory (control memory), Modifiable, Slower, CISC<br><br>
+        For RTU 4-mark answer: Write definition of each (2 lines each), then give 4 comparison points in a table, then mention "Hardwired is preferred in RISC (ARM, MIPS) for speed; Microprogrammed is used in CISC (x86) for flexibility." This format = full marks.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Hardwired vs Microprogrammed</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Differentiate between hardwired and microprogrammed control unit.</div>
+      <div class="pyq-meta"><span>2022 Part B Q6 · 2025 Part B Q4 · 2023-Aug Part A Q10 · ⭐⭐⭐</span><span class="topic-tag">Hardwired vs Microprogrammed</span><span class="pred-tag">🔮 CERTAIN 2026 Part B Q4</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Hardwired Control Unit:</strong><br>
+        Control signals are generated by combinational and sequential logic circuits — gates, flip-flops, and decoders permanently wired together. No program or memory is used. Control signals = f(opcode, timing state, condition flags). Very fast but inflexible.<br><br>
+        <strong>Microprogrammed Control Unit:</strong><br>
+        Control signals are generated by reading microinstructions from a control memory (ROM/RAM). Each machine instruction is implemented as a microprogram (sequence of microinstructions). The CAR (Control Address Register) sequences through microinstructions. Flexible but slower than hardwired.<br><br>
+        <strong>Key Differences:</strong><br>
+        1. Speed: Hardwired is faster (direct logic gates) vs Microprogrammed is slower (memory access per cycle)<br>
+        2. Flexibility: Hardwired cannot be changed without hardware redesign vs Microprogrammed can add/modify instructions by changing microcode<br>
+        3. Complexity: Hardwired is complex to design for rich ISA vs Microprogrammed is systematic and easier<br>
+        4. Usage: Hardwired → RISC (ARM, MIPS); Microprogrammed → CISC (Intel x86)<br>
+        5. Fault correction: Hardwired requires hardware fix vs Microprogrammed just updates memory<br>
+        6. Instruction set changes: Hardwired cannot add instructions vs Microprogrammed can add new microprograms<br><br>
+        [Draw: Hardwired diagram showing instruction → decoder → timing logic → control gates → signals. Microprogrammed diagram showing IR → Mapping ROM → CAR → Control Memory → CDR → signals.]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain the concept of microprogrammed control unit.</div>
+      <div class="pyq-meta"><span>2022 Part A Q7 · 2 marks ⭐⭐</span><span class="topic-tag">Microprogrammed CU</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>microprogrammed control unit</strong> implements the control logic using a small, high-speed memory called <strong>control memory</strong>, which stores microprograms — sequences of microinstructions that define how to execute each machine instruction.<br><br>
+        <strong>Key components:</strong><br>
+        1. <strong>Control Memory:</strong> Stores all microprograms. Each word = one microinstruction (20 bits in the basic computer).<br>
+        2. <strong>Control Address Register (CAR):</strong> Points to the next microinstruction to execute.<br>
+        3. <strong>Control Data Register (CDR):</strong> Holds the current microinstruction being executed.<br>
+        4. <strong>Address Sequencer:</strong> Determines the next value of CAR (sequential, branch, or mapping).<br><br>
+        <strong>Operation:</strong><br>
+        When a machine instruction is fetched (e.g., ADD), its opcode is mapped to a starting address in control memory. The control unit reads microinstructions from that address sequentially, generating control signals to perform micro-operations until the instruction is complete. Then it branches back to the fetch microprogram.<br><br>
+        <strong>Advantage over hardwired:</strong> Instructions can be added or modified by changing microcode without redesigning hardware.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Give an example of a RISC I instruction that will perform the following operations: (a) Decrement a register, (b) Complement a register, (c) Negate a register, (d) Clear a register, (e) Divide by 4, (f) No operation.</div>
+      <div class="pyq-meta"><span>2023-Aug Part C Q3 · 15 marks ⭐⭐</span><span class="topic-tag">RISC I Instructions</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        RISC I uses 3-operand instructions of the form: OP dest, src1, src2 (or immediate).<br><br>
+        <strong>(a) Decrement register R1:</strong><br>
+        SUB R1, R1, 1    / R1 ← R1 − 1  (subtract immediate 1 from R1)<br><br>
+        <strong>(b) Complement register R1 (1's complement):</strong><br>
+        XOR R1, R1, -1   / R1 ← R1 XOR 0xFFFF...  (XOR with all-1s flips every bit)<br>
+        OR: NOT R1, R1   / if NOT instruction available<br><br>
+        <strong>(c) Negate register R1 (2's complement = -R1):</strong><br>
+        SUB R1, R0, R1   / R1 ← 0 − R1 = −R1  (assuming R0 is always 0)<br>
+        OR: XOR R1, R1, -1 then ADD R1, R1, 1<br><br>
+        <strong>(d) Clear register R1 (set to 0):</strong><br>
+        XOR R1, R1, R1   / R1 ← R1 XOR R1 = 0<br>
+        OR: MOV R1, R0   / Move 0 (from R0) to R1<br><br>
+        <strong>(e) Divide by 4 (for signed numbers):</strong><br>
+        SRA R1, R1, 2    / R1 ← arithmetic shift right by 2 positions = R1 ÷ 4<br>
+        (Arithmetic shift right preserves sign bit for signed numbers)<br><br>
+        <strong>(f) No operation (NOP):</strong><br>
+        ADD R0, R0, 0    / R0 ← R0 + 0 = R0  (no change, writes to R0 which is always 0)<br>
+        OR: MOV R0, R0   / Move R0 to itself — no effect
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- PREDICTED PAPER 2026 -->
+<div style="background:#060e14;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:clamp(40px,6vw,70px) 5vw;" id="predicted">
+  <div style="max-width:var(--content-max);margin:0 auto;">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Based on 2022–2025 CAO PYQ Pattern + 2026 DIP, ML & ISS Paper Analysis</div>
+    <div class="sec-header" style="margin-bottom:14px">
+      <h2>CAO — Predicted Paper 2026 (Unit 3 Contribution)</h2>
+      <span class="sub">TOPICS FROM UNIT 3 HIGHLIGHTED IN THE FULL PREDICTED PAPER</span>
+    </div>
+    <p style="font-family:var(--mono);font-size:clamp(11px,0.78vw,14px);color:var(--dim2);margin-bottom:14px;line-height:1.75;">Unit 3 contributes primarily to Part A (subroutine, control memory, assembly vs machine language) and Part B (hardwired vs microprogrammed). The topics below are Unit 3 predictions specifically, cross-referenced with the full 2026 predicted paper.</p>
+    <div class="tip-box warning" style="margin-bottom:24px">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-content">
+        <div class="tip-title">Disclaimer</div>
+        <p>Predictions based on historical patterns. Actual paper may differ. Use for study prioritization.</p>
+      </div>
+    </div>
+    <div class="pred-grid">
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q9) — Unit 3</div>
+        <div class="pred-q">Write a quick note on subroutine. What is the role of a stack in subroutine calls?</div>
+        <div class="pred-reason">Subroutine appeared in 2022 Part A Q3 and 2025 Part A Q9 — two non-consecutive papers. Two-paper recurring topics have near-certain return in 2026. The stack role question adds 2025 phrasing. Expect this exact combined form.</div>
+        <span class="pred-conf high">VERY HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q4) — Unit 3</div>
+        <div class="pred-q">Differentiate between hardwired and microprogrammed control unit.</div>
+        <div class="pred-reason">This is the single most-repeated comparison question in RTU CAO: 2022 Part B Q6, 2023-Aug Part A Q10, 2025 Part B Q4. Three papers. It is CERTAIN for 2026 Part B. Draw both block diagrams and write 5-6 comparison points in a table format.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q?) — Unit 3</div>
+        <div class="pred-q">What is a control memory? (OR What is a microinstruction?)</div>
+        <div class="pred-reason">Control memory was Part A Q3 in 2024. With one-year rotation pattern, it may shift to Q6-Q8 range in 2026 or appear in Part B. Based on 2026 ISS patterns, Part A anchor topics of 2024 (absent 2025) return in 2026.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q?) — Unit 3</div>
+        <div class="pred-q">Differentiate between assembly language and machine language.</div>
+        <div class="pred-reason">Assembly vs machine language appeared in 2023-Aug Part A Q8. Absent in 2024 and 2025. Three-year absence makes it strongly due for return. The 2026 DIP paper confirmed 3-year dormant topics return. Essential definition pair.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q?) — Unit 3</div>
+        <div class="pred-q">Explain address sequencing in microprogrammed control with diagram.</div>
+        <div class="pred-reason">Address sequencing has not appeared as a standalone Part B question in recent papers. Given that control memory (Part A 2024) and hardwired vs microprogrammed (Part B 2025) have been tested, address sequencing — the mechanism that makes microprogramming work — is due for a Part B question in 2026.</div>
+        <span class="pred-conf med">MEDIUM-HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q?) — Unit 3</div>
+        <div class="pred-q">Write an assembly language program to find the larger of two numbers. (OR Sum of N numbers using a loop.)</div>
+        <div class="pred-reason">Assembly language programming questions appeared in 2023-Aug Part C (arithmetic statement with 3/2/1/0 address). Simpler assembly programming (loop, subroutine, max of two numbers) is expected in Part B 2026 — RTU tends to include at least one programming question per paper.</div>
+        <span class="pred-conf med">MEDIUM confidence</span>
+      </div>
+    </div>
+    <div class="tip-box validate" style="margin-top:28px">
+      <div class="tip-icon">✅</div>
+      <div class="tip-content">
+        <div class="tip-title">Unit 3 Preparation Priority for 2026</div>
+        <p><strong>MUST prepare (near-certain marks):</strong><br>
+        • Hardwired vs Microprogrammed CU — full comparison table + two block diagrams<br>
+        • Subroutine — BSA mechanism, stack role, code example<br>
+        • Control memory — structure, CAR/CDR, microinstruction fields<br><br>
+        <strong>HIGH value (prepare definition + one example):</strong><br>
+        • Assembly language vs Machine language (Part A definition)<br>
+        • Address sequencing — four methods with formulas<br>
+        • ISZ loop programming — understand the negative counter pattern<br>
+        • I/O programming — polling vs interrupt, ION/IOF/BUN I 0 pattern</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PYQ MASTER LIST -->
+<div class="layout">
+<div style="width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;"></div>
+<div class="content">
+<section class="section" id="pyq-master" style="margin-top:40px">
+  <div class="section-header">
+    <span class="section-num">M</span>
+    <h2 class="section-title">All PYQs — Unit 3 Master List</h2>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📋 Complete PYQ Reference — Unit 3 Topics (All Years)</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Full Unit 3 PYQ Coverage — Click to Expand</div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full List</button>
+      <div class="answer-content">
+        <strong>PART A — Unit 3 Related Questions:</strong><br><br>
+        2022 (6E1554): Q3: Describe subroutine | Q7: Explain microprogrammed control unit<br>
+        2022 Q9: Describe three fields (Mode, Opcode, Address) of 16-bit instruction format<br>
+        2022 Q10: Perform selective complement A=1011 0110, B=0110 1110 (logic micro-op)<br><br>
+        2023-Aug (610404): Q4: Differentiate instruction code and operation code<br>
+        Q6: Difference between direct and indirect address instruction<br>
+        Q7: Two instructions to set E flip-flop to 1<br>
+        Q8: Differentiate assembly and machine language<br>
+        Q9: Show how MRI and non-MRI tables can be stored in memory<br>
+        Q10: Explain difference between hardwired and microprogrammed control<br><br>
+        2024 (6E7104): Q3: What is a control memory?<br><br>
+        2025 (6E7104): Q2: Most common fields of an Instruction format<br>
+        Q9: Write a quick note on subroutine<br><br>
+        <strong>PART B — Unit 3 Related:</strong><br><br>
+        2022 (6E1554): B-Q6: Differentiate Hardwired and Micro-programmed control unit (8 marks)<br>
+        B-Q5: Explain types of instructions<br>
+        B-Q7: Significance of DR, AR, IR, TR, PC, AC in common bus system<br><br>
+        2023-Aug (610404): B-Q2: RTL conditional statements If(P=1)→R1←R2 (register transfer)<br>
+        B-Q4: Output program at address 230, interrupt when FGO=1 (I/O programming)<br>
+        B-Q5: Instruction format with 256K×32 bit memory, 4 fields (opcode, mode, register, address)<br>
+        B-Q6: How many times control unit refers to memory for indirect addressing (computational/branch)<br>
+        B-Q7: RISC I instruction to jump to address 3200 (immediate/relative addressing)<br><br>
+        2025 (6E7104): B-Q4: Differentiate between hardwired and microprogrammed control unit<br><br>
+        <strong>PART C — Unit 3 Related:</strong><br><br>
+        2023-Aug (610404): C-Q2: Program for arithmetic statement X=(A-B+C*(D*E-F))/(G+H*K) using 3-address, 2-address, 1-address (accumulator), 0-address (stack)<br>
+        C-Q3: RISC I instructions for: decrement/complement/negate/clear/divide-by-4/NOP<br><br>
+        <strong>KEY PATTERNS:</strong><br>
+        Hardwired vs Microprogrammed: Part B 2022, Part A 2023-Aug, Part B 2025 (EVERY other year)<br>
+        Subroutine: Part A 2022 and 2025<br>
+        Control memory: Part A 2024<br>
+        Assembly vs Machine language: Part A 2023-Aug<br>
+        Instruction format: Part A 2022 Q9, Part A 2025 Q2<br>
+        Programming arithmetic: Part C 2023-Aug Q2 (major question)<br>
+        RISC I programming: Part B/C 2023-Aug Q7, Q3
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="#">🏠 Home</a>
+    <a href="unit2.html">🔴 Unit 2: Data & Register</a>
+    <a href="#">🔢 Unit 4: CPU & Pipeline</a>
+    <a href="#">💾 Unit 5: Arithmetic & Memory</a>
+    <a href="#">🔗 Unit 6: I/O & Multiprocessors</a>
+    <a href="#pyq-master" style="color:var(--upred)">📋 All PYQs</a>
+  </div>
+  © 2026 RTU CAO Study Guide · Unit 3 — Programming the Basic Computer & Microprogrammed Control · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans = btn.nextElementSibling;
+  if(ans.classList.contains('open')){
+    ans.classList.remove('open');
+    btn.textContent = btn.textContent.replace('▲','▼');
+  } else {
+    ans.classList.add('open');
+    btn.textContent = btn.textContent.replace('▼','▲');
+  }
+}
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('visible');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      navItems.forEach(n => {
+        n.classList.remove('active');
+        if(n.getAttribute('href') === '#' + e.target.id) n.classList.add('active');
+      });
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
