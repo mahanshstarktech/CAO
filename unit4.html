@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO Unit 4 — CPU, Pipeline & Vector Processing | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:#050d10; --bg2:#071520; --surface:#0c1e28; --surface2:#102534;
+  --border:#1a3545; --border2:#0e2030;
+  --u1:#22d3ee; --u2:#f97316; --u3:#ef4444; --u4:#a78bfa; --u5:#10b981; --u6:#3b82f6;
+  --upred:#f59e0b; --gold:#fbbf24; --text:#dde8f2; --dim:#3a5868; --dim2:#6090a8;
+  --mono:'JetBrains Mono',monospace; --head:'Fraunces',serif; --body:'Outfit',sans-serif;
+  --sidebar-w:300px; --content-max:1400px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:clamp(16px,1.1vw,20px);}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.82;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(5,13,16,0.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border2);padding:0 28px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.topnav::-webkit-scrollbar{display:none;}
+.tnlabel{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#f97316;padding:15px 14px 15px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;flex-shrink:0;}
+.tnlink{font-family:var(--mono);font-size:11.5px;padding:8px 14px;border-radius:6px;text-decoration:none;color:var(--dim2);white-space:nowrap;flex-shrink:0;transition:all .18s;border:1px solid transparent;}
+.tnlink:hover{color:var(--text);background:var(--surface2);}
+.tnlink.active{color:#f97316;background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);}
+.tnlink.pyq{color:var(--upred);background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.22);}
+.tnlink.pred{color:var(--upred);background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);font-weight:600;}
+
+.credit-band{background:#060e14;border-bottom:1px solid var(--border2);padding:11px 32px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.credit-text{font-family:var(--mono);font-size:11.5px;color:var(--dim2);}
+.credit-text span{color:#f97316;font-weight:600;}
+
+.hero{position:relative;overflow:hidden;padding:clamp(40px,6vw,80px) 5vw clamp(36px,5vw,64px);}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(249,115,22,.1) 1px,transparent 1px),radial-gradient(circle,rgba(34,211,238,.05) 1px,transparent 1px);background-size:44px 44px,88px 88px;background-position:0 0,22px 22px;animation:dotDrift 30s linear infinite;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 10% 50%,rgba(249,115,22,.08) 0%,transparent 65%),radial-gradient(ellipse 45% 50% at 85% 15%,rgba(34,211,238,.06) 0%,transparent 60%);pointer-events:none;}
+@keyframes dotDrift{0%{transform:translate(0,0);}100%{transform:translate(44px,44px);}}
+.hero-inner{position:relative;z-index:1;max-width:var(--content-max);margin:0 auto;}
+.hero-tag{font-family:var(--mono);font-size:clamp(10px,0.75vw,12px);color:#f97316;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:#f97316;box-shadow:0 0 14px #f97316;animation:blink 2.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-family:var(--head);font-weight:800;font-size:clamp(30px,5vw,72px);line-height:1.02;color:#fff;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 span{color:#f97316;} .hero h1 em{color:var(--u1);font-style:normal;}
+.hero-sub{color:var(--dim2);font-size:clamp(15px,1.4vw,19px);max-width:760px;line-height:1.8;margin-bottom:22px;}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{font-family:var(--mono);font-size:clamp(10px,0.7vw,12px);padding:5px 14px;border-radius:5px;border:1px solid;}
+.badge-r{color:var(--u3);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);}
+.badge-c{color:var(--u1);border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.08);}
+.badge-v{color:var(--u4);border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08);}
+.badge-o{color:var(--u2);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08);}
+.badge-gold{color:var(--upred);border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);}
+.badge-g{color:var(--u5);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08);}
+
+.layout{display:flex;max-width:100%;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);padding:28px 18px;border-right:1px solid var(--border);position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:4px;} .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sidebar-title{font-family:var(--mono);font-size:10px;color:#f97316;letter-spacing:2px;text-transform:uppercase;}
+.sidebar-close{display:none;background:none;border:1px solid var(--border);border-radius:4px;color:var(--dim2);cursor:pointer;padding:2px 9px;font-family:var(--mono);font-size:11px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-family:var(--head);font-size:clamp(12px,0.85vw,14px);font-weight:600;color:var(--dim2);transition:all .2s;margin-bottom:3px;text-decoration:none;line-height:1.3;}
+.nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:#f97316;border-left:2px solid #f97316;padding-left:10px;}
+.nav-imp{margin-left:auto;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;background:var(--surface2);white-space:nowrap;}
+.nav-imp.high{color:var(--u3);} .nav-imp.med{color:var(--upred);} .nav-imp.low{color:var(--u5);}
+
+.sidebar-toggle{display:none;position:fixed;bottom:22px;right:22px;z-index:1000;width:52px;height:52px;border-radius:50%;background:#f97316;border:none;cursor:pointer;font-size:22px;color:#fff;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(249,115,22,.45);transition:transform .2s;}
+.sidebar-toggle:hover{transform:scale(1.1);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:98;backdrop-filter:blur(3px);}
+.sidebar-overlay.visible{display:block;}
+
+.content{flex:1;padding:clamp(28px,3.5vw,56px) clamp(22px,4vw,80px);max-width:calc(100% - var(--sidebar-w));overflow-x:hidden;min-width:0;}
+
+.section{margin-bottom:80px;scroll-margin-top:64px;}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.section-num{font-family:var(--mono);font-size:12px;color:#f97316;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);padding:5px 10px;border-radius:5px;min-width:40px;text-align:center;}
+.section-title{font-family:var(--head);font-size:clamp(20px,2.5vw,30px);font-weight:800;color:#fff;}
+.imp-pill{margin-left:auto;}
+
+.theory-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(20px,2.5vw,32px);margin-bottom:22px;}
+.theory-block h3{font-family:var(--head);font-size:clamp(16px,1.6vw,21px);font-weight:700;color:var(--u2);margin-bottom:14px;}
+.theory-block h3.red{color:var(--u3);} .theory-block h3.cyan{color:var(--u1);} .theory-block h3.orange{color:#f97316;} .theory-block h3.green{color:var(--u5);}
+.theory-block p{margin-bottom:14px;font-size:clamp(15px,1vw,17px);line-height:1.85;}
+.theory-block p:last-child{margin-bottom:0;}
+.theory-block ul,.theory-block ol{padding-left:24px;margin:12px 0;}
+.theory-block li{margin-bottom:9px;font-size:clamp(15px,1vw,17px);line-height:1.75;}
+h4{font-family:var(--head);font-size:clamp(14px,1vw,17px);font-weight:700;color:var(--text);margin:18px 0 10px;}
+
+.layman{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-left:3px solid #f97316;border-radius:8px;padding:16px 20px;font-family:var(--mono);font-size:clamp(12px,0.8vw,14px);color:#fed7aa;margin:14px 0;line-height:1.75;}
+.layman::before{content:'💬 LAYMAN: ';color:#f97316;font-weight:700;}
+
+.formula-box{background:#030c14;border:1px solid rgba(34,211,238,.22);border-left:3px solid var(--u1);border-radius:9px;padding:18px 22px;margin:18px 0;font-family:var(--mono);font-size:clamp(11px,0.78vw,14px);color:#67e8f9;overflow-x:auto;line-height:1.7;}
+.formula-box .label{font-size:clamp(9px,0.65vw,11px);color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:block;}
+.formula-box .formula{color:#a5f3fc;font-size:clamp(12px,0.82vw,15px);}
+.formula-box .note{color:var(--dim2);font-size:clamp(11px,0.73vw,13px);margin-top:8px;display:block;font-style:italic;}
+
+.tip-box{border-radius:9px;padding:18px 20px;margin:16px 0;display:flex;gap:14px;}
+.tip-box.trick{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);}
+.tip-box.validate{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);}
+.tip-box.connect{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);}
+.tip-box.warning{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);}
+.tip-box.pred{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);}
+.tip-icon{font-size:21px;flex-shrink:0;margin-top:3px;}
+.tip-content{flex:1;}
+.tip-title{font-family:var(--head);font-size:clamp(11px,0.8vw,14px);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;}
+.tip-box.trick .tip-title{color:var(--gold);} .tip-box.validate .tip-title{color:var(--u5);} .tip-box.connect .tip-title{color:var(--u4);} .tip-box.warning .tip-title{color:var(--u3);} .tip-box.pred .tip-title{color:var(--upred);}
+.tip-content p{font-size:clamp(13px,0.88vw,16px);color:var(--text);margin:0;line-height:1.75;}
+
+.comp-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:clamp(12px,0.85vw,15px);display:block;overflow-x:auto;}
+.comp-table th{background:var(--surface2);padding:12px 16px;text-align:left;font-family:var(--head);font-weight:700;color:var(--u1);border-bottom:1px solid var(--border);white-space:nowrap;}
+.comp-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:top;}
+.comp-table tr:last-child td{border-bottom:none;} .comp-table tr:hover td{background:var(--surface2);}
+
+.imp-bar-wrap{margin-bottom:12px;}
+.imp-bar-label{font-family:var(--mono);font-size:clamp(10px,0.73vw,13px);color:var(--dim2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.imp-bar{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.imp-bar-fill{height:100%;border-radius:4px;}
+.imp-high .imp-bar-fill{background:var(--u3);} .imp-med .imp-bar-fill{background:var(--upred);} .imp-low .imp-bar-fill{background:var(--u5);}
+
+.steps{margin:16px 0;}
+.step-item{display:flex;gap:16px;margin-bottom:14px;}
+.step-num{width:34px;height:34px;border-radius:50%;background:#f97316;color:#fff;font-family:var(--mono);font-weight:700;font-size:clamp(11px,0.78vw,14px);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-text{font-size:clamp(14px,1vw,17px);padding-top:6px;line-height:1.75;}
+
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px;margin:18px 0;text-align:center;overflow-x:auto;}
+.diagram-cap{font-family:var(--mono);font-size:clamp(10px,0.72vw,12px);color:var(--dim2);margin-top:12px;text-align:center;}
+
+.pred-banner{background:linear-gradient(135deg,rgba(245,158,11,.09),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.35);border-left:3px solid var(--upred);border-radius:9px;padding:14px 18px;margin:16px 0;font-family:var(--mono);font-size:clamp(11px,0.78vw,14px);color:var(--upred);display:flex;gap:12px;align-items:flex-start;}
+.pred-banner .pb-icon{flex-shrink:0;font-size:18px;} .pred-banner .pb-text{line-height:1.7;}
+
+.pyq-section{background:#060f18;border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:clamp(18px,2.5vw,28px);margin-top:26px;}
+.pyq-header{font-family:var(--head);font-size:clamp(14px,1vw,17px);font-weight:700;color:var(--upred);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.pyq-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:18px 20px;margin-bottom:16px;}
+.pyq-q-text{font-family:var(--head);font-size:clamp(14px,1vw,17px);font-weight:700;color:#fff;margin-bottom:6px;line-height:1.45;}
+.pyq-meta{font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);color:var(--dim2);margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;}
+.topic-tag{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:#f97316;padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pred-tag{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--upred);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pyq-toggle{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 16px;cursor:pointer;font-family:var(--mono);font-size:clamp(10px,0.73vw,13px);color:var(--upred);margin-top:12px;transition:all .2s;}
+.pyq-toggle:hover{background:var(--upred);color:#000;}
+.answer-content{display:none;margin-top:16px;font-size:clamp(14px,0.93vw,17px);line-height:1.85;}
+.answer-content.open{display:block;}
+
+code{font-family:var(--mono);background:var(--surface2);padding:2px 7px;border-radius:4px;font-size:clamp(11px,0.78vw,14px);color:var(--u4);}
+.hl{color:var(--u1);font-weight:600;} .hl-o{color:var(--u2);font-weight:600;} .hl-r{color:var(--u3);font-weight:600;} .hl-v{color:var(--u4);font-weight:600;} .hl-g{color:var(--u5);font-weight:600;} .hl-gold{color:var(--upred);font-weight:600;} .hl-orange{color:#f97316;font-weight:600;}
+
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:24px;}
+.pred-card{background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:20px 22px;border-top:3px solid var(--upred);}
+.pred-part{font-family:var(--mono);font-size:clamp(9px,0.72vw,12px);color:var(--dim2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.pred-q{font-family:var(--head);font-size:clamp(13px,0.95vw,16px);font-weight:700;color:#fff;margin-bottom:8px;line-height:1.4;}
+.pred-reason{font-size:clamp(12px,0.82vw,14px);color:var(--dim2);line-height:1.7;margin-bottom:10px;}
+.pred-conf{font-family:var(--mono);font-size:clamp(9px,0.7vw,12px);padding:3px 10px;border-radius:4px;}
+.pred-conf.high{color:var(--u3);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);}
+.pred-conf.med{color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
+.pred-badge{display:inline-block;font-family:var(--mono);font-size:clamp(10px,0.78vw,13px);color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);padding:5px 14px;border-radius:5px;margin-bottom:14px;}
+.sec-header h2{font-family:var(--head);font-size:clamp(20px,2.5vw,30px);font-weight:800;color:#fff;margin-bottom:6px;}
+.sec-header .sub{font-family:var(--mono);font-size:clamp(9px,0.72vw,12px);color:var(--dim2);letter-spacing:1px;}
+
+.site-footer{background:#030b10;border-top:1px solid var(--border2);padding:28px 5vw;text-align:center;font-family:var(--mono);font-size:clamp(10px,0.72vw,12px);color:var(--dim);}
+.site-footer a{color:var(--dim2);text-decoration:none;margin:0 14px;transition:color .2s;}
+.site-footer a:hover{color:#f97316;}
+.site-footer .footer-links{margin-bottom:12px;}
+
+/* Pipeline timing table */
+.pipeline-table{font-family:var(--mono);font-size:clamp(10px,0.75vw,13px);border-collapse:collapse;width:100%;overflow-x:auto;display:block;margin:16px 0;}
+.pipeline-table th{background:rgba(249,115,22,.15);color:#f97316;padding:8px 12px;border:1px solid var(--border);}
+.pipeline-table td{padding:8px 12px;border:1px solid var(--border);text-align:center;}
+.pipeline-table .active{background:rgba(34,211,238,.15);color:var(--u1);}
+.pipeline-table .stall{background:rgba(239,68,68,.1);color:var(--u3);}
+
+@media(max-width:900px){
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:99;background:var(--bg);transform:translateX(-100%);transition:transform .3s ease;}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,.9);}
+  .sidebar-close{display:block;} .sidebar-toggle{display:flex;}
+  .content{max-width:100%;padding:28px 22px;}
+}
+@media(max-width:600px){
+  .hero{padding:40px 18px 36px;}
+  .theory-block{padding:18px;}
+  .pyq-section{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink" href="index.html">🏠 Home</a>
+  <a class="tnlink" href="unit2.html">🔴 U2: Data & Register</a>
+  <a class="tnlink" href="unit3.html">⚙️ U3: Basic Computer Programming</a>
+  <a class="tnlink active" href="unit4.html">🔢 U4: CPU</a>
+  <a class="tnlink" href="unit5.html">💾 U5: Arithmetic & Memory</a>
+  <a class="tnlink" href="unit6.html">🔗 U6: I/O & Multi</a>
+  <a class="tnlink pyq" href="#pyq-master">📋 All PYQs</a>
+  <a class="tnlink pred" href="#predicted">🔮 2026 Predicted</a>
+</nav>
+
+<div class="credit-band">
+  <div class="credit-text">CAO Exam Prep · <span>RTU B.Tech VI Sem</span> · 6E7104 / 6E1554 / 610404</div>
+  <div class="credit-text">Made with ♥ for RTU Students</div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📚 B.Tech VI Sem · RTU · Computer Architecture & Organization</div>
+    <h1>Unit 4: <span>Central Processing Unit</span>,<br><em>Pipeline</em> & Vector Processing</h1>
+    <p class="hero-sub">General register organization, stack, instruction formats, addressing modes, RISC, pipelining (instruction & arithmetic), Flynn's taxonomy, parallel processing, vector processing, array processors — everything from scratch with layman explanations, formulas, timing diagrams, and every RTU PYQ (2022–2025) solved + 2026 predictions.</p>
+    <div class="hero-badges">
+      <span class="badge badge-r">🔥 Flynn's Taxonomy — 2024 & 2025 Part C</span>
+      <span class="badge badge-gold">🔮 2026 Predicted Topics</span>
+      <span class="badge badge-o">RISC — Part A Every Year</span>
+      <span class="badge badge-c">Pipeline Speedup Formulas</span>
+      <span class="badge badge-v">Addressing Modes — Part A/B</span>
+      <span class="badge badge-g">PYQs Solved 2022–2025</span>
+    </div>
+  </div>
+</section>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Unit 4 Topics</div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <a class="nav-item" href="#overview">📊 Overview & Importance</a>
+  <a class="nav-item" href="#general-register">🗂️ General Register Organization<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#stack">📚 Stack Organization<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#instruction-format">📋 Instruction Format<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#addressing-modes">📍 Addressing Modes<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#data-transfer">🔁 Data Transfer & Manipulation<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#program-control">🎮 Program Control<span class="nav-imp med">70%</span></a>
+  <a class="nav-item" href="#risc">⚡ RISC<span class="nav-imp high">90%</span></a>
+  <a class="nav-item" href="#flynns">🔢 Flynn's Taxonomy<span class="nav-imp high">95%</span></a>
+  <a class="nav-item" href="#parallel">🔀 Parallel Processing<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#pipelining">🚀 Pipelining — Concepts<span class="nav-imp high">92%</span></a>
+  <a class="nav-item" href="#arith-pipeline">➕ Arithmetic Pipeline<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#instruction-pipeline">📡 Instruction Pipeline<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#risc-pipeline">🔴 RISC Pipeline<span class="nav-imp med">75%</span></a>
+  <a class="nav-item" href="#vector">🔷 Vector Processing<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#array">🔲 Array Processors<span class="nav-imp med">68%</span></a>
+  <a class="nav-item" href="#predicted">🔮 2026 Predicted Paper</a>
+  <a class="nav-item" href="#pyq-master">📝 All PYQs Master List</a>
+</nav>
+
+<main class="content">
+
+<!-- SECTION 00: OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">Topic Importance — Unit 4</h2>
+  </div>
+  <div class="theory-block">
+    <p>Unit 4 is the <strong>highest-scoring unit for Part C</strong>. Flynn's taxonomy appeared in Part C in BOTH 2024 AND 2025 — two consecutive years. RISC appeared in Part A Q1 in 2024. Pipeline (arithmetic + instruction) appeared in Part B in 2024 and 2022. Addressing modes appeared in Part A 2025. This unit alone can contribute 20–25 marks across all parts.</p>
+    <div class="imp-bar-wrap imp-high" style="margin-top:18px">
+      <div class="imp-bar-label"><span>Flynn's Taxonomy (SISD/SIMD/MISD/MIMD with diagrams)</span><span style="color:#ef4444">95% 🔮 CERTAIN 2026 Part C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:95%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>RISC — Definition, features, RISC vs CISC</span><span style="color:#ef4444">90% Part A 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:90%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Pipelining — Concepts, speedup, throughput, efficiency</span><span style="color:#ef4444">92% Part B/C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:92%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Arithmetic Pipeline (floating point adder example)</span><span style="color:#ef4444">85% Part B 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Instruction Pipeline (4/6-segment, hazards)</span><span style="color:#ef4444">88% Part C 2023-Aug</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Addressing Modes (immediate, direct, indirect, etc.)</span><span style="color:#ef4444">88% Part A 2025 + 2023-Aug</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Parallel Processing / Multiprocessors</span><span style="color:#ef4444">88% Part A 2022 & 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Instruction Format (3/2/1/0 address types)</span><span style="color:#ef4444">85% Part A 2025</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Stack Organization (push/pop, reverse Polish)</span><span style="color:#ef4444">82%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>General Register Organization (GPR, condition codes)</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Vector Processing / Array Processors</span><span style="color:#f59e0b">72%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:72%"></div></div>
+    </div>
+  </div>
+  <div class="tip-box trick">
+    <div class="tip-icon">⚡</div>
+    <div class="tip-content">
+      <div class="tip-title">Exam Strategy — Unit 4</div>
+      <p><strong>Three guaranteed topics:</strong> (1) Flynn's taxonomy — CERTAIN Part C (2 consecutive years). Draw all 4 categories with block diagrams and examples. (2) RISC vs CISC — CERTAIN Part A Q1 2026. Know 8+ distinguishing features. (3) Pipelining — appeared in Part B (arithmetic pipeline 2024, instruction pipeline 2023-Aug, speedup 2022). Know the speedup formula and draw a timing diagram. These three = 12–15 marks guaranteed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 01: GENERAL REGISTER ORGANIZATION -->
+<section class="section" id="general-register">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">General Register Organization</h2>
+    <span class="imp-pill badge badge-o">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is General Register Organization?</h3>
+    <p>In a <span class="hl-orange">General Register Organization (GRO)</span>, the CPU has multiple general-purpose registers (GPRs) — typically 8, 16, or 32 — that can hold both data and addresses. Unlike the basic computer's single accumulator, any register can serve as source or destination. This is the architecture used by all modern processors (x86, ARM, MIPS).</p>
+    <div class="layman">In the basic computer, you have only ONE work area (the accumulator). In a general register organization, you have a whole row of workbenches (registers) — any of them can hold your work, and you can pick any combination for operations. More registers = fewer memory accesses = faster programs.</div>
+    <div class="formula-box">
+      <span class="label">General Register CPU — Instruction Format</span>
+      <div class="formula">3-address: OP R1, R2, R3    → R1 ← R2 op R3  (all three specified)</div>
+      <div class="formula">2-address: OP R1, R2        → R1 ← R1 op R2  (R1 is both source and destination)</div>
+      <div class="formula">1-address: OP R1             → AC ← AC op R1  (one explicit, one implicit = AC)</div>
+      <div class="formula">0-address: OP                → stack-based: pop two, operate, push result</div>
+      <div class="note">RTU PYQ 2023-Aug: "Write program for X = (A-B+C*(D*E-F))/(G+H*K) using all four address types"</div>
+    </div>
+    <h3>Internal Organization of a Register File</h3>
+    <p>A register file with n registers is connected to the ALU via buses. The CPU typically has:</p>
+    <ul>
+      <li><strong>MUX A:</strong> Selects one register to put on Bus A (first ALU input)</li>
+      <li><strong>MUX B:</strong> Selects one register to put on Bus B (second ALU input)</li>
+      <li><strong>Decoder:</strong> Selects which register receives the ALU result (Bus C)</li>
+    </ul>
+    <div class="formula-box">
+      <span class="label">Control Word for Register Operations</span>
+      <div class="formula">Control word fields: | SELA (src1) | SELB (src2) | SELD (dest) | ALU-op |</div>
+      <div class="formula">Example: R3 ← R1 + R2 → SELA=01, SELB=10, SELD=11, ALU-op=ADD</div>
+      <div class="note">All registers are simultaneously readable (via MUX) — only one write per cycle (via decoder)</div>
+    </div>
+    <h3>Condition Code Register (Status Register / Flags)</h3>
+    <p>Most CPUs have a special register storing condition flags set by ALU operations:</p>
+    <table class="comp-table">
+      <tr><th>Flag</th><th>Name</th><th>Set when...</th><th>Used for...</th></tr>
+      <tr><td><span class="hl-r">Z</span></td><td>Zero</td><td>Result = 0</td><td>BEQ, BNE (branch if equal)</td></tr>
+      <tr><td><span class="hl-o">N</span></td><td>Negative</td><td>MSB of result = 1 (result negative)</td><td>Branch if negative</td></tr>
+      <tr><td><span class="hl">C</span></td><td>Carry</td><td>Carry out from MSB</td><td>Multi-precision addition</td></tr>
+      <tr><td><span class="hl-v">V</span></td><td>Overflow</td><td>Signed overflow occurred</td><td>Detect arithmetic errors</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 02: STACK ORGANIZATION -->
+<section class="section" id="stack">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Stack Organization</h2>
+    <span class="imp-pill badge badge-o">82%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Stack Organization?</h3>
+    <p>A <span class="hl-orange">stack</span> is a Last-In-First-Out (LIFO) data structure where items are added and removed from only one end (the top). In CPUs, the stack is used for subroutine calls, interrupt handling, and expression evaluation. The <strong>Stack Pointer (SP)</strong> register always points to the top of the stack.</p>
+    <div class="layman">A stack is like a pile of plates. You can only put a new plate ON TOP (push) and only take the TOP plate OFF (pop). The last plate you put on is the first one you take off — Last In, First Out. CPUs use this for saving state during function calls: push your current work on the pile before going to a function, pop it back when you return.</div>
+    <div class="formula-box">
+      <span class="label">Stack Operations — PUSH and POP</span>
+      <div class="formula">PUSH X:  SP ← SP + 1          (increment stack pointer first — grows upward)</div>
+      <div class="formula">          M[SP] ← X             (store X at new top of stack)</div>
+      <div class="formula"></div>
+      <div class="formula">POP  X:  X ← M[SP]             (read from top of stack)</div>
+      <div class="formula">          SP ← SP - 1           (decrement stack pointer)</div>
+      <div class="note">Note: Some architectures grow downward (SP decrements on push). RTU basic computer: SP increments on push (grows upward). Always state your assumption!</div>
+    </div>
+    <h3>Stack Applications — RTU Exam Focus</h3>
+    <h4>1. Reverse Polish Notation (Postfix) Evaluation</h4>
+    <p><span class="hl-r">Reverse Polish Notation (RPN)</span> or postfix notation places operators AFTER operands. It eliminates the need for parentheses and is naturally evaluated using a stack. This is how stack-organized computers (0-address computers) work.</p>
+    <div class="formula-box">
+      <span class="label">Postfix Evaluation using Stack</span>
+      <div class="formula">Infix: A + B * C     →  Postfix: A B C * +</div>
+      <div class="formula">Infix: (A + B) * C   →  Postfix: A B + C *</div>
+      <div class="formula">Infix: A * B + C * D →  Postfix: A B * C D * +</div>
+      <div class="formula"></div>
+      <div class="formula">Algorithm: Scan left to right:</div>
+      <div class="formula">  If OPERAND → PUSH onto stack</div>
+      <div class="formula">  If OPERATOR → POP two operands, apply operator, PUSH result</div>
+      <div class="formula">  Final answer is at top of stack</div>
+      <div class="note">Example: A B C * + : Push A, Push B, Push C; Pop C,B → B*C → Push; Pop (B*C),A → A+(B*C) → Push → Done</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Infix to Postfix Conversion Trick</div>
+        <p>Use operator precedence: * and / before + and -. For same precedence, left-to-right. Steps: (1) Add full parentheses according to precedence. (2) Move each operator to replace its RIGHT parenthesis. (3) Remove all parentheses.<br>
+        Example: A+B*C → A+(B*C) → A+(BC*) → ABC*+</p>
+      </div>
+    </div>
+    <h4>2. Stack vs General Register</h4>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Stack Architecture (0-address)</th><th>General Register (3-address)</th></tr>
+      <tr><td>Instruction size</td><td>Short (no operand addresses needed)</td><td>Longer (must specify register names)</td></tr>
+      <tr><td>Code density</td><td>High (compact code)</td><td>Lower</td></tr>
+      <tr><td>Speed</td><td>Slower (sequential access — can't access non-top)</td><td>Faster (any register any time)</td></tr>
+      <tr><td>Examples</td><td>Java JVM, HP calculators, Forth</td><td>x86, ARM, MIPS, PowerPC</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 03: INSTRUCTION FORMAT -->
+<section class="section" id="instruction-format">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Instruction Format</h2>
+    <span class="imp-pill badge badge-r">85%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an Instruction Format?</h3>
+    <p>An <span class="hl-r">instruction format</span> defines the layout of bits in a machine instruction — which bits encode the operation (opcode), which encode operand addresses, and which encode addressing mode information. The format determines how many operations can be specified, how many operands, and how much memory can be addressed.</p>
+    <div class="layman">Instruction format is the form design for giving orders to the CPU. Like a form with fields: "What to do?" (opcode field), "Where is the first data?" (address field 1), "Where is the second data?" (address field 2). Different computers use different form designs — some have 3 address fields, some have 0.</div>
+    <h3>Four Types of Instruction Formats (Number of Address Fields)</h3>
+    <div class="formula-box">
+      <span class="label">Address Types — Format and RTL</span>
+      <div class="formula">3-Address:  OP R1, R2, R3    R1 ← R2 op R3  (all three explicit)</div>
+      <div class="formula">2-Address:  OP R1, R2        R1 ← R1 op R2  (R1 = source AND destination)</div>
+      <div class="formula">1-Address:  OP R1             AC ← AC op R1  (implicit accumulator)</div>
+      <div class="formula">0-Address:  OP                TOS ← TOS op TOS-1  (stack-based)</div>
+    </div>
+    <h3>Trade-offs in Instruction Format Design</h3>
+    <table class="comp-table">
+      <tr><th>Format</th><th>No. of Instructions for X=(A-B)/(C+D)</th><th>Program Length</th><th>Instruction Width</th></tr>
+      <tr><td>3-address</td><td>2 instructions</td><td>Shortest</td><td>Longest (3 addresses)</td></tr>
+      <tr><td>2-address</td><td>4–5 instructions</td><td>Medium</td><td>Medium</td></tr>
+      <tr><td>1-address (accumulator)</td><td>5–6 instructions</td><td>Long</td><td>Short</td></tr>
+      <tr><td>0-address (stack)</td><td>4–5 push/pop/ops</td><td>Longest</td><td>Shortest (no addresses!)</td></tr>
+    </table>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 3 Programming → Unit 4 Instruction Formats</div>
+        <p>In Unit 3, you wrote assembly programs for the basic computer (1-address / accumulator format). In Unit 4, you now understand WHY the basic computer uses LDA/STA/ADD — because it's a 1-address (accumulator) architecture. The RTU PYQ asking to evaluate X=(A-B+C*(D*E-F))/(G+H*K) using all four address types directly connects Unit 3 programming to Unit 4 instruction format concepts.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Instruction Format</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What are the most common fields of an Instruction format?</div>
+      <div class="pyq-meta"><span>2025 Part A Q2 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Instruction Format</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        The most common fields in an instruction format are:<br><br>
+        <strong>1. Opcode Field:</strong> Specifies the operation to be performed (ADD, SUB, LOAD, STORE, BRANCH). Width determines how many distinct operations are possible: k-bit opcode → 2^k operations.<br><br>
+        <strong>2. Address Field(s):</strong> Specify the location of operands (register numbers or memory addresses). Number varies: 3-address (two sources + destination), 2-address, 1-address, or 0-address.<br><br>
+        <strong>3. Mode Field:</strong> Specifies the addressing mode (how the address field is interpreted — immediate, direct, indirect, register, indexed, etc.).<br><br>
+        <strong>Optional fields:</strong> Condition code (for conditional branches), immediate data (for immediate addressing mode), displacement/offset (for indexed/relative addressing).<br><br>
+        The total instruction width = opcode bits + mode bits + address bits. Must fit in one memory word (16, 32, or 64 bits).
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 04: ADDRESSING MODES -->
+<section class="section" id="addressing-modes">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Addressing Modes</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part A 2025 + 2023-Aug</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — HIGH:</strong> Addressing modes appeared in Part A Q3 (2025 — immediate), Part A Q6 (2023-Aug — direct vs indirect), and Part B Q7 (2023-Aug — RISC I immediate/relative mode). For 2026, at least one Part A question on addressing modes (immediate, register, or direct/indirect distinction) is near-certain.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What are Addressing Modes?</h3>
+    <p><span class="hl-r">Addressing modes</span> specify how the CPU computes the Effective Address (EA) of an operand from the address field in the instruction. Different modes provide different trade-offs between flexibility, speed, and code size.</p>
+    <div class="layman">Addressing mode is the method of finding what you're looking for. If a friend says "meet me at 42 Main Street" — that's direct addressing (the address IS the destination). If they say "meet me where the blue car is parked (and the car is at 42 Main)" — that's indirect (the address points to another address). "Meet me 3 streets from here" — that's relative.</div>
+    <div class="formula-box">
+      <span class="label">All Addressing Modes — EA Computation</span>
+      <div class="formula">1. Implied (Inherent):    EA = operand is implied (e.g., CLA — accumulator is implied)</div>
+      <div class="formula">2. Immediate:             Operand = address field itself  (EA has no meaning — VALUE is in instruction)</div>
+      <div class="formula">   ADD #5 → AC ← AC + 5  (# means immediate)</div>
+      <div class="formula">3. Direct (Absolute):     EA = address field  →  operand = M[EA]</div>
+      <div class="formula">   ADD 500 → AC ← AC + M[500]</div>
+      <div class="formula">4. Indirect:              EA = M[address field]  →  operand = M[M[addr]]</div>
+      <div class="formula">   ADD (500) → EA = M[500], operand = M[M[500]]</div>
+      <div class="formula">5. Register:              EA = register number  →  operand = R[n]</div>
+      <div class="formula">   ADD R3 → AC ← AC + R3</div>
+      <div class="formula">6. Register Indirect:     EA = content of register  →  operand = M[R[n]]</div>
+      <div class="formula">   ADD (R3) → AC ← AC + M[R3]  (R3 holds the address)</div>
+      <div class="formula">7. Relative:              EA = PC + displacement</div>
+      <div class="formula">   BUN +5 → PC ← PC + 5  (jump forward 5 from current PC)</div>
+      <div class="formula">8. Indexed:               EA = base register + index register</div>
+      <div class="formula">   ADD X(R1) → EA = X + R1  (X = base address, R1 = array index)</div>
+      <div class="formula">9. Base Register:         EA = base register + displacement (like indexed but fixed base)</div>
+    </div>
+    <table class="comp-table">
+      <tr><th>Mode</th><th>EA Formula</th><th>Memory Accesses</th><th>Advantage</th><th>Use Case</th></tr>
+      <tr><td><span class="hl-o">Immediate</span></td><td>Operand = IR(addr)</td><td>0 extra</td><td>Fastest — no memory needed</td><td>Constants, small literals</td></tr>
+      <tr><td><span class="hl-r">Direct</span></td><td>EA = IR(addr)</td><td>1</td><td>Simple</td><td>Global variables</td></tr>
+      <tr><td><span class="hl">Indirect</span></td><td>EA = M[IR(addr)]</td><td>2</td><td>Flexible (pointer)</td><td>Pointer variables</td></tr>
+      <tr><td><span class="hl-v">Register</span></td><td>EA = R[n]</td><td>0</td><td>Fastest memory alternative</td><td>Local variables in registers</td></tr>
+      <tr><td><span class="hl-g">Relative</span></td><td>EA = PC + d</td><td>1</td><td>Position-independent code</td><td>Branches, jumps</td></tr>
+      <tr><td><span class="hl-orange">Indexed</span></td><td>EA = X + R[n]</td><td>1</td><td>Array traversal</td><td>Array elements</td></tr>
+    </table>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Addressing Modes Exam Trick — Memory Accesses Count</div>
+        <p><strong>Immediate:</strong> 0 extra accesses (value IN the instruction)<br>
+        <strong>Register:</strong> 0 memory accesses (value in CPU register)<br>
+        <strong>Direct:</strong> 1 memory access (to get the operand)<br>
+        <strong>Indirect:</strong> 2 memory accesses (1 for pointer, 1 for operand)<br>
+        RTU PYQ (2023-Aug B-Q6): "How many times does the control unit refer to memory when it fetches and executes an indirect addressing mode instruction?" — Answer: Fetch = 1, Indirect = 1, Execute = 1 (for computational) = 3 total. For branch type = 2 total (no operand read).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Addressing Modes</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is immediate addressing mode?</div>
+      <div class="pyq-meta"><span>2025 Part A Q3 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Addressing Mode</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        In <strong>immediate addressing mode</strong>, the operand is specified DIRECTLY in the instruction itself — the address field of the instruction contains the actual data value (not an address).<br><br>
+        <strong>Key features:</strong><br>
+        • No memory access needed to get the operand → fastest addressing mode<br>
+        • The operand is called an "immediate value" or "literal"<br>
+        • Limited range: operand size is limited by the width of the address field<br><br>
+        <strong>Examples:</strong><br>
+        ADD #5 — Add the constant 5 to the accumulator (AC ← AC + 5)<br>
+        MOV R1, #100 — Load the value 100 into register R1<br><br>
+        <strong>Use cases:</strong> Loading constants, initializing registers, loop counter initialization (like loading -N into a counter register for an N-iteration loop).
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. How many times does the control unit refer to memory when it fetches and executes an indirect addressing mode instruction if the instruction is (a) a computational type requiring an operand from memory, (b) a branch type?</div>
+      <div class="pyq-meta"><span>2023-Aug Part B Q6 · 8 marks ⭐⭐</span><span class="topic-tag">Indirect Addressing</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        For an indirect addressing mode instruction, memory accesses occur in each phase:<br><br>
+        <strong>(a) Computational Instruction (e.g., ADD I X):</strong><br>
+        Phase 1 — Fetch: AR ← PC; IR ← M[AR]; PC ← PC+1 → <strong>1 memory read</strong><br>
+        Phase 2 — Indirect Cycle (I=1): AR ← M[AR] → reads the pointer → <strong>1 memory read</strong><br>
+        Phase 3 — Execute: DR ← M[AR] (read operand), then AC ← AC + DR → <strong>1 memory read</strong><br>
+        <strong>Total: 3 memory references</strong><br><br>
+        <strong>(b) Branch Instruction (e.g., BUN I X):</strong><br>
+        Phase 1 — Fetch: IR ← M[AR]; PC ← PC+1 → <strong>1 memory read</strong><br>
+        Phase 2 — Indirect Cycle: AR ← M[AR] → reads the pointer → <strong>1 memory read</strong><br>
+        Phase 3 — Execute: PC ← AR (just updates PC — no memory read for a branch!) → <strong>0 memory reads</strong><br>
+        <strong>Total: 2 memory references</strong><br><br>
+        Summary: Indirect + Computational = 3 refs | Indirect + Branch = 2 refs.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 05: DATA TRANSFER & MANIPULATION -->
+<section class="section" id="data-transfer">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Data Transfer and Manipulation Instructions</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Categories of CPU Instructions</h3>
+    <p>Modern CPUs have three broad categories of instructions: Data Transfer, Data Manipulation (arithmetic + logic + shift), and Program Control.</p>
+    <table class="comp-table">
+      <tr><th>Category</th><th>Types</th><th>Examples</th><th>Purpose</th></tr>
+      <tr><td><span class="hl-orange">Data Transfer</span></td><td>Load, Store, Move, Push, Pop, Exchange</td><td>LD, ST, MOV, PUSH, POP, XCHG</td><td>Move data between registers and memory</td></tr>
+      <tr><td><span class="hl-r">Arithmetic</span></td><td>Add, Sub, Multiply, Divide, Increment, Decrement, Negate</td><td>ADD, SUB, MUL, DIV, INC, DEC, NEG</td><td>Numeric computation</td></tr>
+      <tr><td><span class="hl-v">Logical</span></td><td>AND, OR, XOR, NOT, Test, Compare</td><td>AND, OR, XOR, NOT, TST, CMP</td><td>Bit manipulation, masking</td></tr>
+      <tr><td><span class="hl-g">Shift/Rotate</span></td><td>Logical shift, Arithmetic shift, Rotate</td><td>SHL, SHR, ASL, ASR, ROL, ROR</td><td>Bit-level operations, multiply/divide by 2^k</td></tr>
+    </table>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 2 Micro-Ops → Unit 4 CPU Instructions</div>
+        <p>In Unit 2, you studied arithmetic micro-operations (add, subtract, increment, decrement) and logic micro-operations (AND, OR, XOR, complement) and shift micro-operations. These ARE the data manipulation instructions in Unit 4 — just at a higher level. Unit 2 described them as register-level primitives; Unit 4 describes them as programmer-visible ISA instructions. Same concepts, different perspective.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 06: PROGRAM CONTROL -->
+<section class="section" id="program-control">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Program Control Instructions</h2>
+    <span class="imp-pill badge badge-o">70%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Types of Program Control Instructions</h3>
+    <p><span class="hl-orange">Program control</span> instructions alter the sequential execution of instructions. Instead of going to PC+1, they change the PC to a new address (branch/jump) or call a subroutine.</p>
+    <table class="comp-table">
+      <tr><th>Instruction</th><th>Action</th><th>Condition</th></tr>
+      <tr><td><span class="hl-r">BUN / JMP</span></td><td>PC ← EA (jump to EA)</td><td>Always (unconditional)</td></tr>
+      <tr><td><span class="hl-o">BEQ / JZ</span></td><td>If Z=1: PC ← EA</td><td>Branch if zero (equal)</td></tr>
+      <tr><td><span class="hl-o">BNE / JNZ</span></td><td>If Z=0: PC ← EA</td><td>Branch if not zero</td></tr>
+      <tr><td><span class="hl-o">BMI / JN</span></td><td>If N=1: PC ← EA</td><td>Branch if negative</td></tr>
+      <tr><td><span class="hl-o">BPL / JP</span></td><td>If N=0: PC ← EA</td><td>Branch if positive</td></tr>
+      <tr><td><span class="hl-v">BSA / CALL</span></td><td>PUSH PC; PC ← EA</td><td>Subroutine call (save return addr)</td></tr>
+      <tr><td><span class="hl-g">BUN I / RET</span></td><td>PC ← M[stack] or saved addr</td><td>Subroutine return</td></tr>
+    </table>
+    <h3>Interrupt vs Subroutine</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Subroutine Call</th><th>Interrupt</th></tr>
+      <tr><td>Initiated by</td><td>Program instruction (BSA/CALL)</td><td>External hardware or software event</td></tr>
+      <tr><td>Time</td><td>Programmer-controlled, predictable</td><td>Asynchronous (can happen anytime)</td></tr>
+      <tr><td>Return</td><td>After subroutine finishes</td><td>After interrupt service routine (ISR)</td></tr>
+      <tr><td>State saved</td><td>Return address</td><td>PC + all registers (full context)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 07: RISC -->
+<section class="section" id="risc">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">RISC — Reduced Instruction Set Computer</h2>
+    <span class="imp-pill badge badge-r">🔥 90% — Part A 2024, Q1 2026</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part A Q1:</strong> RISC was Q1 in 2024, completely absent in 2025. Based on all 2026 RTU papers (DIP, ML, ISS), absent 2025 topics return to Q1 in 2026. "What is meant by RISC? Differentiate RISC and CISC" is the most certain Part A Q1 prediction for 2026. Know 8+ features of RISC and 5+ comparison points.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is RISC?</h3>
+    <p><span class="hl-r">RISC (Reduced Instruction Set Computer)</span> is a CPU design philosophy that uses a small, highly optimized set of simple instructions, each executing in a single clock cycle. RISC processors are optimized for speed through hardware simplicity and compiler sophistication.</p>
+    <div class="layman">RISC is like a fast-food restaurant with only 5 items on the menu — each item is prepared in exactly the same time (1 clock cycle) using simple, standardized cooking steps. You may need to order more items to get a full meal, but everything is fast and predictable. CISC (the alternative) is like a restaurant with 500 items where some dishes take 20 steps to prepare and take much longer.</div>
+    <h3>Key Characteristics of RISC</h3>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#ef4444aa">
+      <ol>
+        <li><strong>Simple instructions:</strong> Small instruction set — typically 50–150 instructions (vs 200–300+ for CISC)</li>
+        <li><strong>Single clock cycle execution:</strong> Most instructions complete in exactly one clock cycle</li>
+        <li><strong>Load/Store architecture:</strong> Only LOAD and STORE instructions access memory; all other instructions operate on registers only</li>
+        <li><strong>Fixed-length instructions:</strong> All instructions are the same width (e.g., 32 bits) — simplifies fetch and decode</li>
+        <li><strong>Large number of registers:</strong> RISC I has 138 registers in a register window scheme (vs 8–16 in typical CISC)</li>
+        <li><strong>Hardwired control:</strong> Control unit is hardwired (not microprogrammed) → faster</li>
+        <li><strong>Pipelining:</strong> Simple instructions make deep pipelining straightforward</li>
+        <li><strong>Compiler-based optimization:</strong> Compiler does complex work that CISC hardware does (compiler calculates which registers to use, instruction scheduling)</li>
+        <li><strong>Few addressing modes:</strong> Typically only register and register-with-offset</li>
+        <li><strong>No condition codes (some RISC):</strong> Condition results stored in registers, not flags</li>
+      </ol>
+    </div>
+    <h3>RISC vs CISC — Master Comparison</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>RISC</th><th>CISC</th></tr>
+      <tr><td><strong>Instruction set</strong></td><td>Small, simple (50–150 instructions)</td><td>Large, complex (200–300+ instructions)</td></tr>
+      <tr><td><strong>Instruction size</strong></td><td>Fixed (32 bits)</td><td>Variable (1–17 bytes in x86)</td></tr>
+      <tr><td><strong>Execution time</strong></td><td>1 clock cycle per instruction</td><td>1–20+ clock cycles per instruction</td></tr>
+      <tr><td><strong>Memory access</strong></td><td>Only LOAD/STORE</td><td>Any instruction can access memory</td></tr>
+      <tr><td><strong>Registers</strong></td><td>Many (16–256)</td><td>Few (8–16)</td></tr>
+      <tr><td><strong>Control unit</strong></td><td>Hardwired (fast)</td><td>Microprogrammed (flexible)</td></tr>
+      <tr><td><strong>Compiler</strong></td><td>Complex compiler, simple hardware</td><td>Simple compiler, complex hardware</td></tr>
+      <tr><td><strong>Code density</strong></td><td>Lower (more instructions for same task)</td><td>Higher (complex instructions = fewer)</td></tr>
+      <tr><td><strong>Pipelining</strong></td><td>Highly efficient</td><td>Difficult (variable instruction lengths)</td></tr>
+      <tr><td><strong>Examples</strong></td><td>ARM, MIPS, PowerPC, SPARC</td><td>Intel x86, VAX, IBM System/360</td></tr>
+    </table>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">RISC Memory Trick — "RISC is SIMPLE"</div>
+        <p><strong>S</strong>mall instruction set | <strong>I</strong>nstructions in 1 clock cycle | <strong>M</strong>any registers | <strong>P</strong>ipelining-friendly | <strong>L</strong>oad/Store only memory access | <strong>E</strong>verything fixed width<br><br>
+        For 2-mark answer: "RISC uses small, simple instructions (≈50–150) that execute in one clock cycle. It uses load/store architecture (only LOAD/STORE access memory), fixed 32-bit instruction width, many registers, and hardwired control. Examples: ARM, MIPS. CISC uses complex variable-width instructions taking multiple cycles. Example: Intel x86."</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — RISC</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is meant by RISC?</div>
+      <div class="pyq-meta"><span>2024 Part A Q1 · 2 marks ⭐⭐⭐</span><span class="topic-tag">RISC</span><span class="pred-tag">🔮 CERTAIN 2026 Part A Q1</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>RISC (Reduced Instruction Set Computer)</strong> is a CPU design philosophy with a small set of simple instructions, each designed to execute in one clock cycle.<br><br>
+        <strong>Key features:</strong><br>
+        1. Small instruction set (50–150 simple instructions)<br>
+        2. Fixed 32-bit instruction length<br>
+        3. Instructions execute in one clock cycle<br>
+        4. Load/Store architecture — only LOAD and STORE access memory<br>
+        5. Large number of registers (reduces memory accesses)<br>
+        6. Hardwired control unit (faster than microprogrammed)<br>
+        7. Efficient pipelining due to uniform instruction format<br><br>
+        <strong>Examples:</strong> ARM (mobile phones), MIPS (routers), SPARC, PowerPC<br><br>
+        <strong>Advantage over CISC:</strong> Simple, uniform instructions are ideal for pipelining — each instruction completes in one cycle, making scheduling predictable and throughput high.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Write the RISC I instruction in assembly language that will cause a jump to address 3200 if the Z (zero) status bit is equal to 1. (a) Using immediate mode (b) Using relative address mode (assume PC = 3400)</div>
+      <div class="pyq-meta"><span>2023-Aug Part B Q7 · 8 marks ⭐⭐</span><span class="topic-tag">RISC Instructions</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        In RISC I, the branch instruction format is: <strong>JMP cond, EA</strong> where cond = condition, EA = target address.<br><br>
+        <strong>(a) Using Immediate Mode (target = 3200):</strong><br>
+        BEQ #3200<br>
+        (BEQ = Branch if Equal/Zero; #3200 = the immediate target address)<br>
+        Explanation: If Z=1, PC ← 3200 directly.<br>
+        In RISC I format: JMPC Z=1, 3200  (jump if zero bit = 1 to address 3200)<br><br>
+        <strong>(b) Using Relative Address Mode (PC = 3400):</strong><br>
+        Displacement = Target − Current PC = 3200 − 3400 = −200<br>
+        BEQ −200<br>
+        (Branch if zero; offset = −200 from current PC)<br>
+        Explanation: If Z=1, PC ← PC + (−200) = 3400 + (−200) = 3200 ✓<br>
+        In RISC I format: JMPC Z=1, -200  (relative displacement of −200)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 08: FLYNN'S TAXONOMY -->
+<section class="section" id="flynns">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Flynn's Taxonomy</h2>
+    <span class="imp-pill badge badge-r">🔥 95% — Part C 2024 & 2025 BOTH</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part C:</strong> Flynn's taxonomy appeared as Part C Q3 in 2024 and Part C Q1 in 2025 — TWO CONSECUTIVE YEARS in Part C. This is the most certain Part C prediction possible. Draw ALL FOUR categories with block diagrams. Each diagram must show Instruction Stream (IS), Data Stream (DS), and Processing Elements (PE) clearly labeled.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is Flynn's Taxonomy?</h3>
+    <p>Flynn's taxonomy (proposed by Michael J. Flynn, 1966) classifies computer architectures based on the number of concurrent <strong>Instruction Streams (IS)</strong> and <strong>Data Streams (DS)</strong>. Two possible values each (Single or Multiple) give four combinations.</p>
+    <div class="layman">Flynn classified computers by asking two questions: (1) How many different instruction sequences run at once? (2) How many different data sets are processed at once? One instruction, one data = the normal computer you know. Multiple instructions, multiple data = modern multiprocessor. The four combinations cover every type of parallel computer.</div>
+    <div class="formula-box">
+      <span class="label">Flynn's Classification — 2×2 Matrix</span>
+      <div class="formula">           | Single Data Stream | Multiple Data Streams</div>
+      <div class="formula">Single IS  |      SISD           |       SIMD</div>
+      <div class="formula">Multiple IS|      MISD           |       MIMD</div>
+    </div>
+    <h3>SISD — Single Instruction, Single Data</h3>
+    <p>One instruction stream processes one data stream at a time. This is the <strong>conventional von Neumann architecture</strong> — a single CPU executing one instruction on one data at a time.</p>
+    <div class="formula-box">
+      <span class="label">SISD</span>
+      <div class="formula">IS: 1 instruction sequence  |  DS: 1 data stream  |  PU: 1 processing unit</div>
+      <div class="formula">Examples: Single-core processor, basic computer, Intel 8086</div>
+      <div class="note">Performance improvement possible through pipelining (but still SISD — one instruction at a time from programmer's view)</div>
+    </div>
+    <h3>SIMD — Single Instruction, Multiple Data</h3>
+    <p>One instruction stream is broadcast to MULTIPLE processing elements, each operating on DIFFERENT data simultaneously. All PEs execute the SAME instruction but on different parts of the dataset.</p>
+    <div class="formula-box">
+      <span class="label">SIMD</span>
+      <div class="formula">IS: 1 instruction (broadcast to all PEs)  |  DS: Multiple data streams  |  PU: n processing units</div>
+      <div class="formula">Examples: GPU (NVIDIA CUDA), vector processors, Intel SSE/AVX, MMX</div>
+      <div class="note">Ideal for: Image processing (same filter on every pixel), scientific computing, machine learning (matrix operations)</div>
+      <div class="note">All PEs are synchronized — if one finishes early, it waits for others. Efficient only when SAME operation on DIFFERENT data.</div>
+    </div>
+    <h3>MISD — Multiple Instructions, Single Data</h3>
+    <p>Multiple processing units execute DIFFERENT instructions on the SAME data stream simultaneously. Rarely implemented in practice (mostly theoretical). Fault-tolerant systems use it for redundancy checking.</p>
+    <div class="formula-box">
+      <span class="label">MISD</span>
+      <div class="formula">IS: Multiple instruction streams  |  DS: 1 data stream  |  PU: n processing units</div>
+      <div class="formula">Theoretical examples: Systolic arrays, pipeline processors (sometimes classified here)</div>
+      <div class="note">Practically uncommon — no real commercial system fits this cleanly. Used in fault-tolerant designs where multiple algorithms check the same data for errors.</div>
+    </div>
+    <h3>MIMD — Multiple Instructions, Multiple Data</h3>
+    <p>Multiple autonomous processors execute DIFFERENT instructions on DIFFERENT data independently. This is the most general and most common parallel computer architecture.</p>
+    <div class="formula-box">
+      <span class="label">MIMD</span>
+      <div class="formula">IS: Multiple different instruction streams  |  DS: Multiple different data streams  |  PU: n independent processors</div>
+      <div class="formula">Examples: Shared-memory multiprocessors, distributed systems, computer clusters, multi-core CPUs</div>
+      <div class="note">Types: Shared memory MIMD (UMA/NUMA) vs Distributed memory MIMD (clusters, MPP)</div>
+      <div class="note">Intel Core i9 (8 cores) = MIMD: each core runs different programs on different data independently</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 340" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">Flynn's Taxonomy — Draw ALL FOUR for Full Marks</text>
+        <!-- SISD -->
+        <rect x="10" y="30" width="250" height="130" rx="6" fill="#0c1e28" stroke="#22d3ee" stroke-width="2"/>
+        <text x="135" y="52" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="10" font-weight="bold">SISD (Single CPU)</text>
+        <rect x="30" y="62" width="60" height="28" rx="4" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="60" y="80" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">IS</text>
+        <rect x="120" y="62" width="60" height="28" rx="4" fill="#152432" stroke="#f97316" stroke-width="2"/>
+        <text x="150" y="80" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8">PU (CPU)</text>
+        <rect x="200" y="62" width="45" height="28" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="222" y="80" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">DS</text>
+        <line x1="90" y1="76" x2="120" y2="76" stroke="#22d3ee" stroke-width="2"/>
+        <polygon points="117,72 127,76 117,80" fill="#22d3ee"/>
+        <line x1="180" y1="76" x2="200" y2="76" stroke="#a78bfa" stroke-width="2"/>
+        <polygon points="197,72 207,76 197,80" fill="#a78bfa"/>
+        <text x="135" y="118" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">1 IS → 1 PU → 1 DS</text>
+        <text x="135" y="132" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Von Neumann, single-core CPU</text>
+        <text x="135" y="148" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Example: Intel 8086, basic computer</text>
+        <!-- SIMD -->
+        <rect x="290" y="30" width="260" height="130" rx="6" fill="#0c1e28" stroke="#a78bfa" stroke-width="2"/>
+        <text x="420" y="52" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="10" font-weight="bold">SIMD (GPU / Vector)</text>
+        <rect x="300" y="62" width="50" height="28" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="325" y="80" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">IS (×1)</text>
+        <rect x="385" y="55" width="45" height="20" rx="3" fill="#152432" stroke="#f97316" stroke-width="1.5"/>
+        <text x="407" y="68" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">PU1</text>
+        <rect x="385" y="80" width="45" height="20" rx="3" fill="#152432" stroke="#f97316" stroke-width="1.5"/>
+        <text x="407" y="93" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">PU2</text>
+        <rect x="385" y="105" width="45" height="20" rx="3" fill="#152432" stroke="#f97316" stroke-width="1.5"/>
+        <text x="407" y="118" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">PU3</text>
+        <line x1="350" y1="65" x2="385" y2="65" stroke="#a78bfa" stroke-width="1.5"/>
+        <line x1="350" y1="76" x2="385" y2="90" stroke="#a78bfa" stroke-width="1.5"/>
+        <line x1="350" y1="76" x2="385" y2="115" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="420" y="140" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">1 IS → multiple PUs (same instr)</text>
+        <text x="420" y="152" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">GPU, vector processor, Intel SSE</text>
+        <!-- MISD -->
+        <rect x="10" y="180" width="250" height="145" rx="6" fill="#0c1e28" stroke="#10b981" stroke-width="2"/>
+        <text x="135" y="202" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">MISD (Fault-Tolerant)</text>
+        <rect x="20" y="212" width="45" height="20" rx="3" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="42" y="225" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">IS1</text>
+        <rect x="20" y="237" width="45" height="20" rx="3" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="42" y="250" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">IS2</text>
+        <rect x="20" y="262" width="45" height="20" rx="3" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="42" y="275" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">IS3</text>
+        <rect x="115" y="237" width="50" height="28" rx="4" fill="#152432" stroke="#f97316" stroke-width="2"/>
+        <text x="140" y="255" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8">1 DS</text>
+        <line x1="65" y1="222" x2="100" y2="245" stroke="#22d3ee" stroke-width="1.5"/>
+        <line x1="65" y1="247" x2="100" y2="251" stroke="#22d3ee" stroke-width="1.5"/>
+        <line x1="65" y1="272" x2="100" y2="257" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="135" y="295" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Multiple IS → 1 DS (theoretical)</text>
+        <text x="135" y="310" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Fault-tolerant systems</text>
+        <!-- MIMD -->
+        <rect x="290" y="180" width="260" height="145" rx="6" fill="#0c1e28" stroke="#ef4444" stroke-width="2"/>
+        <text x="420" y="202" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="10" font-weight="bold">MIMD (Multiprocessor)</text>
+        <rect x="300" y="212" width="45" height="20" rx="3" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="322" y="225" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">IS1</text>
+        <rect x="300" y="237" width="45" height="20" rx="3" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="322" y="250" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">IS2</text>
+        <rect x="355" y="212" width="40" height="20" rx="3" fill="#152432" stroke="#f97316" stroke-width="1.5"/>
+        <text x="375" y="225" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">PU1</text>
+        <rect x="355" y="237" width="40" height="20" rx="3" fill="#152432" stroke="#f97316" stroke-width="1.5"/>
+        <text x="375" y="250" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">PU2</text>
+        <rect x="405" y="212" width="45" height="20" rx="3" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="427" y="225" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">DS1</text>
+        <rect x="405" y="237" width="45" height="20" rx="3" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="427" y="250" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">DS2</text>
+        <line x1="345" y1="222" x2="355" y2="222" stroke="#22d3ee" stroke-width="1.5"/>
+        <line x1="345" y1="247" x2="355" y2="247" stroke="#22d3ee" stroke-width="1.5"/>
+        <line x1="395" y1="222" x2="405" y2="222" stroke="#a78bfa" stroke-width="1.5"/>
+        <line x1="395" y1="247" x2="405" y2="247" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="420" y="280" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Multiple IS, PU, DS — fully parallel</text>
+        <text x="420" y="295" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Multi-core CPU, clusters, supercomputers</text>
+        <text x="420" y="310" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Most common parallel architecture</text>
+      </svg>
+      <div class="diagram-cap">Fig 8.1 — Flynn's Taxonomy: Draw all four (SISD, SIMD, MISD, MIMD) with IS/PU/DS arrows for full marks</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Flynn's Taxonomy</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Define parallel processing and explain Flynn's classification of computers with suitable diagram.</div>
+      <div class="pyq-meta"><span>2025 Part C Q1 · 2024 Part C Q3 · 10 marks ⭐⭐⭐</span><span class="topic-tag">Flynn's Taxonomy</span><span class="pred-tag">🔮 CERTAIN 2026 Part C</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Parallel Processing:</strong><br>
+        Parallel processing is the simultaneous use of multiple computational resources to solve a problem faster. Instead of one processor executing instructions sequentially, multiple processors work concurrently on different parts of the problem.<br><br>
+        <strong>Flynn's Classification:</strong><br>
+        Michael Flynn (1966) classified computer architectures based on the number of Instruction Streams (IS) and Data Streams (DS).<br><br>
+        <strong>1. SISD (Single Instruction, Single Data):</strong><br>
+        One control unit, one processor, one data stream. Sequential von Neumann architecture. One instruction acts on one data at a time. Example: Intel 8086, basic computer.<br><br>
+        <strong>2. SIMD (Single Instruction, Multiple Data):</strong><br>
+        One instruction is broadcast to multiple processing elements simultaneously, each operating on different data. All PEs execute same instruction synchronously. Example: GPU, vector processor, Intel SSE. Use: Image processing, scientific computing.<br><br>
+        <strong>3. MISD (Multiple Instructions, Single Data):</strong><br>
+        Multiple processors execute different instructions on the same data. Theoretical/rarely implemented. Example: Fault-tolerant systems where same data is verified by different algorithms.<br><br>
+        <strong>4. MIMD (Multiple Instructions, Multiple Data):</strong><br>
+        Multiple independent processors each execute different instruction sequences on different data. Most versatile and common parallel architecture. Example: Multicore CPUs, computer clusters, supercomputers.<br><br>
+        [DRAW all four diagrams showing IS→PU→DS paths for each category]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is parallel processing?</div>
+      <div class="pyq-meta"><span>2024 Part A Q8 · 2022 Part A Q6 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Parallel Processing</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Parallel processing</strong> is a method of computation in which many calculations or processes are carried out simultaneously by dividing a problem into smaller subproblems and solving them concurrently using multiple processors.<br><br>
+        <strong>Key aspects:</strong><br>
+        • Uses multiple processing elements working together<br>
+        • Parts of a problem are processed simultaneously → reduces execution time<br>
+        • Requires mechanisms for coordination, communication, and synchronization between processors<br><br>
+        <strong>Types of parallelism:</strong><br>
+        1. Instruction-level parallelism: pipelining, superscalar<br>
+        2. Data-level parallelism: SIMD, vector processing<br>
+        3. Task-level parallelism: MIMD, multiprocessors<br><br>
+        <strong>Example:</strong> Image rendering divided among 8 GPU cores → 8x faster than single-core processing.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 09: PARALLEL PROCESSING -->
+<section class="section" id="parallel">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Parallel Processing — Concepts</h2>
+    <span class="imp-pill badge badge-r">88%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Multiprocessor vs Multicomputer</h3>
+    <p><span class="hl-r">Multiprocessor</span>: Multiple processors share a common memory (shared-memory system). All CPUs can access any memory location. Fast communication but memory contention is a bottleneck.</p>
+    <p><span class="hl-orange">Multicomputer</span>: Each processor has its own private memory (distributed-memory system). Communication via message passing. Scales better but communication overhead is higher.</p>
+    <div class="formula-box">
+      <span class="label">Amdahl's Law — Speedup with Parallelism</span>
+      <div class="formula">S = 1 / (f + (1-f)/n)</div>
+      <div class="formula">where: f = fraction of program that CANNOT be parallelized (serial fraction)</div>
+      <div class="formula">       n = number of processors</div>
+      <div class="formula">       S = speedup factor</div>
+      <div class="formula">       (1-f) = fraction that CAN be parallelized</div>
+      <div class="formula">Example: f = 0.1 (10% serial), n = 8 processors:</div>
+      <div class="formula">S = 1 / (0.1 + 0.9/8) = 1 / (0.1 + 0.1125) = 1/0.2125 ≈ 4.7 (not 8!)</div>
+      <div class="note">Key insight: Even with infinite processors, speedup is limited to 1/f. If 20% is serial, max speedup = 5×.</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Multicomputer RTU Definition</div>
+        <p>"Multicomputer" appeared as Part A Q7 in 2024. Definition: A <strong>multicomputer</strong> is a system of multiple independent computers (nodes), each with its own processor, memory, and I/O, connected by a high-speed interconnection network. They communicate by passing messages (not shared memory). Examples: Beowulf cluster, MPI systems, internet computing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: PIPELINING -->
+<section class="section" id="pipelining">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Pipelining — Concepts, Speedup & Efficiency</h2>
+    <span class="imp-pill badge badge-r">🔥 92% — Part A Q4 2025, Part B/C Multiple Years</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — VERY HIGH:</strong> Pipeline characteristics appeared as Part A Q4 in 2025. Arithmetic pipeline appeared in Part B Q7 in 2024. Instruction pipeline (6-segment) appeared as Part C Q4 in 2022. Pipeline speedup calculation (with n tasks, k segments, clock period) appeared in 2022 Part B Q3. For 2026, arithmetic pipeline (Part B) or instruction pipeline with speedup calculation (Part C) is very likely.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is Pipelining?</h3>
+    <p><span class="hl-orange">Pipelining</span> is a technique of implementing parallel computing within a single processor. It overlaps the execution of multiple instructions simultaneously by dividing the execution process into distinct <strong>stages</strong>. Like a factory assembly line — multiple products (instructions) are at different stages of production simultaneously.</p>
+    <div class="layman">Imagine washing dishes: wash → rinse → dry → put away. Without pipeline: finish ALL 4 steps for dish 1 before starting dish 2. WITH pipeline: while you dry dish 1, you can rinse dish 2 AND wash dish 3 simultaneously. The dishes form a "pipeline" — different dishes at different stages at the same time. 4x faster if all 4 stages are always busy.</div>
+    <h3>Pipeline Performance Metrics — RTU Exam Formulas ⭐⭐⭐</h3>
+    <div class="formula-box">
+      <span class="label">Pipeline Formulas — Essential for Numericals</span>
+      <div class="formula">Definitions:</div>
+      <div class="formula">  k = number of pipeline stages</div>
+      <div class="formula">  n = number of tasks to process</div>
+      <div class="formula">  t = clock cycle time (time for one stage = time of longest stage)</div>
+      <div class="formula"></div>
+      <div class="formula">Time WITHOUT pipeline (non-pipelined):  Tₙ = n × k × t  (each task takes k stages)</div>
+      <div class="formula">Time WITH pipeline:                     Tₚ = (k + n - 1) × t  (k to fill + n-1 more)</div>
+      <div class="formula"></div>
+      <div class="formula">Speedup:     S = Tₙ / Tₚ = (n×k×t) / ((k + n - 1)×t) = n×k / (k + n - 1)</div>
+      <div class="formula">           For large n: S ≈ k  (approaches number of stages)</div>
+      <div class="formula"></div>
+      <div class="formula">Throughput:  Tput = n / Tₚ = n / ((k + n - 1)×t)  [tasks per unit time]</div>
+      <div class="formula">           Max throughput (large n): Tput_max = 1/t  [one task per clock cycle]</div>
+      <div class="formula"></div>
+      <div class="formula">Efficiency:  E = S / k = n / (k + n - 1)  [fraction of time stages are busy]</div>
+      <div class="note">RTU 2022: non-pipeline = 100 ns/task; pipeline 6-stage, 20 ns clock, 200 tasks</div>
+      <div class="note">→ Tₙ = 200×100 = 20,000 ns | Tₚ = (6+200-1)×20 = 205×20 = 4,100 ns</div>
+      <div class="note">→ Speedup = 20,000/4,100 ≈ 4.88 | Max speedup = 6 (approached as n→∞)</div>
+    </div>
+    <h3>Pipeline Timing Diagram</h3>
+    <div class="diagram-wrap">
+      <table class="pipeline-table">
+        <tr>
+          <th>Task</th><th>S1: FI</th><th>S2: DI</th><th>S3: CO</th><th>S4: FO</th><th>S5: EI</th><th>S6: WO</th><th>S7</th><th>S8</th><th>S9</th>
+        </tr>
+        <tr><td>T1</td><td class="active">S1</td><td class="active">S2</td><td class="active">S3</td><td class="active">S4</td><td class="active">S5</td><td class="active">S6</td><td></td><td></td><td></td></tr>
+        <tr><td>T2</td><td></td><td class="active">S1</td><td class="active">S2</td><td class="active">S3</td><td class="active">S4</td><td class="active">S5</td><td class="active">S6</td><td></td><td></td></tr>
+        <tr><td>T3</td><td></td><td></td><td class="active">S1</td><td class="active">S2</td><td class="active">S3</td><td class="active">S4</td><td class="active">S5</td><td class="active">S6</td><td></td></tr>
+        <tr><td>T4</td><td></td><td></td><td></td><td class="active">S1</td><td class="active">S2</td><td class="active">S3</td><td class="active">S4</td><td class="active">S5</td><td class="active">S6</td></tr>
+      </table>
+      <div class="diagram-cap">Fig 10.1 — 6-Stage Pipeline Timing: FI=Fetch Instr, DI=Decode Instr, CO=Calculate Operands, FO=Fetch Operands, EI=Execute Instruction, WO=Write Operand</div>
+    </div>
+    <h3>Pipeline Characteristics — RTU Part A Q4 (2025)</h3>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#f9731655">
+      <ol>
+        <li><strong>Overlap:</strong> Multiple instructions are in different stages simultaneously — the defining feature</li>
+        <li><strong>Throughput:</strong> Rate at which tasks complete = approximately 1 task per clock cycle for large n</li>
+        <li><strong>Latency:</strong> Time to complete ONE task = k × t (still takes all k stages)</li>
+        <li><strong>Speedup approaches k:</strong> For n >> k, speedup → k (number of stages)</li>
+        <li><strong>All stages must take equal time:</strong> Slowest stage sets the clock period</li>
+        <li><strong>Hazards:</strong> Structural hazards (resource conflict), data hazards (RAW/WAR/WAW dependencies), control hazards (branches)</li>
+      </ol>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Pipelining</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. A non-pipeline system takes 100 ns to process a task. The same task can be processed in a six-segment pipeline with a clock cycle of 20 ns. Determine the speed-up ratio for 200 tasks. What is maximum speed-up that can be achieved?</div>
+      <div class="pyq-meta"><span>2022 Part B Q3 · 8 marks ⭐⭐⭐</span><span class="topic-tag">Pipeline Speedup</span><span class="pred-tag">🔮 HIGH 2026 Part B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Given:</strong> Non-pipelined: 100 ns/task | Pipeline: k=6 stages, t=20 ns/stage, n=200 tasks<br><br>
+        <strong>Non-pipelined time (Tₙ):</strong><br>
+        Tₙ = n × (time per task) = 200 × 100 = <strong>20,000 ns</strong><br>
+        (Alternatively: n × k × t = 200 × 6 × 20 = 24,000 ns if using stage time)<br>
+        Note: Given 100 ns/task directly → use 200 × 100 = 20,000 ns<br><br>
+        <strong>Pipelined time (Tₚ):</strong><br>
+        Tₚ = (k + n − 1) × t = (6 + 200 − 1) × 20 = 205 × 20 = <strong>4,100 ns</strong><br><br>
+        <strong>Speedup:</strong><br>
+        S = Tₙ / Tₚ = 20,000 / 4,100 = <strong>4.88 ≈ 4.9</strong><br><br>
+        <strong>Maximum Speedup (n → ∞):</strong><br>
+        As n becomes very large: S_max → k = <strong>6</strong><br>
+        Derivation: S = nk/(k+n-1). Divide by n: S = k/(k/n + 1 - 1/n). As n→∞: S → k/(0+1-0) = k.<br><br>
+        <strong>Conclusion:</strong> With 200 tasks, speedup = 4.88. Maximum possible speedup = 6 (equal to number of stages, achieved as n approaches infinity).
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What are the major characteristics of a pipeline?</div>
+      <div class="pyq-meta"><span>2025 Part A Q4 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Pipeline Characteristics</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Major characteristics of a pipeline:</strong><br><br>
+        1. <strong>Overlap/Concurrency:</strong> Multiple instructions are in different stages simultaneously — this is what creates the speedup.<br>
+        2. <strong>Throughput:</strong> A task completes every clock cycle (for large n). Maximum throughput = 1/t (one task per clock period).<br>
+        3. <strong>Latency:</strong> Time to complete ONE task = k × t. Pipelining does NOT reduce single-task latency, only increases throughput.<br>
+        4. <strong>Clock cycle = slowest stage:</strong> The clock period is determined by the longest pipeline stage. Stages must be balanced.<br>
+        5. <strong>Speedup approaches k:</strong> For large number of tasks (n >> k), speedup → k (number of stages).<br>
+        6. <strong>Efficiency:</strong> E = S/k (fraction of time all stages are active). For large n, efficiency → 1 (100%).<br>
+        7. <strong>Hazards:</strong> Data hazards (RAW dependencies), control hazards (branches), and structural hazards (resource conflicts) reduce effective speedup.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 11: ARITHMETIC PIPELINE -->
+<section class="section" id="arith-pipeline">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Arithmetic Pipeline</h2>
+    <span class="imp-pill badge badge-r">🔥 85% — Part B 2024</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an Arithmetic Pipeline?</h3>
+    <p>An <span class="hl-r">arithmetic pipeline</span> divides a complex arithmetic operation (like floating-point addition) into sub-operations, each assigned to a separate pipeline stage. Different sets of operands flow through the pipeline, with each stage processing its portion simultaneously.</p>
+    <div class="layman">An arithmetic pipeline is like a specialized factory for computing one type of operation (like floating-point addition). The factory has 4 stations: normalize numbers, align exponents, add mantissas, normalize result. While Station 4 finishes adding A+B, Station 3 can already be adding C+D, and Station 2 can be aligning E+F's exponents. All happening simultaneously!</div>
+    <h3>Floating-Point Addition Pipeline (4 Stages) — RTU Exam Example</h3>
+    <p>Floating-point addition requires 4 steps, each implemented as a pipeline stage:</p>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Compare Exponents:</strong> Subtract exponents to find the difference. EA - EB = shift amount. (Determines how many positions to shift the smaller mantissa)</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Align Mantissas:</strong> Right-shift the mantissa of the number with the smaller exponent by the amount found in Stage 1. Both mantissas now have the same exponent.</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Add/Subtract Mantissas:</strong> Perform the actual addition or subtraction of the aligned mantissas. Result mantissa may be unnormalized.</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Normalize Result:</strong> Adjust the result mantissa (shift left until leading 1, adjusting exponent accordingly). Store sign, exponent, mantissa.</div></div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 140" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#f97316" font-family="JetBrains Mono" font-size="10" font-weight="bold">4-Stage Floating Point Adder Pipeline</text>
+        <!-- Stage boxes -->
+        <rect x="10" y="35" width="110" height="50" rx="5" fill="#102534" stroke="#ef4444" stroke-width="2"/>
+        <text x="65" y="56" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8" font-weight="bold">Stage 1</text>
+        <text x="65" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Compare</text>
+        <text x="65" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Exponents</text>
+        <rect x="145" y="35" width="110" height="50" rx="5" fill="#102534" stroke="#f97316" stroke-width="2"/>
+        <text x="200" y="56" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8" font-weight="bold">Stage 2</text>
+        <text x="200" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Align</text>
+        <text x="200" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Mantissas</text>
+        <rect x="280" y="35" width="110" height="50" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="2"/>
+        <text x="335" y="56" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8" font-weight="bold">Stage 3</text>
+        <text x="335" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Add</text>
+        <text x="335" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Mantissas</text>
+        <rect x="415" y="35" width="130" height="50" rx="5" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="480" y="56" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">Stage 4</text>
+        <text x="480" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Normalize</text>
+        <text x="480" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Result</text>
+        <!-- Arrows -->
+        <line x1="120" y1="60" x2="145" y2="60" stroke="#f97316" stroke-width="2"/>
+        <polygon points="142,56 152,60 142,64" fill="#f97316"/>
+        <line x1="255" y1="60" x2="280" y2="60" stroke="#f97316" stroke-width="2"/>
+        <polygon points="277,56 287,60 277,64" fill="#f97316"/>
+        <line x1="390" y1="60" x2="415" y2="60" stroke="#f97316" stroke-width="2"/>
+        <polygon points="412,56 422,60 412,64" fill="#f97316"/>
+        <!-- Input arrow -->
+        <line x1="10" y1="100" x2="65" y2="90" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="10" y="115" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">Two FP numbers</text>
+        <!-- Output arrow -->
+        <line x1="480" y1="85" x2="480" y2="105" stroke="#10b981" stroke-width="2"/>
+        <polygon points="476,102 480,112 484,102" fill="#10b981"/>
+        <text x="430" y="125" fill="#10b981" font-family="JetBrains Mono" font-size="8">Result = A + B (FP)</text>
+        <!-- Latch dividers -->
+        <line x1="140" y1="25" x2="140" y2="100" stroke="#3a5868" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="275" y1="25" x2="275" y2="100" stroke="#3a5868" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="410" y1="25" x2="410" y2="100" stroke="#3a5868" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="143" y="28" fill="#3a5868" font-family="JetBrains Mono" font-size="7">Latch</text>
+        <text x="278" y="28" fill="#3a5868" font-family="JetBrains Mono" font-size="7">Latch</text>
+        <text x="413" y="28" fill="#3a5868" font-family="JetBrains Mono" font-size="7">Latch</text>
+      </svg>
+      <div class="diagram-cap">Fig 11.1 — 4-Stage Floating-Point Adder Pipeline: Compare Exponents → Align → Add → Normalize. Latches between stages hold intermediate results.</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Arithmetic Pipeline</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain arithmetic pipeline with an example.</div>
+      <div class="pyq-meta"><span>2024 Part B Q7 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Arithmetic Pipeline</span><span class="pred-tag">🔮 HIGH 2026 Part B Q7</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Arithmetic Pipeline:</strong><br>
+        An arithmetic pipeline divides a complex arithmetic operation into sequential sub-operations implemented as pipeline stages. Different operand pairs are at different stages simultaneously, increasing throughput.<br><br>
+        <strong>Example — Floating-Point Addition Pipeline (4 stages):</strong><br><br>
+        Stage 1 — Compare Exponents: EA − EB = d (determine shift amount)<br>
+        Stage 2 — Align Mantissas: shift smaller mantissa right by d positions<br>
+        Stage 3 — Add Mantissas: perform binary addition of aligned mantissas<br>
+        Stage 4 — Normalize Result: adjust mantissa so leading bit is 1; update exponent<br><br>
+        <strong>Pipeline timing for 3 additions:</strong><br>
+        Clock 1: A1+B1 in Stage 1<br>
+        Clock 2: A1+B1 in Stage 2 | A2+B2 in Stage 1<br>
+        Clock 3: A1+B1 in Stage 3 | A2+B2 in Stage 2 | A3+B3 in Stage 1<br>
+        Clock 4: A1+B1 in Stage 4 | A2+B2 in Stage 3 | A3+B3 in Stage 2<br>
+        Clock 5: Result1 out | A2+B2 in Stage 4 | A3+B3 in Stage 3<br>
+        Clock 6: Result2 out | A3+B3 in Stage 4<br>
+        Clock 7: Result3 out<br><br>
+        <strong>Advantage:</strong> Without pipeline: 3 × 4 = 12 clock cycles. With pipeline: 4 + 3 - 1 = 6 clock cycles. Speedup ≈ 2×.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 12: INSTRUCTION PIPELINE -->
+<section class="section" id="instruction-pipeline">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Instruction Pipeline (6-Segment)</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part C 2022</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an Instruction Pipeline?</h3>
+    <p>An <span class="hl-r">instruction pipeline</span> overlaps the execution of multiple machine instructions simultaneously by dividing instruction processing into stages. The classic 6-stage instruction pipeline processes one instruction per clock cycle at steady state.</p>
+    <h3>6-Stage Instruction Pipeline</h3>
+    <table class="comp-table">
+      <tr><th>Stage</th><th>Name</th><th>Action</th></tr>
+      <tr><td><span class="hl-r">S1: FI</span></td><td>Fetch Instruction</td><td>Read instruction from memory (or cache) into IR</td></tr>
+      <tr><td><span class="hl-o">S2: DI</span></td><td>Decode Instruction</td><td>Determine opcode, operand addresses, addressing mode</td></tr>
+      <tr><td><span class="hl">S3: CO</span></td><td>Calculate Operand Address</td><td>Compute effective addresses (EA) for all operands</td></tr>
+      <tr><td><span class="hl-v">S4: FO</span></td><td>Fetch Operand</td><td>Read operands from memory/registers</td></tr>
+      <tr><td><span class="hl-g">S5: EI</span></td><td>Execute Instruction</td><td>Perform ALU operation or other computation</td></tr>
+      <tr><td><span class="hl-orange">S6: WO</span></td><td>Write Operand</td><td>Store result in memory or register</td></tr>
+    </table>
+    <h3>Pipeline Hazards — Causes of Stalls</h3>
+    <p><span class="hl-r">Hazards</span> are situations that prevent the pipeline from executing at maximum throughput:</p>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#ef4444aa">
+      <h3 class="red">1. Structural Hazards (Resource Conflicts)</h3>
+      <p>Two instructions need the same hardware resource simultaneously. Example: both S1 (Fetch) and S4 (Fetch Operand) need memory access at the same time.</p>
+      <p><strong>Solution:</strong> Separate instruction cache (I-cache) and data cache (D-cache). Or add more resources (duplicate memory ports).</p>
+      <h3 class="red">2. Data Hazards (RAW, WAR, WAW)</h3>
+      <p>An instruction needs data that is being produced by a preceding instruction still in the pipeline.</p>
+      <div class="formula-box">
+        <span class="label">Types of Data Hazards</span>
+        <div class="formula">RAW (Read After Write):  I2 reads R1 before I1 has written R1  ← most common!</div>
+        <div class="formula">WAR (Write After Read):  I2 writes R1 before I1 has read R1</div>
+        <div class="formula">WAW (Write After Write): I2 writes R1 before I1 has written R1</div>
+        <div class="note">Solutions: Pipeline stalls (bubble insertion), data forwarding/bypassing (forward result before writeback), out-of-order execution</div>
+      </div>
+      <h3 class="red">3. Control Hazards (Branch Hazards)</h3>
+      <p>When a branch instruction is encountered, the pipeline has already fetched the next sequential instructions, but these may be wrong if the branch is taken.</p>
+      <p><strong>Solutions:</strong> Branch prediction (static or dynamic), delayed branching (execute one instruction after branch regardless), branch target buffer.</p>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Pipeline Speedup RTU Trick — Steps</div>
+        <p>For any pipeline speedup question:<br>
+        1. Find n (number of tasks), k (stages), t (clock period)<br>
+        2. Non-pipeline time = n × k × t (or n × original_time)<br>
+        3. Pipeline time = (k + n − 1) × t<br>
+        4. Speedup = Non-pipeline time / Pipeline time<br>
+        5. Max speedup (large n) = k<br>
+        Always show the formula, substitution, and final answer clearly.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Instruction Pipeline</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Formulate a six-segment instruction pipeline for a computer. Specify the operations to be performed in each segment.</div>
+      <div class="pyq-meta"><span>2023-Aug Part C Q4 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Instruction Pipeline</span><span class="pred-tag">🔮 HIGH 2026 Part C</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Six-Segment Instruction Pipeline:</strong><br><br>
+        A 6-segment instruction pipeline processes one instruction per clock cycle at steady state by dividing instruction execution into 6 overlapping stages:<br><br>
+        <strong>Segment 1 — FI (Fetch Instruction):</strong><br>
+        Read the next instruction from memory (or instruction cache) and load it into the instruction register. PC is incremented to point to the next instruction address.<br><br>
+        <strong>Segment 2 — DI (Decode Instruction):</strong><br>
+        Decode the instruction to determine: opcode (what operation), type of operands, addressing modes used, and number of operands. Control signals for subsequent stages are generated.<br><br>
+        <strong>Segment 3 — CO (Calculate Operand Address):</strong><br>
+        Compute the effective address (EA) for each operand using the addressing mode identified in DI. For register operands, identify register numbers. For memory, compute EA = base + displacement or indirect address resolution.<br><br>
+        <strong>Segment 4 — FO (Fetch Operands):</strong><br>
+        Retrieve operand values from memory or registers using the addresses computed in CO. For immediate operands, the value is already available from DI.<br><br>
+        <strong>Segment 5 — EI (Execute Instruction):</strong><br>
+        Perform the actual operation: ALU computes arithmetic/logic result, or memory address is finalized for load/store, or branch condition is evaluated.<br><br>
+        <strong>Segment 6 — WO (Write Operand / Write Back):</strong><br>
+        Store the result: write to destination register or write to memory. For branches, update PC if branch is taken.<br><br>
+        [DRAW the 6-box pipeline with arrows and timing diagram showing instructions T1, T2, T3 overlapping across all 6 stages]<br><br>
+        <strong>Performance:</strong> With k=6 stages and n tasks: Time = (6+n-1)×t. Speedup vs sequential = 6×n/(6+n-1). For large n → speedup approaches 6.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Why pipeline is useful in processing? Explain instruction pipeline including the processing steps used in pipeline. Explain speedup, efficiency and throughput in pipelining. Prove that ratio of non-pipeline based architecture and pipeline based architecture depends upon the number of segments (k).</div>
+      <div class="pyq-meta"><span>2022 Part C Q4 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Pipeline Complete</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Why Pipeline is Useful:</strong><br>
+        Modern CPUs operate at GHz speeds, but memory access still takes multiple ns. Without pipelining, the CPU would be idle waiting for each instruction to complete before starting the next. Pipelining keeps the CPU busy all the time by overlapping instruction execution — while one instruction is executing, the next is being decoded, and the one after that is being fetched. This dramatically increases throughput.<br><br>
+        [Instruction pipeline explanation — same as the 6-segment answer above]<br><br>
+        <strong>Performance Metrics:</strong><br><br>
+        Let: k = number of stages, n = number of tasks, t = clock period<br><br>
+        <strong>Throughput:</strong> Tput = n / ((k+n-1)×t) → For large n: Tput_max = 1/t<br><br>
+        <strong>Speedup:</strong> S = (n×k×t) / ((k+n-1)×t) = n×k / (k+n-1)<br><br>
+        <strong>Efficiency:</strong> E = S/k = n/(k+n-1) → ranges from 1/(k) [n=1] to 1 [n→∞]<br><br>
+        <strong>Proof that speedup → k (ratio depends on k):</strong><br>
+        S = n×k / (k+n-1)<br>
+        Divide numerator and denominator by n:<br>
+        S = k / (k/n + 1 - 1/n)<br>
+        As n → ∞: k/n → 0 and 1/n → 0<br>
+        Therefore: S → k/(0 + 1 - 0) = k ✓<br><br>
+        This proves that the maximum speedup ratio equals the number of pipeline segments k. The pipeline is most efficient when processing a large number of tasks.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 13: RISC PIPELINE -->
+<section class="section" id="risc-pipeline">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2 class="section-title">RISC Pipeline</h2>
+    <span class="imp-pill badge badge-o">75%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Why RISC is Ideal for Pipelining</h3>
+    <p>RISC architectures are specifically designed for efficient pipelining. The characteristics of RISC that make pipelining easy:</p>
+    <ul>
+      <li><strong>Fixed-length instructions:</strong> All instructions are 32 bits — fetch is always one word, decode is always the same time</li>
+      <li><strong>Load/Store architecture:</strong> Memory access only in LOAD/STORE — execution stage only does ALU ops (no memory in EX stage)</li>
+      <li><strong>Simple addressing modes:</strong> EA computation is fast and uniform</li>
+      <li><strong>Many registers:</strong> Data forwarding is more effective when results stay in registers</li>
+    </ul>
+    <h3>Classic RISC 5-Stage Pipeline (MIPS-style)</h3>
+    <table class="comp-table">
+      <tr><th>Stage</th><th>Name</th><th>Action</th></tr>
+      <tr><td><span class="hl-r">IF</span></td><td>Instruction Fetch</td><td>Fetch instruction from I-cache; PC ← PC+4</td></tr>
+      <tr><td><span class="hl-o">ID/RF</span></td><td>Instruction Decode / Register Fetch</td><td>Decode instruction; read source registers</td></tr>
+      <tr><td><span class="hl">EX</span></td><td>Execute</td><td>ALU operation (for R-type) or EA computation (for Load/Store)</td></tr>
+      <tr><td><span class="hl-v">MEM</span></td><td>Memory Access</td><td>Data cache read (Load) or write (Store); NOP for R-type</td></tr>
+      <tr><td><span class="hl-g">WB</span></td><td>Write Back</td><td>Write result to destination register</td></tr>
+    </table>
+    <h3>Delayed Branching in RISC</h3>
+    <p>In RISC pipelines, a branch instruction modifies PC at the EX stage (stage 3), but by then the next instruction (PC+4) has already been fetched in IF. Rather than flush this instruction (waste a cycle), RISC uses <strong>delayed branching</strong>: the instruction immediately after a branch (the branch delay slot) is ALWAYS executed, regardless of branch outcome. The compiler fills this slot with a useful instruction.</p>
+    <div class="formula-box">
+      <span class="label">Delayed Branching</span>
+      <div class="formula">Normal code:    BEQ R1, R2, TARGET  / branch if equal</div>
+      <div class="formula">                ADD R3, R4, R5       / this executes BEFORE the branch takes effect</div>
+      <div class="formula">With delayed:   ADD R3, R4, R5       / moved here (delay slot) — always executes</div>
+      <div class="formula">                BEQ R1, R2, TARGET  / branch now jumps</div>
+      <div class="note">The instruction in the delay slot always executes regardless of branch — compiler must ensure this is safe (not a data dependency conflict)</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 14: VECTOR PROCESSING -->
+<section class="section" id="vector">
+  <div class="section-header">
+    <span class="section-num">14</span>
+    <h2 class="section-title">Vector Processing</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Vector Processing?</h3>
+    <p>A <span class="hl-orange">vector processor</span> operates on entire arrays (vectors) of data with a single instruction, rather than processing one element at a time. It uses SIMD-style hardware to apply the same operation to multiple data elements simultaneously.</p>
+    <div class="layman">A vector processor is like a combine harvester vs a person with a sickle. The sickle cuts one stalk at a time (scalar). The combine harvester cuts an entire row in one pass (vector). A single "ADD" instruction adds ALL elements of one array to ALL corresponding elements of another array simultaneously.</div>
+    <div class="formula-box">
+      <span class="label">Vector vs Scalar Processing</span>
+      <div class="formula">Scalar: for(i=0; i<n; i++) C[i] = A[i] + B[i];  ← n iterations, n ADD instructions</div>
+      <div class="formula">Vector: C = A + B;  ← ONE vector instruction, processes all n elements</div>
+      <div class="note">Vector instruction fetches entire array A and B → applies ADD to all element pairs → stores result in C</div>
+      <div class="note">Benefit: Eliminates loop overhead, instruction fetch overhead, and control flow</div>
+    </div>
+    <h3>Vector Processor Design of a RTU Exam Question</h3>
+    <p>A vector processor has:</p>
+    <ul>
+      <li><strong>Vector registers:</strong> Long registers holding 8, 16, or 64 elements</li>
+      <li><strong>Vector functional units:</strong> Pipelined ALUs that process elements in sequence through the pipeline</li>
+      <li><strong>Vector load/store unit:</strong> Fetches/stores entire vectors from/to memory</li>
+      <li><strong>Scalar unit:</strong> Processes individual scalar values (loop counters, addresses)</li>
+    </ul>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Vector Processing</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain the design of a vector processor.</div>
+      <div class="pyq-meta"><span>2024 Part C Q4 · 10 marks ⭐⭐</span><span class="topic-tag">Vector Processor</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Vector Processor — Introduction:</strong><br>
+        A vector processor is designed to efficiently execute operations on arrays (vectors) of data using a single instruction. It's classified as SIMD in Flynn's taxonomy.<br><br>
+        <strong>Key Components:</strong><br><br>
+        1. <strong>Vector Registers (VR):</strong><br>
+        Large registers that can hold a vector of elements (e.g., 64 × 64-bit floating-point values). The Cray-1 had 8 vector registers, each holding 64 elements. Vector instructions specify vector register numbers as operands.<br><br>
+        2. <strong>Vector Functional Units:</strong><br>
+        Pipelined arithmetic units for vector addition, multiplication, division, logical operations. Each unit is a pipeline — elements enter one per clock cycle, results emerge after the pipeline latency. Multiple functional units can operate simultaneously (chaining).<br><br>
+        3. <strong>Vector Load/Store Unit:</strong><br>
+        Transfers entire vectors between vector registers and memory. Can load stride-1 (contiguous) or stride-k (every k-th element) vectors.<br><br>
+        4. <strong>Scalar Unit:</strong><br>
+        Standard scalar CPU for non-vector operations — loop control, address calculation, scalar arithmetic.<br><br>
+        5. <strong>Memory Interleaving:</strong><br>
+        Memory is organized into multiple independent banks. Different banks can be accessed simultaneously, enabling high-bandwidth vector loads at one element per clock.<br><br>
+        <strong>Operation Example:</strong><br>
+        To compute C[i] = A[i] + B[i] for 64 elements:<br>
+        VLOAD VR1, A    (load 64-element vector A)<br>
+        VLOAD VR2, B    (load 64-element vector B)<br>
+        VADD  VR3, VR1, VR2  (add all 64 pairs in pipeline)<br>
+        VSTORE C, VR3   (store 64-element result)<br><br>
+        <strong>Advantages:</strong> Extremely high throughput for regular, data-parallel applications. Used in weather forecasting, CFD simulation, signal processing.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 15: ARRAY PROCESSORS -->
+<section class="section" id="array">
+  <div class="section-header">
+    <span class="section-num">15</span>
+    <h2 class="section-title">Array Processors</h2>
+    <span class="imp-pill badge badge-o">68%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What are Array Processors?</h3>
+    <p>An <span class="hl-orange">array processor</span> (or processor array) is a collection of identical processing elements (PEs) connected in a regular pattern, all operating in lockstep under a single control unit. It is the classic SIMD hardware implementation.</p>
+    <div class="layman">An array processor is like a classroom where the teacher (control unit) says "add your left neighbor's number to your number" and ALL students do it simultaneously. Each student is a PE. The teacher broadcasts one instruction; every student executes it on their own data. Massively parallel for regular patterns.</div>
+    <div class="formula-box">
+      <span class="label">Array Processor vs Vector Processor</span>
+      <div class="formula">Array Processor:  n PEs each with own ALU + local memory, all in sync</div>
+      <div class="formula">                  One CU broadcasts instructions to all PEs</div>
+      <div class="formula">                  Physical parallelism — operations literally simultaneous</div>
+      <div class="formula"></div>
+      <div class="formula">Vector Processor: One pipelined ALU processes elements sequentially via pipeline</div>
+      <div class="formula">                  Time-multiplexed parallelism — pipeline stages overlap, not truly simultaneous</div>
+      <div class="formula"></div>
+      <div class="note">Array processor examples: CM-1 Connection Machine (65,536 1-bit PEs), ILLIAC IV, modern GPU compute cores</div>
+      <div class="note">Key difference: Array = n separate ALUs working truly simultaneously | Vector = 1 pipelined ALU</div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- PREDICTED PAPER 2026 -->
+<div style="background:#060e14;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:clamp(40px,6vw,70px) 5vw;" id="predicted">
+  <div style="max-width:var(--content-max);margin:0 auto;">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Based on 2022–2025 CAO PYQ Pattern + 2026 DIP, ML & ISS Paper Analysis</div>
+    <div class="sec-header" style="margin-bottom:14px">
+      <h2>CAO — Predicted Paper 2026 (Unit 4 Contribution)</h2>
+      <span class="sub">UNIT 4 TOPICS IN THE 2026 PREDICTED PAPER</span>
+    </div>
+    <p style="font-family:var(--mono);font-size:clamp(11px,0.78vw,14px);color:var(--dim2);margin-bottom:14px;line-height:1.75;">Unit 4 contributes the most to the predicted 2026 paper. Flynn's taxonomy (CERTAIN Part C), RISC definition (CERTAIN Part A Q1), pipeline characteristics (HIGH Part A Q4), and arithmetic pipeline (HIGH Part B Q7) are all Unit 4 topics with very high prediction confidence.</p>
+    <div class="tip-box warning" style="margin-bottom:24px">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-content">
+        <div class="tip-title">Disclaimer</div>
+        <p>Predictions based on historical patterns. Actual paper may differ. Use for study prioritization.</p>
+      </div>
+    </div>
+    <div class="pred-grid">
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q1) — Unit 4</div>
+        <div class="pred-q">What is meant by RISC? Differentiate RISC and CISC.</div>
+        <div class="pred-reason">RISC was Q1 in 2024, absent in 2025. ALL 2026 RTU papers (DIP, ML, ISS) confirmed that absent-2025 topics return to Part A Q1 in 2026. This is the single most certain Part A prediction. Know: small instruction set, load/store arch, fixed 32-bit, 1 clock/instr, hardwired CU.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q3) — Unit 4</div>
+        <div class="pred-q">What is immediate addressing mode? (OR Direct vs Indirect addressing)</div>
+        <div class="pred-reason">Immediate addressing mode was Q3 in 2025. Direct vs indirect appeared in 2023-Aug Q6. Addressing modes are permanent Part A material. For 2026, one addressing mode question (immediate, register direct, or a comparison between two modes) is near-certain.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q4) — Unit 4</div>
+        <div class="pred-q">What are the major characteristics of a pipeline?</div>
+        <div class="pred-reason">Pipeline characteristics was Part A Q4 in 2025. Based on 2026 DIP and ML patterns where 2025 Part A topics are retained in 2026, this specific phrasing is likely to remain. Cover: overlap, throughput, latency, speedup→k, clock=slowest stage, hazards.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q8) — Unit 4</div>
+        <div class="pred-q">What is parallel processing? (OR Define multi-processing.)</div>
+        <div class="pred-reason">Parallel processing appeared in 2022 Part A Q6 and 2024 Part A Q8 — two papers, one-year gap pattern. Multiprocessing was 2025 Q7. One of these variations will appear in 2026 Q7-Q9 area. Critical: mention simultaneous computation, multiple PEs, coordination.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q7) — Unit 4</div>
+        <div class="pred-q">Explain arithmetic pipeline with an example. (4-stage floating-point adder)</div>
+        <div class="pred-reason">Arithmetic pipeline was Part B Q7 in 2024, absent in 2025. After a one-year gap, arithmetic pipeline is strongly due to return in 2026 Part B Q7. Draw the 4-stage FP adder (Compare Exponents → Align → Add → Normalize). Include a timing diagram showing 3 pairs in the pipeline.</div>
+        <span class="pred-conf high">HIGH confidence — due after 1-year gap</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q1) — Unit 4</div>
+        <div class="pred-q">Define parallel processing and explain Flynn's classification of computers with suitable diagram.</div>
+        <div class="pred-reason">CERTAIN — Flynn's taxonomy appeared in Part C Q3 (2024) and Part C Q1 (2025) — TWO CONSECUTIVE YEARS. No RTU topic has ever appeared in two consecutive Part C slots and then disappeared. Draw all FOUR categories (SISD/SIMD/MISD/MIMD) with block diagrams. Label IS, PU, DS for each. Include real examples.</div>
+        <span class="pred-conf high">CERTAIN — 2 consecutive years</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q?) — Unit 4</div>
+        <div class="pred-q">Explain instruction pipeline: 6 segments, speedup, efficiency, throughput + numerical.</div>
+        <div class="pred-reason">Instruction pipeline with speedup numerical appeared in 2022 Part B (numerical) and 2023-Aug Part C Q4 (6-segment formulation). In 2024 and 2025 it appeared implicitly via pipeline characteristics. For 2026, a full Part C question on instruction pipeline (define all 6 stages + derive speedup formula + solve numerical) is predicted.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q?) — Unit 4</div>
+        <div class="pred-q">Why interprocess synchronization needed? Explain. (OR Explain superscalar processor.)</div>
+        <div class="pred-reason">Interprocess synchronization appeared in 2025 Part B Q2. "Define superscalar processor" appeared in 2025 Part A Q10. Both are Unit 4/multiprocessor topics that haven't been deeply tested yet. One of these may appear as Part B Q2 in 2026.</div>
+        <span class="pred-conf med">MEDIUM confidence</span>
+      </div>
+    </div>
+    <div class="tip-box validate" style="margin-top:28px">
+      <div class="tip-icon">✅</div>
+      <div class="tip-content">
+        <div class="tip-title">Unit 4 Preparation Priority for 2026</div>
+        <p><strong>MUST prepare completely:</strong><br>
+        • Flynn's taxonomy (CERTAIN Part C) — all 4 categories with diagrams, examples, comparison table<br>
+        • RISC (CERTAIN Part A Q1) — 8 features, RISC vs CISC table, examples<br>
+        • Pipeline speedup numerical — know the 3 formulas (Speedup, Throughput, Efficiency) cold<br>
+        • Arithmetic pipeline — 4-stage FP adder with timing diagram<br><br>
+        <strong>HIGH value (Part A definitions):</strong><br>
+        Pipeline characteristics, immediate addressing mode, parallel processing definition, RISC definition<br><br>
+        <strong>Know but don't over-invest:</strong><br>
+        Vector processor, array processor, MISD details, delayed branching</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PYQ MASTER LIST -->
+<div class="layout">
+<div style="width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;"></div>
+<div class="content">
+<section class="section" id="pyq-master" style="margin-top:40px">
+  <div class="section-header">
+    <span class="section-num">M</span>
+    <h2 class="section-title">All PYQs — Unit 4 Master List</h2>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📋 Complete PYQ Reference — Unit 4 Topics (All Years)</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Full Unit 4 PYQ Coverage — Click to Expand</div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full List</button>
+      <div class="answer-content">
+        <strong>PART A — Unit 4 Related:</strong><br><br>
+        2022: Q6: Parallel processing | Q7: Microprogrammed control unit<br>
+        2022: Q9: 16-bit instruction format (3 fields) | Q5: Interrupt initiated I/O<br><br>
+        2023-Aug: Q6: Direct vs indirect address instruction | Q7: Two instructions to set E flip-flop<br><br>
+        2024: Q1: What is RISC? | Q7: Multicomputer | Q8: Parallel processing<br><br>
+        2025: Q1: Priority interrupt | Q2: Most common fields of Instruction format | Q3: Immediate addressing mode | Q4: Pipeline characteristics | Q5: Latency time | Q7: Multi-processing | Q10: Superscalar processor<br><br>
+        <strong>PART B — Unit 4 Related:</strong><br><br>
+        2022: B-Q2: Priority interrupt + Daisy chaining | B-Q3: Pipeline speedup (100ns non-pipeline, 6-seg 20ns, 200 tasks) | B-Q5: Instruction types<br><br>
+        2023-Aug: B-Q6: Indirect addressing memory references (computational vs branch) | B-Q7: RISC I instruction for jump to 3200 with Z=1 (immediate + relative mode)<br><br>
+        2024: B-Q7: Explain arithmetic pipeline with example<br><br>
+        2025: B-Q2: Why interprocess synchronization needed? | B-Q3: Logical microoperations + applications<br><br>
+        <strong>PART C — Unit 4 Related:</strong><br><br>
+        2022: C-Q4: Instruction pipeline — why useful, explain, speedup/efficiency/throughput, prove ratio depends on k<br>
+        2022: C-Q3: RISC I instructions for operations<br><br>
+        2023-Aug: C-Q3: RISC I instructions (decrement/complement/negate/clear/divide-by-4/NOP)<br>
+        2023-Aug: C-Q4: Formulate six-segment instruction pipeline; specify operations per segment<br><br>
+        2024: C-Q3: Describe Flynn's taxonomy (SISD/SIMD/MISD/MIMD)<br>
+        2024: C-Q4: Explain design of vector processor<br><br>
+        2025: C-Q1: Define parallel processing + explain Flynn's classification with diagram<br><br>
+        <strong>KEY PATTERNS:</strong><br>
+        Flynn's taxonomy: Part C 2024 and 2025 (CERTAIN 2026)<br>
+        RISC: Part A Q1 2024 (absent 2025 → CERTAIN 2026 Q1)<br>
+        Pipeline speedup numerical: Part B 2022<br>
+        Instruction pipeline (6-segment): Part C 2022 and 2023-Aug<br>
+        Arithmetic pipeline: Part B 2024 (absent 2025 → HIGH 2026)<br>
+        Parallel processing / multicomputer: Part A 2022, 2024<br>
+        Addressing modes: Part A Q3 2025, Part A Q6 + Part B Q6 2023-Aug<br>
+        Vector processor: Part C 2024
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="#">🏠 Home</a>
+    <a href="unit2.html">🔴 Unit 2: Data & Register</a>
+    <a href="unit3.html">🟣 Unit 3: Programming</a>
+    <a href="#">💾 Unit 5: Arithmetic & Memory</a>
+    <a href="#">🔗 Unit 6: I/O & Multiprocessors</a>
+    <a href="#pyq-master" style="color:var(--upred)">📋 All PYQs</a>
+  </div>
+  © 2026 RTU CAO Study Guide · Unit 4 — Central Processing Unit, Pipeline & Vector Processing · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans=btn.nextElementSibling;
+  if(ans.classList.contains('open')){ans.classList.remove('open');btn.textContent=btn.textContent.replace('▲','▼');}
+  else{ans.classList.add('open');btn.textContent=btn.textContent.replace('▼','▲');}
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('visible');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('visible');}
+const sections=document.querySelectorAll('.section');
+const navItems=document.querySelectorAll('.nav-item');
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){navItems.forEach(n=>{n.classList.remove('active');if(n.getAttribute('href')==='#'+e.target.id)n.classList.add('active');});}});},{rootMargin:'-15% 0px -70% 0px'});
+sections.forEach(s=>observer.observe(s));
+</script>
+</body>
+</html>
