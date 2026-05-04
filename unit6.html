@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO Unit 6 — Memory Organization & Multiprocessors | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:#050d10; --bg2:#071520; --surface:#0c1e28; --surface2:#102534;
+  --border:#1a3545; --border2:#0e2030;
+  --u1:#22d3ee; --u2:#f97316; --u3:#ef4444; --u4:#a78bfa; --u5:#10b981; --u6:#3b82f6;
+  --upred:#f59e0b; --gold:#fbbf24; --text:#dde8f2; --dim:#3a5868; --dim2:#6090a8;
+  --accent:#3b82f6;
+  --mono:'JetBrains Mono',monospace; --head:'Fraunces',serif; --body:'Outfit',sans-serif;
+  --sidebar-w:300px; --content-max:1400px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:clamp(17px,1.25vw,22px);}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.85;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(5,13,16,0.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border2);padding:0 28px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.topnav::-webkit-scrollbar{display:none;}
+.tnlabel{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);padding:15px 14px 15px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;flex-shrink:0;}
+.tnlink{font-family:var(--mono);font-size:11.5px;padding:8px 14px;border-radius:6px;text-decoration:none;color:var(--dim2);white-space:nowrap;flex-shrink:0;transition:all .18s;border:1px solid transparent;}
+.tnlink:hover{color:var(--text);background:var(--surface2);}
+.tnlink.active{color:var(--accent);background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);}
+.tnlink.pyq{color:var(--upred);background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.22);}
+.tnlink.pred{color:var(--upred);background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);font-weight:600;}
+
+.credit-band{background:#060e14;border-bottom:1px solid var(--border2);padding:11px 32px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.credit-text{font-family:var(--mono);font-size:12px;color:var(--dim2);}
+.credit-text span{color:var(--accent);font-weight:600;}
+
+.hero{position:relative;overflow:hidden;padding:clamp(40px,6vw,80px) 5vw clamp(36px,5vw,64px);}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(59,130,246,.1) 1px,transparent 1px),radial-gradient(circle,rgba(34,211,238,.05) 1px,transparent 1px);background-size:44px 44px,88px 88px;background-position:0 0,22px 22px;animation:dotDrift 30s linear infinite;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 10% 50%,rgba(59,130,246,.08) 0%,transparent 65%),radial-gradient(ellipse 45% 50% at 85% 15%,rgba(34,211,238,.06) 0%,transparent 60%);pointer-events:none;}
+@keyframes dotDrift{0%{transform:translate(0,0);}100%{transform:translate(44px,44px);}}
+.hero-inner{position:relative;z-index:1;max-width:var(--content-max);margin:0 auto;}
+.hero-tag{font-family:var(--mono);font-size:clamp(10px,0.75vw,13px);color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:blink 2.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-family:var(--head);font-weight:800;font-size:clamp(30px,5vw,72px);line-height:1.02;color:#fff;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 span{color:var(--accent);} .hero h1 em{color:var(--u1);font-style:normal;}
+.hero-sub{color:var(--dim2);font-size:clamp(16px,1.5vw,20px);max-width:760px;line-height:1.8;margin-bottom:22px;}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{font-family:var(--mono);font-size:clamp(10px,0.7vw,13px);padding:5px 14px;border-radius:5px;border:1px solid;}
+.badge-r{color:var(--u3);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);}
+.badge-c{color:var(--u1);border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.08);}
+.badge-v{color:var(--u4);border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08);}
+.badge-o{color:var(--u2);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08);}
+.badge-gold{color:var(--upred);border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);}
+.badge-g{color:var(--u5);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08);}
+.badge-b{color:var(--accent);border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.08);}
+
+.layout{display:flex;max-width:100%;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);padding:28px 18px;border-right:1px solid var(--border);position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:4px;} .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sidebar-title{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+.sidebar-close{display:none;background:none;border:1px solid var(--border);border-radius:4px;color:var(--dim2);cursor:pointer;padding:2px 9px;font-family:var(--mono);font-size:11px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-family:var(--head);font-size:clamp(12px,0.85vw,15px);font-weight:600;color:var(--dim2);transition:all .2s;margin-bottom:3px;text-decoration:none;line-height:1.3;}
+.nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:var(--accent);border-left:2px solid var(--accent);padding-left:10px;}
+.nav-imp{margin-left:auto;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;background:var(--surface2);white-space:nowrap;}
+.nav-imp.high{color:var(--u3);} .nav-imp.med{color:var(--upred);} .nav-imp.low{color:var(--u5);}
+
+.sidebar-toggle{display:none;position:fixed;bottom:22px;right:22px;z-index:1000;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;font-size:22px;color:#fff;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(59,130,246,.45);transition:transform .2s;}
+.sidebar-toggle:hover{transform:scale(1.1);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:98;backdrop-filter:blur(3px);}
+.sidebar-overlay.visible{display:block;}
+
+.content{flex:1;padding:clamp(28px,3.5vw,56px) clamp(22px,4vw,80px);max-width:calc(100% - var(--sidebar-w));overflow-x:hidden;min-width:0;}
+
+.section{margin-bottom:80px;scroll-margin-top:64px;}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.section-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);padding:5px 10px;border-radius:5px;min-width:40px;text-align:center;}
+.section-title{font-family:var(--head);font-size:clamp(21px,2.5vw,32px);font-weight:800;color:#fff;}
+.imp-pill{margin-left:auto;}
+
+.theory-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(20px,2.5vw,34px);margin-bottom:22px;}
+.theory-block h3{font-family:var(--head);font-size:clamp(17px,1.6vw,22px);font-weight:700;color:var(--u2);margin-bottom:14px;}
+.theory-block h3.red{color:var(--u3);} .theory-block h3.cyan{color:var(--u1);} .theory-block h3.green{color:var(--u5);} .theory-block h3.blue{color:var(--accent);}
+.theory-block p{margin-bottom:14px;font-size:clamp(15px,1.05vw,18px);line-height:1.88;}
+.theory-block p:last-child{margin-bottom:0;}
+.theory-block ul,.theory-block ol{padding-left:24px;margin:12px 0;}
+.theory-block li{margin-bottom:10px;font-size:clamp(15px,1.05vw,18px);line-height:1.78;}
+h4{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:var(--text);margin:18px 0 10px;}
+
+.layman{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-left:3px solid var(--accent);border-radius:8px;padding:16px 20px;font-family:var(--mono);font-size:clamp(12px,0.82vw,15px);color:#93c5fd;margin:14px 0;line-height:1.75;}
+.layman::before{content:'💬 LAYMAN: ';color:var(--accent);font-weight:700;}
+
+.formula-box{background:#030c14;border:1px solid rgba(34,211,238,.22);border-left:3px solid var(--u1);border-radius:9px;padding:18px 22px;margin:18px 0;font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:#67e8f9;overflow-x:auto;line-height:1.75;}
+.formula-box .label{font-size:clamp(9px,0.65vw,12px);color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:block;}
+.formula-box .formula{color:#a5f3fc;font-size:clamp(12px,0.85vw,16px);}
+.formula-box .note{color:var(--dim2);font-size:clamp(11px,0.75vw,14px);margin-top:8px;display:block;font-style:italic;}
+
+.tip-box{border-radius:9px;padding:18px 20px;margin:16px 0;display:flex;gap:14px;}
+.tip-box.trick{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);}
+.tip-box.validate{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);}
+.tip-box.connect{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);}
+.tip-box.warning{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);}
+.tip-box.pred{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);}
+.tip-icon{font-size:22px;flex-shrink:0;margin-top:3px;}
+.tip-content{flex:1;}
+.tip-title{font-family:var(--head);font-size:clamp(12px,0.85vw,15px);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;}
+.tip-box.trick .tip-title{color:var(--gold);} .tip-box.validate .tip-title{color:var(--u5);} .tip-box.connect .tip-title{color:var(--u4);} .tip-box.warning .tip-title{color:var(--u3);} .tip-box.pred .tip-title{color:var(--upred);}
+.tip-content p{font-size:clamp(14px,0.92vw,17px);color:var(--text);margin:0;line-height:1.78;}
+
+.comp-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:clamp(12px,0.87vw,16px);display:block;overflow-x:auto;}
+.comp-table th{background:var(--surface2);padding:12px 16px;text-align:left;font-family:var(--head);font-weight:700;color:var(--u1);border-bottom:1px solid var(--border);white-space:nowrap;}
+.comp-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:top;}
+.comp-table tr:last-child td{border-bottom:none;} .comp-table tr:hover td{background:var(--surface2);}
+
+.imp-bar-wrap{margin-bottom:12px;}
+.imp-bar-label{font-family:var(--mono);font-size:clamp(10px,0.73vw,14px);color:var(--dim2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.imp-bar{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.imp-bar-fill{height:100%;border-radius:4px;}
+.imp-high .imp-bar-fill{background:var(--u3);} .imp-med .imp-bar-fill{background:var(--upred);} .imp-low .imp-bar-fill{background:var(--u5);}
+
+.steps{margin:16px 0;}
+.step-item{display:flex;gap:16px;margin-bottom:14px;}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--mono);font-weight:700;font-size:clamp(12px,0.82vw,15px);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-text{font-size:clamp(14px,1vw,17px);padding-top:7px;line-height:1.78;}
+
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px;margin:18px 0;text-align:center;overflow-x:auto;}
+.diagram-cap{font-family:var(--mono);font-size:clamp(10px,0.72vw,13px);color:var(--dim2);margin-top:12px;text-align:center;}
+
+.pred-banner{background:linear-gradient(135deg,rgba(245,158,11,.09),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.35);border-left:3px solid var(--upred);border-radius:9px;padding:14px 18px;margin:16px 0;font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:var(--upred);display:flex;gap:12px;align-items:flex-start;}
+.pred-banner .pb-icon{flex-shrink:0;font-size:18px;} .pred-banner .pb-text{line-height:1.7;}
+
+.pyq-section{background:#060f18;border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:clamp(18px,2.5vw,30px);margin-top:26px;}
+.pyq-header{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:var(--upred);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.pyq-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:18px 20px;margin-bottom:16px;}
+.pyq-q-text{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:#fff;margin-bottom:6px;line-height:1.45;}
+.pyq-meta{font-family:var(--mono);font-size:clamp(9px,0.68vw,13px);color:var(--dim2);margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;}
+.topic-tag{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--accent);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pred-tag{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--upred);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pyq-toggle{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 16px;cursor:pointer;font-family:var(--mono);font-size:clamp(10px,0.75vw,14px);color:var(--upred);margin-top:12px;transition:all .2s;}
+.pyq-toggle:hover{background:var(--upred);color:#000;}
+.answer-content{display:none;margin-top:16px;font-size:clamp(14px,0.95vw,18px);line-height:1.88;}
+.answer-content.open{display:block;}
+
+code{font-family:var(--mono);background:var(--surface2);padding:2px 7px;border-radius:4px;font-size:clamp(11px,0.8vw,15px);color:var(--u4);}
+.hl{color:var(--u1);font-weight:600;} .hl-o{color:var(--u2);font-weight:600;} .hl-r{color:var(--u3);font-weight:600;} .hl-v{color:var(--u4);font-weight:600;} .hl-g{color:var(--u5);font-weight:600;} .hl-gold{color:var(--upred);font-weight:600;} .hl-b{color:var(--accent);font-weight:600;}
+
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:24px;}
+.pred-card{background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:20px 22px;border-top:3px solid var(--upred);}
+.pred-part{font-family:var(--mono);font-size:clamp(9px,0.72vw,13px);color:var(--dim2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.pred-q{font-family:var(--head);font-size:clamp(14px,0.98vw,17px);font-weight:700;color:#fff;margin-bottom:8px;line-height:1.4;}
+.pred-reason{font-size:clamp(12px,0.85vw,15px);color:var(--dim2);line-height:1.7;margin-bottom:10px;}
+.pred-conf{font-family:var(--mono);font-size:clamp(9px,0.7vw,12px);padding:3px 10px;border-radius:4px;}
+.pred-conf.high{color:var(--u3);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);}
+.pred-conf.med{color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
+.pred-badge{display:inline-block;font-family:var(--mono);font-size:clamp(10px,0.78vw,14px);color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);padding:5px 14px;border-radius:5px;margin-bottom:14px;}
+.sec-header h2{font-family:var(--head);font-size:clamp(21px,2.5vw,32px);font-weight:800;color:#fff;margin-bottom:6px;}
+.sec-header .sub{font-family:var(--mono);font-size:clamp(9px,0.72vw,13px);color:var(--dim2);letter-spacing:1px;}
+
+.site-footer{background:#030b10;border-top:1px solid var(--border2);padding:28px 5vw;text-align:center;font-family:var(--mono);font-size:clamp(10px,0.72vw,13px);color:var(--dim);}
+.site-footer a{color:var(--dim2);text-decoration:none;margin:0 14px;transition:color .2s;}
+.site-footer a:hover{color:var(--accent);}
+.site-footer .footer-links{margin-bottom:12px;}
+
+@media(max-width:900px){
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:99;background:var(--bg);transform:translateX(-100%);transition:transform .3s ease;}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,.9);}
+  .sidebar-close{display:block;} .sidebar-toggle{display:flex;}
+  .content{max-width:100%;padding:28px 22px;}
+}
+@media(max-width:600px){
+  .hero{padding:40px 18px 36px;}
+  .theory-block{padding:18px;}
+  .pyq-section{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink" href="index.html">🏠 Home</a>
+  <a class="tnlink" href="unit2.html">🔴 U2: Data & Register</a>
+  <a class="tnlink" href="unit3.html">⚙️ U3: Basic Computer Programming</a>
+  <a class="tnlink" href="unit4.html">🔢 U4: CPU</a>
+  <a class="tnlink" href="unit5.html">💾 U5: Arithmetic & Memory</a>
+  <a class="tnlink active" href="unit6.html">🔗 U6: I/O & Multi</a>
+  <a class="tnlink pyq" href="#pyq-master">📋 All PYQs</a>
+  <a class="tnlink pred" href="#predicted">🔮 2026 Predicted</a>
+</nav>
+
+<div class="credit-band">
+  <div class="credit-text">CAO Exam Prep · <span>RTU B.Tech VI Sem</span> · 6E7104 / 6E1554 / 610404</div>
+  <div class="credit-text">Made with ♥ for RTU Students</div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📚 B.Tech VI Sem · RTU · Computer Architecture & Organization</div>
+    <h1>Unit 6: <span>Memory Organization</span><br>& <em>Multiprocessors</em></h1>
+    <p class="hero-sub">Memory Hierarchy, Main Memory (RAM/ROM chip design), Auxiliary Memory, Associative Memory, Cache Memory (Direct/Fully Associative/Set-Associative mapping), Virtual Memory, Cache Coherence, Multiprocessor Interconnection — every RTU PYQ solved + 2026 predictions.</p>
+    <div class="hero-badges">
+      <span class="badge badge-r">🔥 Cache Mapping — 3-Year Absence → CERTAIN 2026</span>
+      <span class="badge badge-gold">🔮 RAM Chip Design — 2022 & 2025</span>
+      <span class="badge badge-c">Cache Coherence — 2024 Part C</span>
+      <span class="badge badge-v">Set-Associative Mapping — Part B 2024</span>
+      <span class="badge badge-o">Memory Hierarchy — Part B 2024</span>
+      <span class="badge badge-g">Hit Ratio — Part A 2022 & Part B 2025</span>
+    </div>
+  </div>
+</section>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Unit 6 Topics</div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <a class="nav-item" href="#overview">📊 Overview & Importance</a>
+  <a class="nav-item" href="#hierarchy">🏔️ Memory Hierarchy<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#main-memory">🧠 Main Memory (RAM/ROM)<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#auxiliary">💿 Auxiliary Memory<span class="nav-imp med">70%</span></a>
+  <a class="nav-item" href="#associative">🔍 Associative Memory<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#cache">⚡ Cache Memory<span class="nav-imp high">92%</span></a>
+  <a class="nav-item" href="#direct-mapping">📌 Direct Mapping<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#fully-assoc">🔓 Fully Associative<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#set-assoc">🗂️ Set-Associative<span class="nav-imp high">90%</span></a>
+  <a class="nav-item" href="#virtual">🌐 Virtual Memory<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#multiprocessor">🖥️ Multiprocessors<span class="nav-imp high">85%</span></a>
+  <a class="nav-item" href="#interconnection">🔗 Interconnection<span class="nav-imp med">75%</span></a>
+  <a class="nav-item" href="#cache-coherence">⚠️ Cache Coherence<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#shared-memory">🤝 Shared Memory<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#predicted">🔮 2026 Predicted</a>
+  <a class="nav-item" href="#pyq-master">📝 All PYQs</a>
+</nav>
+
+<main class="content">
+
+<!-- SECTION 00: OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">Topic Importance — Unit 6</h2>
+  </div>
+  <div class="theory-block">
+    <p>Unit 6 has several high-value topics. The <strong>RAM chip design numerical</strong> appeared in BOTH 2022 and 2025 Part C Q5 with identical structure (128×8 chips). <strong>Cache mapping</strong> (all three types in one question) appeared in 2022 Part C Q3 — after a 3-year absence it is OVERDUE for 2026. <strong>Set-associative mapping</strong> appeared in 2024 Part B Q2. <strong>Cache coherence</strong> appeared in 2024 Part C Q5. <strong>Memory hierarchy</strong> was 2024 Part B Q5. <strong>Hit Ratio</strong> was 2022 Part A Q4 and 2025 Part B Q6.</p>
+    <div class="imp-bar-wrap imp-high" style="margin-top:18px">
+      <div class="imp-bar-label"><span>Cache Memory — All 3 Mapping Types with Diagrams</span><span style="color:#ef4444">92% — 3-year absence → CERTAIN 2026 Part C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:92%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Cache Coherence — protocols, MESI, write invalidate</span><span style="color:#ef4444">88% — Part C 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>RAM Chip Design Numerical (chips, address lines, decoders)</span><span style="color:#ef4444">88% — Part C 2022 & 2025</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Memory Hierarchy (registers→cache→RAM→disk)</span><span style="color:#ef4444">85% — Part B 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Multiprocessor Characteristics + Interconnection</span><span style="color:#ef4444">85% — Part A 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:85%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Set-Associative Cache Mapping with example</span><span style="color:#ef4444">90% — Part B 2024, absent 2025 → HIGH 2026</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:90%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Virtual Memory (page tables, TLB, page fault)</span><span style="color:#ef4444">82% — Part B/C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Auxiliary Memory (magnetic disk, track/sector)</span><span style="color:#f59e0b">70% — Part A 2024</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:70%"></div></div>
+    </div>
+  </div>
+  <div class="tip-box trick">
+    <div class="tip-icon">⚡</div>
+    <div class="tip-content">
+      <div class="tip-title">Exam Strategy — Unit 6</div>
+      <p><strong>Three high-certainty topics:</strong><br>
+      (1) <strong>Cache Mapping (all 3 types)</strong> — 3-year absence makes this the most overdue Part C topic. Draw direct, fully associative, and set-associative with worked address examples.<br>
+      (2) <strong>RAM chip design numerical</strong> — appeared in 2022 and 2025 with SAME structure. New values in 2026. Master the formula: #chips = total/chip, address lines = log₂(total words).<br>
+      (3) <strong>Set-associative mapping</strong> — was Part B 2024, absent 2025 → CERTAIN return in Part B 2026.<br>
+      These three = approximately 20+ marks secured in 2026.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 01: MEMORY HIERARCHY -->
+<section class="section" id="hierarchy">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Memory Hierarchy</h2>
+    <span class="imp-pill badge badge-b">85% — Part B 2024</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Memory Hierarchy?</h3>
+    <p>The <span class="hl-b">memory hierarchy</span> is the organization of different types of memory in a computer system, arranged from the fastest/most expensive/smallest at the top to the slowest/cheapest/largest at the bottom. The key insight is: programs exhibit locality — they use a small subset of memory most of the time. By keeping the most-used data in fast memory (cache/registers), we approach the speed of fast memory at the cost of slow memory.</p>
+    <div class="layman">Memory hierarchy is like your study space. Your desk (registers) is tiny but you can grab anything instantly. Your bookshelf (cache) is slightly farther — seconds to reach. Your home library (RAM) takes minutes. A storage room (hard disk) takes much longer. An off-site warehouse (cloud/tape) takes hours. You organize your work so the most needed books are on your desk. If the book isn't on your desk, you get it from the shelf (cache hit/miss).</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 310" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#3b82f6" font-family="JetBrains Mono" font-size="10" font-weight="bold">Memory Hierarchy — Draw This for Part B (With Numbers)</text>
+        <!-- Triangle -->
+        <!-- Registers -->
+        <rect x="200" y="32" width="160" height="38" rx="4" fill="#102534" stroke="#ef4444" stroke-width="2.5"/>
+        <text x="280" y="50" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">REGISTERS</text>
+        <text x="280" y="63" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">~KB | 0.3 ns | on-chip</text>
+        <!-- Cache L1 -->
+        <rect x="170" y="78" width="220" height="38" rx="4" fill="#102534" stroke="#f97316" stroke-width="2"/>
+        <text x="280" y="96" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">L1/L2 CACHE</text>
+        <text x="280" y="109" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">32KB–8MB | 1–10 ns | on-chip</text>
+        <!-- Main Memory -->
+        <rect x="130" y="124" width="300" height="38" rx="4" fill="#102534" stroke="#f59e0b" stroke-width="2"/>
+        <text x="280" y="142" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">MAIN MEMORY (RAM)</text>
+        <text x="280" y="155" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">4GB–128GB | 60–100 ns | DIMM modules</text>
+        <!-- Magnetic Disk -->
+        <rect x="80" y="170" width="400" height="38" rx="4" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="280" y="188" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">SECONDARY MEMORY (SSD/HDD)</text>
+        <text x="280" y="201" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">256GB–4TB | 0.1–10 ms | local disk</text>
+        <!-- Offline -->
+        <rect x="30" y="216" width="500" height="38" rx="4" fill="#102534" stroke="#3b82f6" stroke-width="2"/>
+        <text x="280" y="234" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono" font-size="9" font-weight="bold">OFFLINE / ARCHIVAL STORAGE (Tape/Cloud)</text>
+        <text x="280" y="247" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Petabytes | seconds–minutes | removable media</text>
+        <!-- Labels -->
+        <text x="10" y="272" fill="#ef4444" font-family="JetBrains Mono" font-size="8" font-weight="bold">↑ Faster, Costlier, Smaller</text>
+        <text x="10" y="286" fill="#3b82f6" font-family="JetBrains Mono" font-size="8" font-weight="bold">↓ Slower, Cheaper, Larger</text>
+        <text x="310" y="272" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Locality Principle → Keep hot data near CPU</text>
+        <text x="310" y="286" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Cache hit → fast | Cache miss → penalty</text>
+      </svg>
+      <div class="diagram-cap">Fig 1.1 — Memory Hierarchy: Registers (fastest) → Cache → RAM → Disk → Tape (slowest). Speed decreases, capacity increases, cost-per-bit decreases as we go down.</div>
+    </div>
+    <h3>Locality of Reference — Why the Hierarchy Works</h3>
+    <p>The memory hierarchy exploits two principles of <span class="hl-b">locality of reference</span>:</p>
+    <ul>
+      <li><strong>Temporal Locality:</strong> A recently accessed memory location is likely to be accessed again soon (e.g., loop counter — accessed every iteration).</li>
+      <li><strong>Spatial Locality:</strong> When a memory location is accessed, nearby locations are likely to be accessed soon (e.g., array traversal — sequential elements accessed one after another).</li>
+    </ul>
+    <div class="formula-box">
+      <span class="label">Memory Hierarchy Performance Metrics</span>
+      <div class="formula">Hit Ratio (h): h = (Number of cache hits) / (Total memory accesses)</div>
+      <div class="formula">Average Access Time: Tavg = h × Tc + (1-h) × Tm</div>
+      <div class="formula">  where Tc = cache access time, Tm = main memory access time</div>
+      <div class="formula">  (1-h) = miss rate</div>
+      <div class="formula"></div>
+      <div class="formula">Example: h = 0.95, Tc = 5 ns, Tm = 80 ns:</div>
+      <div class="formula">Tavg = 0.95×5 + 0.05×80 = 4.75 + 4 = 8.75 ns</div>
+      <div class="formula">Compare: no cache = 80 ns → with cache = 8.75 ns → ~9× speedup!</div>
+      <div class="note">RTU 2022 Part A Q4 and 2025 Part B Q6 asked: "What is Hit Ratio in cache memory?" and "Explain need of cache memory. Also explain Hit Ratio."</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Memory Hierarchy</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain memory hierarchy.</div>
+      <div class="pyq-meta"><span>2024 Part B Q5 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Memory Hierarchy</span><span class="pred-tag">🔮 HIGH 2026 Part B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Memory Hierarchy:</strong><br>
+        The memory hierarchy is an organization of memory systems at different speed/cost/capacity levels, designed to provide the user with as much memory as is available in the cheapest technology while operating at the speed offered by the fastest memory.<br><br>
+        <strong>Levels (fastest to slowest):</strong><br>
+        1. <strong>Registers:</strong> ~KB capacity, &lt;1 ns access, inside CPU. Most expensive. Directly used by ALU.<br>
+        2. <strong>Cache Memory (L1/L2/L3):</strong> 32 KB–8 MB, 1–10 ns, on-chip or near-chip. SRAM technology.<br>
+        3. <strong>Main Memory (RAM):</strong> 4–128 GB, 60–100 ns, DRAM. The primary working area for programs.<br>
+        4. <strong>Secondary Memory (SSD/HDD):</strong> 256 GB–4 TB, 0.1–10 ms. Non-volatile storage.<br>
+        5. <strong>Offline Storage (Tape/Cloud):</strong> Petabytes, seconds–minutes. Archival purposes.<br><br>
+        <strong>Key Principle — Locality of Reference:</strong><br>
+        • Temporal Locality: Recently used data will be used again soon<br>
+        • Spatial Locality: Data near recently accessed locations will be used soon<br><br>
+        <strong>Performance:</strong> Tavg = h × Tc + (1−h) × Tm<br>
+        With h = 0.95, Tc = 5 ns, Tm = 80 ns → Tavg ≈ 8.75 ns (vs 80 ns without cache)<br><br>
+        [Draw the pyramid/rectangle diagram with all 5 levels, labeled with capacity, speed, and technology]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What do you mean by Hit Ratio in cache memory?</div>
+      <div class="pyq-meta"><span>2022 Part A Q4 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Hit Ratio</span><span class="pred-tag">🔮 CERTAIN 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Hit Ratio (h)</strong> in cache memory is the ratio of the number of successful cache accesses (hits) to the total number of memory access requests.<br><br>
+        <strong>Formula:</strong><br>
+        h = (Number of cache hits) / (Total memory accesses) = hits / (hits + misses)<br><br>
+        <strong>Average Access Time:</strong><br>
+        Tavg = h × Tc + (1 − h) × Tm<br>
+        where Tc = cache access time, Tm = main memory access time, (1−h) = miss rate<br><br>
+        <strong>Example:</strong> h = 0.9, Tc = 10 ns, Tm = 100 ns<br>
+        Tavg = 0.9×10 + 0.1×100 = 9 + 10 = 19 ns<br><br>
+        A higher hit ratio means better performance. Modern CPUs achieve h ≥ 0.95.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 02: MAIN MEMORY -->
+<section class="section" id="main-memory">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Main Memory — RAM/ROM Chip Design</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part C 2022 & 2025</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — HIGH Part C Q5:</strong> The RAM chip design problem appeared in IDENTICAL format in 2022 Part C Q5 (2048 bytes, 128×8 chips) AND 2025 Part C Q5 (2048 bytes, 128×8 chips). For 2026, the memory size will change (predicted: 4096 bytes or 8192 bytes or 512×8 chips) but the method is IDENTICAL. Master the formula — this is a guaranteed 10 marks in 2026 with changed values.</div>
+  </div>
+  <div class="theory-block">
+    <h3>Memory Types</h3>
+    <table class="comp-table">
+      <tr><th>Type</th><th>Full Name</th><th>Volatile?</th><th>Read/Write</th><th>Use</th></tr>
+      <tr><td><span class="hl-r">SRAM</span></td><td>Static RAM</td><td>Yes</td><td>Read + Write</td><td>Cache memory (fast, expensive)</td></tr>
+      <tr><td><span class="hl-o">DRAM</span></td><td>Dynamic RAM</td><td>Yes</td><td>Read + Write</td><td>Main memory (slow, cheap, needs refresh)</td></tr>
+      <tr><td><span class="hl-b">ROM</span></td><td>Read-Only Memory</td><td>No</td><td>Read only</td><td>BIOS, firmware (permanent)</td></tr>
+      <tr><td><span class="hl-v">PROM</span></td><td>Programmable ROM</td><td>No</td><td>Write once</td><td>One-time programming</td></tr>
+      <tr><td><span class="hl-g">EPROM</span></td><td>Erasable PROM</td><td>No</td><td>UV erasable</td><td>Development/testing</td></tr>
+      <tr><td><span class="hl-g">EEPROM</span></td><td>Electrically Erasable PROM</td><td>No</td><td>Electrically erasable</td><td>Flash drives, SSDs</td></tr>
+    </table>
+    <h3>RAM Chip Design — RTU Numerical Method</h3>
+    <p>When a computer needs more memory than a single chip provides, multiple chips are connected together. This requires address decoding to select the right chip.</p>
+    <div class="layman">Imagine each RAM chip is a small notebook with 128 pages (128 locations), each page holding 8 bits (1 byte). If you need a 4096-page notebook (4096 bytes), you need 4096/128 = 32 small notebooks. You need a "manager" (address decoder) who, given a page number, finds which notebook and which page within that notebook to look at.</div>
+    <div class="formula-box">
+      <span class="label">RAM Chip Design Formulas — Master These for Part C Q5</span>
+      <div class="formula">Given: Each chip = W words × B bits</div>
+      <div class="formula">       Total memory required = N bytes (or words)</div>
+      <div class="formula"></div>
+      <div class="formula">(i) Number of chips = Total memory ÷ Per-chip memory</div>
+      <div class="formula">    = N bytes ÷ (W × B / 8) bytes</div>
+      <div class="formula"></div>
+      <div class="formula">(ii) Total address bus lines = log₂(total words)</div>
+      <div class="formula">     Lines within each chip (word select) = log₂(W)    [these are COMMON to all chips]</div>
+      <div class="formula">     Lines for chip select = log₂(total chips) = log₂(N/W)</div>
+      <div class="formula"></div>
+      <div class="formula">(iii) Chip select lines = log₂(number of chips)</div>
+      <div class="formula"></div>
+      <div class="formula">(iv) Size of decoder = chip_select_lines × number_of_chips</div>
+      <div class="formula">     (a k-to-2^k decoder, where k = chip select bits)</div>
+    </div>
+    <h3>RTU 2022 & 2025 Example — 2048 bytes from 128×8 chips</h3>
+    <div class="formula-box">
+      <span class="label">Worked Example — 2048 bytes from 128×8 RAM chips</span>
+      <div class="formula">Each chip: 128 words × 8 bits (= 128 bytes per chip)</div>
+      <div class="formula">Total memory: 2048 bytes</div>
+      <div class="formula"></div>
+      <div class="formula">(i) Number of chips = 2048 / 128 = 16 chips</div>
+      <div class="formula"></div>
+      <div class="formula">(ii) Total address lines = log₂(2048) = 11 lines</div>
+      <div class="formula">     Within each chip (word select): log₂(128) = 7 lines (common to ALL chips)</div>
+      <div class="formula">     For chip select: 11 - 7 = 4 lines (select 1 of 16 chips)</div>
+      <div class="formula">     Verify: 2^4 = 16 chips ✓</div>
+      <div class="formula"></div>
+      <div class="formula">(iii) Chip select lines = 4 lines (decoded to select one of 16 chips)</div>
+      <div class="formula"></div>
+      <div class="formula">(iv) Decoder size = 4-to-16 decoder (4 input lines → 16 output chip-select lines)</div>
+      <div class="formula"></div>
+      <div class="formula">Memory map: Address 0x000–0x07F → Chip 1 | 0x080–0x0FF → Chip 2 | ... | 0x780–0x7FF → Chip 16</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">2026 Predicted Values — Same Formula, New Numbers</div>
+        <p>Predicted 2026 values (same question structure, changed values):<br>
+        <strong>Option A:</strong> 4096 bytes from 128×8 chips → 32 chips, 12 address lines, 5 chip-select lines, 5-to-32 decoder<br>
+        <strong>Option B:</strong> 8192 bytes from 512×8 chips → 16 chips, 13 address lines, 4 chip-select lines, 4-to-16 decoder<br>
+        <strong>Option C:</strong> 1024 bytes from 256×4 chips → need 8 chips (for 8-bit word) × 4 groups = 32 chips...<br>
+        <strong>Universal method:</strong> Chips = Total/Chip_size → Total_addr_lines = log₂(total_words) → Common_lines = log₂(words_per_chip) → CS_lines = total − common → Decoder = CS×2^CS</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Main Memory / RAM Chip Design</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. (i) How many 128×8 RAM chips are needed for a memory capacity of 2048 bytes? (ii) How many lines of address bus? How many common to all chips? (iii) How many lines for chip select? (iv) Specify size of decoders.</div>
+      <div class="pyq-meta"><span>2022 Part C Q5 · 2025 Part C Q5 · 15/10 marks ⭐⭐⭐</span><span class="topic-tag">RAM Chip Design</span><span class="pred-tag">🔮 CERTAIN 2026 Part C Q5 (new values)</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full Answer</button>
+      <div class="answer-content">
+        <strong>Given:</strong> Memory capacity = 2048 bytes, Chip size = 128 × 8 (128 words, 8 bits/word = 1 byte/word)<br><br>
+        <strong>(i) Number of chips:</strong><br>
+        Each chip holds 128 bytes.<br>
+        Number of chips = 2048 / 128 = <strong>16 chips</strong><br><br>
+        <strong>(ii) Address bus lines:</strong><br>
+        Total addressable locations = 2048 words<br>
+        Total address lines = log₂(2048) = <strong>11 lines</strong><br><br>
+        Lines within each chip (word select within chip): log₂(128) = 7 lines<br>
+        These 7 lines are <strong>common to all chips</strong> (lower 7 address bits go to all chips simultaneously)<br><br>
+        Lines for chip selection: 11 − 7 = <strong>4 lines</strong> (upper 4 bits select which of the 16 chips)<br><br>
+        <strong>(iii) Lines for chip select:</strong><br>
+        <strong>4 lines</strong> (2⁴ = 16 chips can be selected)<br><br>
+        <strong>(iv) Size of decoder:</strong><br>
+        The 4 chip-select lines go into a decoder that activates exactly one chip at a time.<br>
+        Decoder size = <strong>4-to-16 decoder</strong> (4 input lines, 16 output lines — one per chip)<br><br>
+        <strong>Summary:</strong> 16 chips | 11 total address lines (7 common + 4 chip-select) | 4-to-16 decoder<br><br>
+        [Draw: Address bus splits into lower 7 bits (A0-A6 → all chips in parallel) and upper 4 bits (A7-A10 → 4:16 decoder → 16 chip-select signals, one per chip)]
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is auxiliary memory?</div>
+      <div class="pyq-meta"><span>2024 Part A Q10 · 2 marks ⭐⭐</span><span class="topic-tag">Auxiliary Memory</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Auxiliary memory</strong> (secondary memory or mass storage) is non-volatile storage that holds large amounts of data permanently, even when the computer is powered off.<br><br>
+        <strong>Characteristics:</strong><br>
+        • Non-volatile (data persists without power)<br>
+        • Much larger capacity than main memory (GBs to TBs)<br>
+        • Much slower access times than RAM (milliseconds vs nanoseconds)<br>
+        • Lower cost per bit than RAM<br><br>
+        <strong>Types:</strong><br>
+        1. <strong>Magnetic Hard Disk (HDD):</strong> Rotating platters with read/write heads. Organized into tracks, cylinders, and sectors. Access time = seek time + rotational latency + transfer time.<br>
+        2. <strong>Solid State Drive (SSD):</strong> Flash memory chips. No moving parts → faster, more durable, more expensive per GB.<br>
+        3. <strong>Magnetic Tape:</strong> Sequential access. Used for backup and archiving.<br>
+        4. <strong>Optical Disks (CD/DVD/Blu-ray):</strong> Laser-read storage.<br><br>
+        <strong>Use:</strong> Stores the operating system, user files, databases, and program files. Data must be loaded into main memory before the CPU can process it.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 03: AUXILIARY MEMORY -->
+<section class="section" id="auxiliary">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Auxiliary Memory</h2>
+    <span class="imp-pill badge badge-o">70%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Magnetic Disk Organization</h3>
+    <p>A <span class="hl-o">magnetic disk</span> (HDD) stores data on concentric circles called <strong>tracks</strong> on a rotating magnetic platter. Each track is divided into <strong>sectors</strong> (smallest addressable unit, typically 512 bytes). Multiple platters share a common spindle; the set of tracks at the same radial position on all platters is called a <strong>cylinder</strong>.</p>
+    <div class="formula-box">
+      <span class="label">Disk Access Time Formula</span>
+      <div class="formula">Total Access Time = Seek Time + Rotational Latency + Transfer Time</div>
+      <div class="formula"></div>
+      <div class="formula">Seek Time:          Time to move read/write head to correct TRACK</div>
+      <div class="formula">                    Typical: 3–15 ms (average ≈ 4–8 ms)</div>
+      <div class="formula">Rotational Latency: Time for correct SECTOR to rotate under head</div>
+      <div class="formula">                    Average = half rotation time</div>
+      <div class="formula">                    For 7200 RPM: rotation time = 60/7200 = 8.33 ms → avg latency = 4.17 ms</div>
+      <div class="formula">Transfer Time:      Time to read/write the data once head is positioned</div>
+      <div class="formula">                    Transfer time = sector_size / (data_rate)</div>
+      <div class="note">Seek time dominates → place related data in same cylinder to minimize seeks</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 04: ASSOCIATIVE MEMORY -->
+<section class="section" id="associative">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Associative Memory (Content-Addressable Memory)</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Associative Memory?</h3>
+    <p><span class="hl-o">Associative memory</span> (CAM — Content-Addressable Memory) is a special type of memory where you look up data by its CONTENT, not by its address. You provide a search key (partial content), and the hardware returns all matching entries simultaneously by searching the entire memory in parallel.</p>
+    <div class="layman">Regular memory is like a library where you look up a book by its shelf number (address). Associative memory is like a search engine — you say "show me all books about computers written in 1990" and it searches ALL books simultaneously and returns all matches in one step. This is how a cache looks up whether it contains a particular block — it compares the tag field with all cache entries in parallel.</div>
+    <div class="formula-box">
+      <span class="label">Associative Memory Components</span>
+      <div class="formula">Key Register (Argument):    holds the search pattern (query)</div>
+      <div class="formula">Mask Register:              specifies which bits of the key to compare (1=compare, 0=ignore)</div>
+      <div class="formula">Match Register:             1 bit per word — set to 1 if that word matches the key</div>
+      <div class="formula">Read Register:              output of the matching word(s)</div>
+      <div class="formula"></div>
+      <div class="formula">Operation: For each word in memory, simultaneously compare</div>
+      <div class="formula">           (Key AND Mask) with (Memory_word AND Mask)</div>
+      <div class="formula">           → If all compared bits match → set corresponding Match bit to 1</div>
+      <div class="note">Used in: TLB (Translation Lookaside Buffer), cache tag comparison, network routing tables</div>
+    </div>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Associative Memory → Cache + Virtual Memory</div>
+        <p>Associative memory is NOT just a standalone concept — it is the HARDWARE MECHANISM inside fully associative cache and the TLB (Translation Lookaside Buffer). When your CPU checks if a memory block is in the cache (fully associative), it uses associative memory hardware to compare the tag with ALL cache lines simultaneously. The TLB (which maps virtual to physical pages) is also a small associative memory. Understanding CAM = understanding how cache lookups work!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 05: CACHE MEMORY -->
+<section class="section" id="cache">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Cache Memory — Concepts & Need</h2>
+    <span class="imp-pill badge badge-r">🔥 92% — Part C 2022, Part B 2025</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part C Q4:</strong> All three cache mapping types as one Part C question appeared in 2022 Part C Q3 but was ABSENT from 2023-Aug, 2024, and 2025 — a THREE-YEAR ABSENCE. This is the most overdue Part C topic. The 2026 DIP paper pattern confirms that topics dormant since 2022 return in 2026. Cover all three mappings with complete address division examples.</div>
+  </div>
+  <div class="theory-block">
+    <h3>Why Cache Memory?</h3>
+    <p>Cache memory is a small, high-speed memory that sits between the CPU and main memory. It stores copies of frequently accessed memory blocks. Because of temporal and spatial locality, most memory accesses find what they need in cache (hit) — only occasionally needing to access slow main memory (miss).</p>
+    <div class="layman">Cache is the CPU's personal notepad. Main memory is a huge filing cabinet across the room. When the CPU needs data, it first checks its notepad (cache). If found — great, instant access! If not — it has to walk to the filing cabinet (main memory), which takes much longer. But it also writes the retrieved data on the notepad for future use. After a while, the notepad contains all the frequently-used data — the CPU rarely needs to walk to the filing cabinet anymore.</div>
+    <div class="formula-box">
+      <span class="label">Cache Terminology</span>
+      <div class="formula">Block (Cache Line):  Unit of transfer between cache and memory (typically 64 bytes)</div>
+      <div class="formula">Tag:                 The part of the memory address stored in cache to identify which block</div>
+      <div class="formula">Valid bit:           1 = cache line contains valid data | 0 = empty/invalid</div>
+      <div class="formula">Hit:                 Requested data found in cache</div>
+      <div class="formula">Miss:                Requested data NOT in cache → fetch from main memory</div>
+      <div class="formula">Hit ratio (h):       hits / (hits + misses)</div>
+      <div class="formula">Cache size:          typically 32 KB (L1) to 8 MB (L3)</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 06: DIRECT MAPPING -->
+<section class="section" id="direct-mapping">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Direct Mapping Cache</h2>
+    <span class="imp-pill badge badge-r">88%</span>
+  </div>
+  <div class="theory-block">
+    <h3>How Direct Mapping Works</h3>
+    <p>In <span class="hl-r">direct mapping</span>, each block in main memory can go to exactly ONE specific cache line. The mapping is fixed: <code>cache_line = memory_block_number mod number_of_cache_lines</code>.</p>
+    <div class="layman">Direct mapping is like assigned parking spots. Every car (memory block) has exactly ONE allowed parking spot (cache line) — there's no choice. Block 0 goes to spot 0, block 8 goes to spot 0, block 16 goes to spot 0... If two blocks that both map to the same spot are needed alternately, constant eviction and refilling occurs (called thrashing).</div>
+    <div class="formula-box">
+      <span class="label">Direct Mapping — Address Division</span>
+      <div class="formula">Memory address is divided into 3 fields:</div>
+      <div class="formula">| TAG | INDEX (cache line number) | BLOCK OFFSET (word within block) |</div>
+      <div class="formula"></div>
+      <div class="formula">Block Offset bits: log₂(block_size_in_words)  = b bits</div>
+      <div class="formula">Index bits:        log₂(number_of_cache_lines) = k bits</div>
+      <div class="formula">Tag bits:          total_address_bits - k - b = t bits</div>
+      <div class="formula"></div>
+      <div class="formula">Lookup procedure:</div>
+      <div class="formula">1. Extract INDEX from address → go to that cache line</div>
+      <div class="formula">2. Compare TAG in address with TAG stored in that cache line</div>
+      <div class="formula">3. Check Valid bit = 1</div>
+      <div class="formula">4. If TAG matches AND Valid=1 → HIT, use OFFSET to get word</div>
+      <div class="formula">   If TAG doesn't match OR Valid=0 → MISS, fetch from memory</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#3b82f6" font-family="JetBrains Mono" font-size="10" font-weight="bold">Direct Mapping — Address Breakdown</text>
+        <!-- Address bits -->
+        <rect x="10" y="32" width="80" height="32" rx="3" fill="#102534" stroke="#ef4444" stroke-width="2"/>
+        <text x="50" y="50" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">TAG</text>
+        <text x="50" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">t bits</text>
+        <rect x="95" y="32" width="100" height="32" rx="3" fill="#102534" stroke="#f59e0b" stroke-width="2"/>
+        <text x="145" y="50" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">INDEX</text>
+        <text x="145" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">k bits = log₂(lines)</text>
+        <rect x="200" y="32" width="110" height="32" rx="3" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="255" y="50" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">BLOCK OFFSET</text>
+        <text x="255" y="62" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">b bits = log₂(block size)</text>
+        <!-- Cache structure -->
+        <rect x="340" y="30" width="200" height="130" rx="5" fill="#0a1820" stroke="#3b82f6" stroke-width="2"/>
+        <text x="440" y="48" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono" font-size="9" font-weight="bold">CACHE LINES</text>
+        <rect x="350" y="55" width="180" height="20" rx="2" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="440" y="68" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="7">Line 0: [V][TAG][DATA block]</text>
+        <rect x="350" y="78" width="180" height="20" rx="2" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="440" y="91" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="7">Line 1: [V][TAG][DATA block]</text>
+        <text x="440" y="112" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="9">· · ·</text>
+        <rect x="350" y="120" width="180" height="20" rx="2" fill="#102534" stroke="#6090a8" stroke-width="1"/>
+        <text x="440" y="133" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="7">Line k-1: [V][TAG][DATA block]</text>
+        <!-- Arrows -->
+        <line x1="145" y1="64" x2="360" y2="88" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="250" y="82" fill="#f59e0b" font-family="JetBrains Mono" font-size="7">INDEX selects line</text>
+        <line x1="50" y1="64" x2="390" y2="118" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="140" y="115" fill="#ef4444" font-family="JetBrains Mono" font-size="7">TAG compared</text>
+        <!-- Labels -->
+        <text x="10" y="180" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Direct Mapping: 1 block → exactly 1 cache line (fixed by INDEX)</text>
+        <text x="10" y="195" fill="#6090a8" font-family="JetBrains Mono" font-size="8">Advantage: Simple, fast. Disadvantage: Conflict misses (thrashing)</text>
+      </svg>
+      <div class="diagram-cap">Fig 6.1 — Direct Mapping: Address = TAG | INDEX | OFFSET. INDEX selects the cache line; TAG is compared to verify it's the right block.</div>
+    </div>
+    <h3>Direct Mapping Numerical Example</h3>
+    <div class="formula-box">
+      <span class="label">Example: 32KB cache, 64-byte blocks, 32-bit addresses</span>
+      <div class="formula">Cache lines = 32 KB / 64 bytes = 512 lines</div>
+      <div class="formula">Block offset bits = log₂(64) = 6 bits</div>
+      <div class="formula">Index bits = log₂(512) = 9 bits</div>
+      <div class="formula">Tag bits = 32 - 9 - 6 = 17 bits</div>
+      <div class="formula">Address format: [17-bit TAG | 9-bit INDEX | 6-bit OFFSET]</div>
+      <div class="formula"></div>
+      <div class="formula">Memory block 0   → cache line 0 (0 mod 512 = 0)</div>
+      <div class="formula">Memory block 512 → cache line 0 (512 mod 512 = 0)  ← CONFLICT!</div>
+      <div class="formula">Memory block 1   → cache line 1</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 07: FULLY ASSOCIATIVE -->
+<section class="section" id="fully-assoc">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Fully Associative Cache Mapping</h2>
+    <span class="imp-pill badge badge-r">82%</span>
+  </div>
+  <div class="theory-block">
+    <h3>How Fully Associative Mapping Works</h3>
+    <p>In <span class="hl-r">fully associative mapping</span>, any block of main memory can be placed in ANY cache line. There is NO index field — the entire address (minus the offset) is the tag. The cache uses associative memory hardware to search ALL cache lines simultaneously.</p>
+    <div class="layman">Fully associative is like open parking — no assigned spots. Any car can park in any available spot. This is more flexible (no conflicts), but to find your car, you need to check every parking spot simultaneously (associative search hardware). This is expensive but eliminates conflict misses.</div>
+    <div class="formula-box">
+      <span class="label">Fully Associative — Address Division</span>
+      <div class="formula">Memory address = | TAG | BLOCK OFFSET |</div>
+      <div class="formula">                   (no INDEX field)</div>
+      <div class="formula">TAG bits = total_bits - offset_bits</div>
+      <div class="formula">OFFSET bits = log₂(block_size)</div>
+      <div class="formula"></div>
+      <div class="formula">Example: 32-bit address, 64-byte blocks:</div>
+      <div class="formula">OFFSET = log₂(64) = 6 bits</div>
+      <div class="formula">TAG = 32 - 6 = 26 bits</div>
+      <div class="formula"></div>
+      <div class="formula">Replacement policy (when cache is full):</div>
+      <div class="formula">LRU (Least Recently Used): evict line not used for longest time — most common</div>
+      <div class="formula">FIFO: evict oldest line (first loaded)</div>
+      <div class="formula">Random: evict random line (simple hardware)</div>
+      <div class="note">Fully associative = most flexible placement, most hardware, used for TLBs (which are small)</div>
+    </div>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Direct Mapping</th><th>Fully Associative</th><th>Set-Associative</th></tr>
+      <tr><td>Placement</td><td>Fixed (1 possible line)</td><td>Anywhere (all lines)</td><td>Set of k lines</td></tr>
+      <tr><td>Address fields</td><td>Tag + Index + Offset</td><td>Tag + Offset</td><td>Tag + Set + Offset</td></tr>
+      <tr><td>Conflict misses</td><td>High</td><td>None</td><td>Low</td></tr>
+      <tr><td>Hardware cost</td><td>Low (simple comparator)</td><td>High (CAM for all lines)</td><td>Medium (k comparators)</td></tr>
+      <tr><td>Typical use</td><td>L1 instruction cache</td><td>TLB (small)</td><td>L1/L2/L3 data cache</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 08: SET-ASSOCIATIVE -->
+<section class="section" id="set-assoc">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Set-Associative Cache Mapping</h2>
+    <span class="imp-pill badge badge-r">🔥 90% — Part B 2024, CERTAIN 2026</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part B Q2:</strong> Set-associative mapping appeared as Part B Q2 in 2024, absent in 2025. After a one-year gap, this is strongly due to return in 2026. Always include both the address division AND the lookup procedure with a worked numerical example.</div>
+  </div>
+  <div class="theory-block">
+    <h3>How Set-Associative Mapping Works</h3>
+    <p><span class="hl-r">Set-associative mapping</span> is a compromise between direct and fully associative mapping. The cache is divided into <strong>sets</strong>, each containing <strong>k ways</strong> (k cache lines). Each memory block maps to exactly ONE set (like direct mapping) but can go into ANY of the k lines within that set (like fully associative within the set).</p>
+    <div class="layman">Set-associative is like a parking garage with designated FLOORS (sets) but free parking WITHIN each floor (ways). Each car must park on a specific floor (determined by the car's license plate mod number_of_floors), but once on that floor, they can take any available spot. This reduces conflicts (2-4 spots per floor means even if two cars map to the same floor, they rarely conflict) while keeping hardware manageable (only check 2-4 spots, not thousands).</div>
+    <div class="formula-box">
+      <span class="label">k-Way Set-Associative — Address Division</span>
+      <div class="formula">Address = | TAG | SET INDEX | BLOCK OFFSET |</div>
+      <div class="formula"></div>
+      <div class="formula">Number of sets = Cache_size / (k × block_size)</div>
+      <div class="formula">Set index bits  = log₂(number of sets)</div>
+      <div class="formula">Block offset bits = log₂(block_size)</div>
+      <div class="formula">Tag bits = address_bits - set_bits - offset_bits</div>
+      <div class="formula"></div>
+      <div class="formula">Lookup procedure:</div>
+      <div class="formula">1. Use SET INDEX bits to identify the set</div>
+      <div class="formula">2. Within that set, check ALL k ways simultaneously (compare TAG)</div>
+      <div class="formula">3. If any way's TAG matches AND Valid=1 → HIT</div>
+      <div class="formula">4. If no match → MISS, fetch from memory, use LRU to replace a way</div>
+    </div>
+    <h3>Set-Associative Worked Example</h3>
+    <div class="formula-box">
+      <span class="label">Example: 2-way set-associative, 8 sets, 4-word blocks, 16-bit address</span>
+      <div class="formula">Cache organization: 2 ways × 8 sets × 4 words/block</div>
+      <div class="formula">Total cache: 2 × 8 × 4 = 64 words = 64 words capacity</div>
+      <div class="formula"></div>
+      <div class="formula">Address breakdown (16-bit):</div>
+      <div class="formula">Block offset bits = log₂(4) = 2 bits    (bits 1-0)</div>
+      <div class="formula">Set index bits = log₂(8) = 3 bits       (bits 4-2)</div>
+      <div class="formula">Tag bits = 16 - 3 - 2 = 11 bits         (bits 15-5)</div>
+      <div class="formula">Address format: [11-bit TAG | 3-bit SET | 2-bit OFFSET]</div>
+      <div class="formula"></div>
+      <div class="formula">Example address: 0x0A3C = 0000 1010 0011 1100</div>
+      <div class="formula">Binary: 0000 1 | 010 | 00 | rest → SET = 011 = set 3 | TAG = 000010 | OFFSET = 00</div>
+      <div class="formula">→ Look in SET 3 (ways 0 and 1), compare TAG=000010 with both ways</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 230" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#3b82f6" font-family="JetBrains Mono" font-size="10" font-weight="bold">2-Way Set-Associative Cache Structure</text>
+        <!-- Address fields -->
+        <rect x="10" y="32" width="80" height="28" rx="3" fill="#102534" stroke="#ef4444" stroke-width="2"/>
+        <text x="50" y="50" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9" font-weight="bold">TAG</text>
+        <rect x="95" y="32" width="70" height="28" rx="3" fill="#102534" stroke="#f59e0b" stroke-width="2"/>
+        <text x="130" y="50" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">SET</text>
+        <rect x="170" y="32" width="80" height="28" rx="3" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="210" y="50" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">OFFSET</text>
+        <!-- Cache sets -->
+        <text x="290" y="38" fill="#3b82f6" font-family="JetBrains Mono" font-size="9" font-weight="bold">WAY 0</text>
+        <text x="430" y="38" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">WAY 1</text>
+        <!-- Sets -->
+        <rect x="260" y="46" width="120" height="20" rx="2" fill="#102534" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="320" y="59" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono" font-size="7">Set 0: [V|TAG|DATA]</text>
+        <rect x="390" y="46" width="120" height="20" rx="2" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="450" y="59" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">Set 0: [V|TAG|DATA]</text>
+        <rect x="260" y="70" width="120" height="20" rx="2" fill="#102534" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="320" y="83" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono" font-size="7">Set 1: [V|TAG|DATA]</text>
+        <rect x="390" y="70" width="120" height="20" rx="2" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="450" y="83" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">Set 1: [V|TAG|DATA]</text>
+        <text x="320" y="103" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="9">· · ·</text>
+        <text x="450" y="103" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="9">· · ·</text>
+        <rect x="260" y="110" width="120" height="20" rx="2" fill="#102534" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="320" y="123" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono" font-size="7">Set k-1: [V|TAG|DATA]</text>
+        <rect x="390" y="110" width="120" height="20" rx="2" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="450" y="123" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">Set k-1: [V|TAG|DATA]</text>
+        <!-- Arrows -->
+        <line x1="130" y1="60" x2="270" y2="88" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="175" y="85" fill="#f59e0b" font-family="JetBrains Mono" font-size="7">SET selects set</text>
+        <line x1="50" y1="60" x2="270" y2="90" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <!-- Notes -->
+        <text x="10" y="160" fill="#6090a8" font-family="JetBrains Mono" font-size="8">SET field: selects which SET to look in</text>
+        <text x="10" y="175" fill="#ef4444" font-family="JetBrains Mono" font-size="8">TAG: compared with ALL ways in selected set simultaneously</text>
+        <text x="10" y="190" fill="#10b981" font-family="JetBrains Mono" font-size="8">OFFSET: selects word within the matching block</text>
+        <text x="10" y="210" fill="#6090a8" font-family="JetBrains Mono" font-size="8">If k=1 → Direct Mapping | If k=total lines → Fully Associative</text>
+      </svg>
+      <div class="diagram-cap">Fig 8.1 — 2-Way Set-Associative Cache: SET index selects the set; TAG is compared with BOTH ways in parallel; OFFSET selects word within block.</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Set-Associative Mapping</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain set-associative mapping with a suitable example.</div>
+      <div class="pyq-meta"><span>2024 Part B Q2 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Set-Associative Cache</span><span class="pred-tag">🔮 CERTAIN 2026 Part B Q2</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Set-Associative Mapping:</strong><br>
+        Set-associative mapping combines the advantages of direct mapping (simple hardware, fast lookup) and fully associative mapping (flexible placement, no conflicts). The cache is divided into sets, each containing k lines (k-way set-associative).<br><br>
+        <strong>Address Division:</strong><br>
+        Memory address = | TAG | SET INDEX | BLOCK OFFSET |<br>
+        • SET INDEX: selects which set to look in<br>
+        • TAG: compared with all k ways in that set simultaneously<br>
+        • OFFSET: selects the word within the block<br><br>
+        <strong>Operation:</strong><br>
+        1. Use SET field to identify the set (like direct mapping)<br>
+        2. Compare TAG with all k line tags in that set simultaneously (like fully associative within the set)<br>
+        3. If any line's TAG matches AND valid bit = 1 → HIT<br>
+        4. If no match → MISS → fetch from memory, use LRU to replace a line in the set<br><br>
+        <strong>Example (2-way set-associative):</strong><br>
+        Cache = 8 sets × 2 ways, block size = 4 words, 12-bit address<br>
+        Block offset: log₂(4) = 2 bits | Set index: log₂(8) = 3 bits | Tag: 12-2-3 = 7 bits<br><br>
+        Address 0x1B4 = 0001 1011 0100<br>
+        Tag = 0001 101 = 13 | Set = 011 = 3 | Offset = 00<br>
+        → Check set 3 (both ways). If way 0 has tag=13, V=1 → HIT in way 0.<br><br>
+        <strong>Advantage over Direct:</strong> Reduces conflict misses (2 blocks can share a set)<br>
+        <strong>Advantage over Fully Associative:</strong> Simpler hardware (only k comparators per access)
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain the need of cache memory. What is Hit Ratio? Elaborate over the three types of mapping under cache memory with neat diagram.</div>
+      <div class="pyq-meta"><span>2022 Part C Q3 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Cache Mapping — All 3</span><span class="pred-tag">🔮 CERTAIN 2026 Part C Q4 — 3 year absence</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full Answer</button>
+      <div class="answer-content">
+        <strong>Need for Cache Memory:</strong><br>
+        CPU speed has improved much faster than main memory (DRAM) speed. Without cache, the CPU spends most of its time waiting for memory. Cache (SRAM) bridges this gap by storing copies of frequently accessed data closer to the CPU.<br><br>
+        <strong>Hit Ratio:</strong> h = cache_hits / total_accesses. Average access time = h×Tc + (1−h)×Tm<br><br>
+        <strong>Three Types of Cache Mapping:</strong><br><br>
+        <strong>1. Direct Mapping:</strong><br>
+        Each main memory block maps to exactly one cache line: cache_line = block_number mod N (N = number of cache lines).<br>
+        Address = [TAG | INDEX | OFFSET]<br>
+        Lookup: Use INDEX to find line, compare TAG. Simple hardware. Suffers from conflict misses (thrashing).<br><br>
+        [Draw: Address → split into TAG, INDEX, OFFSET. INDEX points to specific cache line. TAG compared.] <br><br>
+        <strong>2. Fully Associative Mapping:</strong><br>
+        Any memory block can be placed in any cache line. No INDEX field.<br>
+        Address = [TAG | OFFSET]<br>
+        Lookup: Compare TAG with ALL cache line tags simultaneously (associative search). No conflicts but expensive hardware. LRU replacement.<br><br>
+        [Draw: Address TAG compared with ALL cache line tags in parallel using comparators.]<br><br>
+        <strong>3. Set-Associative Mapping:</strong><br>
+        Cache divided into sets, each with k lines (k-way). Block maps to one set, can go in any of k lines.<br>
+        Address = [TAG | SET | OFFSET]<br>
+        Lookup: SET selects set, TAG compared with all k lines in that set. Good balance of performance and hardware cost. Most used in modern CPUs (2-way, 4-way, 8-way).<br><br>
+        [Draw: Address splits into SET (selects set) and TAG (compared with k ways in parallel). OFFSET selects word.]
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 09: VIRTUAL MEMORY -->
+<section class="section" id="virtual">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Virtual Memory</h2>
+    <span class="imp-pill badge badge-r">82%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is Virtual Memory?</h3>
+    <p><span class="hl-r">Virtual memory</span> is a memory management technique that gives each process the illusion of having a large, private address space (virtual address space) even when physical memory (RAM) may be smaller. It allows programs larger than RAM to run, and enables multiple programs to run simultaneously without interfering with each other.</p>
+    <div class="layman">Virtual memory is like a hotel where guests (programs) each think they have an entire building (virtual address space) to themselves. In reality, the hotel only has 100 rooms (physical RAM). The hotel management (OS) maps each guest's "imagined room numbers" to actual room numbers. If all rooms are full and a guest needs a room, management moves an unused guest's belongings to a storage room (disk/swap space) to free a room — this is a page fault/swap.</div>
+    <div class="formula-box">
+      <span class="label">Virtual Memory — Key Concepts</span>
+      <div class="formula">Virtual Address: Address used by program (as seen by the process)</div>
+      <div class="formula">Physical Address: Actual address in RAM</div>
+      <div class="formula">Page: Fixed-size unit of virtual address space (typically 4 KB)</div>
+      <div class="formula">Frame: Fixed-size unit of physical memory (same size as page)</div>
+      <div class="formula">Page Table: OS-maintained mapping from virtual page numbers to physical frame numbers</div>
+      <div class="formula">TLB (Translation Lookaside Buffer): Hardware cache for page table entries (associative memory)</div>
+      <div class="formula"></div>
+      <div class="formula">Virtual address translation:</div>
+      <div class="formula">Virtual address = [Virtual Page Number | Page Offset]</div>
+      <div class="formula">VPN → Page Table → Physical Frame Number</div>
+      <div class="formula">Physical address = [Frame Number | Page Offset]</div>
+    </div>
+    <h3>Page Fault Handling</h3>
+    <p>A <span class="hl-r">page fault</span> occurs when a program accesses a virtual page that is NOT currently in physical memory (it's on the disk). The OS must: (1) find a free frame or evict an existing page (using LRU), (2) load the required page from disk to RAM, (3) update the page table, (4) resume the program.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#3b82f6" font-family="JetBrains Mono" font-size="10" font-weight="bold">Virtual Address Translation with TLB</text>
+        <!-- CPU -->
+        <rect x="10" y="35" width="70" height="45" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="2"/>
+        <text x="45" y="56" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8" font-weight="bold">CPU</text>
+        <text x="45" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Virtual</text>
+        <text x="45" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Addr</text>
+        <!-- Arrow to TLB -->
+        <line x1="80" y1="57" x2="120" y2="57" stroke="#22d3ee" stroke-width="2"/>
+        <polygon points="117,53 127,57 117,61" fill="#22d3ee"/>
+        <!-- TLB -->
+        <rect x="127" y="35" width="80" height="45" rx="5" fill="#102534" stroke="#f59e0b" stroke-width="2"/>
+        <text x="167" y="56" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8" font-weight="bold">TLB</text>
+        <text x="167" y="68" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Assoc.</text>
+        <text x="167" y="78" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Memory</text>
+        <!-- TLB hit arrow -->
+        <line x1="207" y1="57" x2="280" y2="57" stroke="#10b981" stroke-width="2"/>
+        <polygon points="277,53 287,57 277,61" fill="#10b981"/>
+        <text x="240" y="50" fill="#10b981" font-family="JetBrains Mono" font-size="7">HIT (fast)</text>
+        <!-- Page Table (TLB miss) -->
+        <line x1="167" y1="80" x2="167" y2="120" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <rect x="100" y="120" width="130" height="35" rx="4" fill="#102534" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="165" y="137" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Page Table (in RAM)</text>
+        <text x="165" y="148" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">TLB MISS → slow path</text>
+        <!-- Physical Memory -->
+        <rect x="287" y="35" width="100" height="65" rx="5" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="337" y="58" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">Physical</text>
+        <text x="337" y="70" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">Memory</text>
+        <text x="337" y="82" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(RAM frames)</text>
+        <text x="337" y="93" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Physical Addr</text>
+        <!-- Disk (page fault) -->
+        <rect x="420" y="85" width="120" height="40" rx="4" fill="#102534" stroke="#f97316" stroke-width="1.5"/>
+        <text x="480" y="102" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8">Disk (Swap Space)</text>
+        <text x="480" y="115" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">PAGE FAULT → load page</text>
+        <line x1="387" y1="100" x2="420" y2="100" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <!-- Labels -->
+        <text x="10" y="175" fill="#6090a8" font-family="JetBrains Mono" font-size="8">TLB Hit: VPN → Frame (fast, 1 cycle) | TLB Miss: check Page Table (slower)</text>
+        <text x="10" y="190" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Page Fault: page not in RAM → OS loads from disk → very slow (milliseconds!)</text>
+      </svg>
+      <div class="diagram-cap">Fig 9.1 — Virtual Memory Translation: CPU generates virtual address → TLB lookup (fast) → on miss, check page table → on page fault, load from disk.</div>
+    </div>
+    <div class="formula-box">
+      <span class="label">Page Table Entry Fields</span>
+      <div class="formula">| Valid | Frame Number | Dirty | Referenced | Protection | ...</div>
+      <div class="formula">Valid (Present) bit: 1 = page is in RAM | 0 = page fault (on disk)</div>
+      <div class="formula">Dirty bit:          1 = page modified since loaded → must write back to disk when evicted</div>
+      <div class="formula">Referenced bit:     1 = page accessed recently (used for LRU)</div>
+      <div class="formula">Protection bits:    read/write/execute permissions</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: MULTIPROCESSORS -->
+<section class="section" id="multiprocessor">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Multiprocessors — Characteristics</h2>
+    <span class="imp-pill badge badge-r">85%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is a Multiprocessor?</h3>
+    <p>A <span class="hl-b">multiprocessor</span> is a system with two or more processors that share memory and I/O facilities, and are controlled by one operating system that provides interaction between processors and programs.</p>
+    <div class="layman">A multiprocessor is like a company with multiple employees (CPUs) sharing the same office building (memory). All employees can access any file cabinet (memory location), but they need to coordinate to avoid conflicts — two people shouldn't edit the same document simultaneously. The manager (OS) and protocols (synchronization) keep everything organized.</div>
+    <h3>Characteristics of Multiprocessors</h3>
+    <div class="theory-block" style="background:#0a1e2a;border-color:#3b82f655">
+      <ol>
+        <li><strong>Multiple CPUs:</strong> Two or more physically separate processing units, each with its own registers and local cache.</li>
+        <li><strong>Shared Memory:</strong> Common global memory accessible to all processors (in tightly-coupled systems).</li>
+        <li><strong>Common I/O:</strong> All processors share the same I/O system and secondary storage.</li>
+        <li><strong>Single OS:</strong> One operating system manages all processors and coordinates their activities.</li>
+        <li><strong>Message Passing or Shared Variables:</strong> Processors communicate and synchronize via shared memory variables or message passing.</li>
+        <li><strong>Parallel Execution:</strong> Multiple programs or parts of one program execute simultaneously → increased throughput.</li>
+        <li><strong>Fault Tolerance:</strong> If one processor fails, others can continue operating.</li>
+      </ol>
+    </div>
+    <h3>Classification of Multiprocessors</h3>
+    <table class="comp-table">
+      <tr><th>Type</th><th>Memory</th><th>Communication</th><th>Example</th></tr>
+      <tr><td><span class="hl-r">Shared Memory (MIMD)</span></td><td>All CPUs share one address space</td><td>Shared variables + synchronization</td><td>Multi-core CPUs (Intel Core i9, AMD Ryzen)</td></tr>
+      <tr><td><span class="hl-o">Distributed Memory</span></td><td>Each CPU has private memory</td><td>Message passing over network</td><td>Beowulf clusters, MPI systems</td></tr>
+      <tr><td><span class="hl-b">UMA (Uniform Memory Access)</span></td><td>Shared, equal distance to all CPUs</td><td>Bus-based interconnect</td><td>Symmetric Multiprocessors (SMP)</td></tr>
+      <tr><td><span class="hl-v">NUMA (Non-Uniform Memory Access)</span></td><td>Shared but different latency</td><td>Each CPU has "local" and "remote" memory</td><td>AMD EPYC, Intel NUMA servers</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 11: INTERCONNECTION -->
+<section class="section" id="interconnection">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Interconnection Structures</h2>
+    <span class="imp-pill badge badge-o">75%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Types of Interconnection Networks</h3>
+    <p>The <span class="hl-o">interconnection structure</span> (network) connects processors to each other and to memory modules. The choice affects cost, bandwidth, latency, and scalability.</p>
+    <table class="comp-table">
+      <tr><th>Structure</th><th>How it Works</th><th>Bandwidth</th><th>Cost</th><th>Scalability</th></tr>
+      <tr><td><span class="hl-r">Time-shared Bus</span></td><td>All processors/memories share one bus; one transfer at a time</td><td>Low (bus bottleneck)</td><td>Very low</td><td>Poor (max ~8 processors)</td></tr>
+      <tr><td><span class="hl-o">Crossbar Switch</span></td><td>n×n switch connects any processor to any memory simultaneously</td><td>Very high (n parallel transfers)</td><td>n² switches — very expensive</td><td>Limited (n²)</td></tr>
+      <tr><td><span class="hl-b">Multistage Network</span></td><td>Multiple stages of smaller switches (Omega, Butterfly, Benes)</td><td>High</td><td>Medium (n/2 × log₂n)</td><td>Good</td></tr>
+      <tr><td><span class="hl-g">Mesh/Torus</span></td><td>Processors connected in 2D or 3D grid pattern</td><td>Medium</td><td>Low (local connections)</td><td>Very good</td></tr>
+      <tr><td><span class="hl-v">Hypercube</span></td><td>n-dimensional cube topology</td><td>High</td><td>Medium</td><td>Good</td></tr>
+    </table>
+    <h3>Interprocessor Arbitration</h3>
+    <p><span class="hl-b">Arbitration</span> is the mechanism for resolving conflicts when multiple processors try to access the same shared resource (memory bus) simultaneously. Methods:</p>
+    <ul>
+      <li><strong>Daisy Chain Arbitration:</strong> Grant signal propagates through processors in chain order (same as priority interrupt).</li>
+      <li><strong>Centralized Parallel Arbitration:</strong> All processors request bus simultaneously; a central arbiter selects one based on priority.</li>
+      <li><strong>Distributed Arbitration:</strong> Each processor broadcasts its request; all processors resolve contention by looking at all requests together (e.g., lowest ID wins).</li>
+    </ul>
+    <h3>Interprocessor Synchronization</h3>
+    <p>When multiple processors share data, synchronization prevents race conditions. Key primitives:</p>
+    <div class="formula-box">
+      <span class="label">Synchronization Mechanisms</span>
+      <div class="formula">Semaphore:    Binary (mutex) or counting semaphore — P (wait/lock) and V (signal/unlock)</div>
+      <div class="formula">Spin Lock:    Processor busy-waits (loops) testing a variable until lock is available</div>
+      <div class="formula">Barrier:      All processors must reach the barrier before any can proceed</div>
+      <div class="formula">Test-and-Set: Atomic instruction — reads and sets a variable in one uninterruptible step</div>
+      <div class="note">RTU 2025 Part B Q2: "Why is interprocess synchronization needed? Explain." — answer covers race conditions, critical sections, and solutions (semaphore, mutex)</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 12: CACHE COHERENCE -->
+<section class="section" id="cache-coherence">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Cache Coherence</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part C 2024</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — HIGH:</strong> Cache coherence appeared as Part C Q5 in 2024. After a one-year gap, it has HIGH probability of returning in 2026 Part C or Part B. Know the cache coherence problem clearly, write-invalidate vs write-update protocols, and the MESI protocol states (Modified, Exclusive, Shared, Invalid).</div>
+  </div>
+  <div class="theory-block">
+    <h3>The Cache Coherence Problem</h3>
+    <p>In a multiprocessor system, each processor has its own private cache. When multiple processors cache copies of the same memory block, and one processor modifies its copy, the other caches have stale (outdated) data. This inconsistency is the <span class="hl-r">cache coherence problem</span>.</p>
+    <div class="layman">Cache coherence is the "stale newspaper" problem in a multiprocessor. Imagine 3 people (processors) each have a photocopy (cache) of the same newspaper page. Person 1 marks a correction on their copy. Now Person 2 and 3 still have the old, incorrect version. They don't know about the update. If someone asks Person 2 for information, they give stale data. In a computer, this causes INCORRECT results — different processors see different values for the same variable.</div>
+    <div class="formula-box">
+      <span class="label">Cache Coherence — Example of the Problem</span>
+      <div class="formula">Initial: Memory[X] = 5</div>
+      <div class="formula">P1 reads X: P1's cache = 5</div>
+      <div class="formula">P2 reads X: P2's cache = 5</div>
+      <div class="formula">P1 writes X = 10: P1's cache = 10, Memory might still be 5 (write-back)</div>
+      <div class="formula">P2 reads X: P2's cache = 5 → WRONG! (should be 10)</div>
+      <div class="formula">→ Cache incoherence!</div>
+    </div>
+    <h3>Cache Coherence Protocols</h3>
+    <h4>1. Write-Invalidate Protocol</h4>
+    <p>When a processor writes to a cache block, it <strong>invalidates</strong> all other caches that have copies of that block. The next time other processors try to read that block, they get a cache miss and fetch the updated value from memory (or directly from the writing processor's cache).</p>
+    <div class="formula-box">
+      <span class="label">Write-Invalidate Operation</span>
+      <div class="formula">P1 writes X = 10:</div>
+      <div class="formula">→ Broadcasts invalidation message on bus: "Everyone: invalidate your copy of block containing X"</div>
+      <div class="formula">→ P2, P3 see the message: mark their cached copy of X as INVALID</div>
+      <div class="formula">→ Next time P2 reads X: cache miss → gets the new value 10 from P1's cache or memory</div>
+      <div class="note">Used by: most modern CPU cache protocols. Generates fewer bus transactions than write-update for writes followed by multiple reads.</div>
+    </div>
+    <h4>2. Write-Update Protocol</h4>
+    <p>When a processor writes to a block, it <strong>updates</strong> all other cached copies with the new value immediately (broadcast update).</p>
+    <div class="formula-box">
+      <span class="label">Write-Update Operation</span>
+      <div class="formula">P1 writes X = 10:</div>
+      <div class="formula">→ Broadcasts update: "Everyone: update your cached copy of X to 10"</div>
+      <div class="formula">→ P2, P3 immediately update their cache: now all have X = 10</div>
+      <div class="note">Advantage: No misses after update. Disadvantage: High bus traffic for every write. Less common than write-invalidate.</div>
+    </div>
+    <h3>MESI Protocol — 4-State Cache Coherence</h3>
+    <p>The <span class="hl-r">MESI protocol</span> is the most widely used cache coherence protocol. Each cache line can be in one of four states:</p>
+    <table class="comp-table">
+      <tr><th>State</th><th>Meaning</th><th>Data valid?</th><th>Other caches have copy?</th><th>Memory up to date?</th></tr>
+      <tr><td><span class="hl-r"><strong>M</strong>odified</span></td><td>Only this cache has the block, and it has been modified (dirty)</td><td>Yes</td><td>No</td><td>No (must write back)</td></tr>
+      <tr><td><span class="hl-b"><strong>E</strong>xclusive</span></td><td>Only this cache has the block, not modified (clean)</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+      <tr><td><span class="hl-g"><strong>S</strong>hared</span></td><td>Multiple caches may have this block (read-only)</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td><span class="hl-o"><strong>I</strong>nvalid</span></td><td>Cache line is invalid — data not usable</td><td>No</td><td>Unknown</td><td>Unknown</td></tr>
+    </table>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">MESI Memory Trick — "My Exclusive Shared Invalid"</div>
+        <p><strong>M</strong>odified = "Mine! Dirty — I changed it, memory is outdated, must write back if evicted"<br>
+        <strong>E</strong>xclusive = "Mine alone! Clean — I have the only copy, memory is current"<br>
+        <strong>S</strong>hared = "Shared read-only — multiple caches have it, memory is current"<br>
+        <strong>I</strong>nvalid = "Unusable — my copy is stale or was invalidated"<br><br>
+        For exam: "Explain MESI protocol" = define each state with conditions and draw the state transition diagram showing when states change (e.g., S→M on write, M→I on another processor's read-invalidate request).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Cache Coherence</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain cache coherence with a suitable example.</div>
+      <div class="pyq-meta"><span>2024 Part C Q5 · 10 marks ⭐⭐⭐</span><span class="topic-tag">Cache Coherence</span><span class="pred-tag">🔮 HIGH 2026 Part C/B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full Answer</button>
+      <div class="answer-content">
+        <strong>Cache Coherence Problem:</strong><br>
+        In a multiprocessor system, each processor has a private cache. When multiple processors cache copies of the same memory block and one processor modifies its copy, the other caches contain stale (outdated) data. This inconsistency is the cache coherence problem.<br><br>
+        <strong>Example:</strong><br>
+        Initial: Memory[A] = 100<br>
+        Step 1: P1 reads A → P1's cache: A=100; Memory: A=100<br>
+        Step 2: P2 reads A → P2's cache: A=100; Memory: A=100<br>
+        Step 3: P1 writes A = 200 → P1's cache: A=200; Memory may still have A=100<br>
+        Step 4: P2 reads A → gets A=100 from its cache → WRONG! (should be 200)<br>
+        Result: P1 and P2 have inconsistent views of A → incorrect program behavior<br><br>
+        <strong>Solutions — Cache Coherence Protocols:</strong><br><br>
+        <strong>1. Write-Invalidate Protocol:</strong><br>
+        When P1 writes, it broadcasts an invalidation to the bus. All other caches that have the same block mark it INVALID. On P2's next read, it gets a cache miss and fetches the updated value.<br>
+        Advantage: Fewer bus transactions for writes. Most common (used in Intel/AMD CPUs).<br><br>
+        <strong>2. Write-Update Protocol:</strong><br>
+        When P1 writes, it immediately broadcasts the new value. All caches with that block update to the new value.<br>
+        Advantage: No subsequent misses. Disadvantage: High bus traffic per write.<br><br>
+        <strong>MESI Protocol:</strong><br>
+        A widely-used write-invalidate protocol where each cache line is in one of four states:<br>
+        • M (Modified): Only this cache, data is modified, memory outdated<br>
+        • E (Exclusive): Only this cache, data not modified, memory current<br>
+        • S (Shared): Multiple caches may have copy, all clean<br>
+        • I (Invalid): Data not usable, must refetch<br><br>
+        State transitions ensure coherence: when one cache moves to M, all other caches move their copy to I. When multiple caches share (S), no one can write without first invalidating others.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 13: SHARED MEMORY MULTIPROCESSORS -->
+<section class="section" id="shared-memory">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2 class="section-title">Shared Memory Multiprocessors</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What are Shared Memory Multiprocessors?</h3>
+    <p><span class="hl-o">Shared memory multiprocessors</span> (also called tightly-coupled multiprocessors) have all processors connected to a single, common physical memory through an interconnection network. Any processor can access any memory location using LOAD and STORE instructions.</p>
+    <div class="formula-box">
+      <span class="label">UMA vs NUMA</span>
+      <div class="formula">UMA (Uniform Memory Access):</div>
+      <div class="formula">  All processors have equal access time to all memory locations</div>
+      <div class="formula">  Simple bus-based interconnect (symmetric multiprocessors — SMP)</div>
+      <div class="formula">  Scalability limited (bus becomes bottleneck beyond ~8 CPUs)</div>
+      <div class="formula">  Example: Intel Xeon dual-socket server, AMD dual-socket workstation</div>
+      <div class="formula"></div>
+      <div class="formula">NUMA (Non-Uniform Memory Access):</div>
+      <div class="formula">  Each CPU has local memory (fast access) and remote memory (slow access)</div>
+      <div class="formula">  Better scalability (no single shared bus)</div>
+      <div class="formula">  OS and programs must be NUMA-aware for best performance</div>
+      <div class="formula">  Example: AMD EPYC (multiple dies with local DRAM), large Intel servers</div>
+    </div>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 4 Flynn's MIMD → Unit 6 Shared Memory Multiprocessors</div>
+        <p>In Unit 4, Flynn's taxonomy classified MIMD as "multiple instruction streams, multiple data streams." Shared memory multiprocessors ARE the most common MIMD architecture. The cache coherence problem (Unit 6) exists because of MIMD — multiple independent instruction streams write to shared data, creating the coherence challenge. Unit 4 gave you the classification; Unit 6 gives you the implementation details and problems that arise.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- PREDICTED PAPER 2026 -->
+<div style="background:#060e14;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:clamp(40px,6vw,70px) 5vw;" id="predicted">
+  <div style="max-width:var(--content-max);margin:0 auto;">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Based on 2022–2025 CAO PYQ Pattern + 2026 DIP, ML & ISS Paper Analysis</div>
+    <div class="sec-header" style="margin-bottom:14px">
+      <h2>CAO — Predicted Paper 2026 (Unit 6 Contribution)</h2>
+      <span class="sub">UNIT 6 TOPICS IN THE 2026 PREDICTED PAPER</span>
+    </div>
+    <p style="font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:var(--dim2);margin-bottom:14px;line-height:1.75;">Unit 6 contributes the RAM chip design numerical (CERTAIN Part C Q5 with new values), all three cache mapping types (CERTAIN Part C Q4 after 3-year absence), and set-associative mapping (CERTAIN Part B Q2 after 1-year gap). Cache coherence (appeared 2024) has high probability of returning.</p>
+    <div class="tip-box warning" style="margin-bottom:24px">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-content">
+        <div class="tip-title">Disclaimer</div>
+        <p>Predictions based on historical patterns. Actual paper may differ. Use for study prioritization.</p>
+      </div>
+    </div>
+    <div class="pred-grid">
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q4) — Unit 6</div>
+        <div class="pred-q">Explain the need of cache memory. Elaborate over the three types of mapping with neat diagrams (Direct, Fully Associative, Set-Associative).</div>
+        <div class="pred-reason">All three cache mapping types appeared in 2022 Part C Q3 (15 marks) but was ABSENT from 2023, 2024, and 2025 — THREE consecutive year absence. The 2026 DIP paper confirmed topics absent for 3+ years strongly return. Cover complete address division for each, worked numerical, and comparison table.</div>
+        <span class="pred-conf high">CERTAIN — 3-year absence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q5) — Unit 6</div>
+        <div class="pred-q">How many RAM chips (new capacity) from 128×8 chips? Address bus lines? Lines common to all chips? Lines for chip select? Specify decoder size.</div>
+        <div class="pred-reason">IDENTICAL problem appeared in 2022 Part C Q5 (2048 bytes) and 2025 Part C Q5 (2048 bytes) — same format both times. For 2026, values change: predicted 4096 bytes → 32 chips, 12 total addr lines, 7 common, 5 chip-select, 5-to-32 decoder. Method is 100% identical.</div>
+        <span class="pred-conf high">CERTAIN — same format both years</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q2) — Unit 6</div>
+        <div class="pred-q">Explain set-associative mapping with a suitable example.</div>
+        <div class="pred-reason">Set-associative mapping was Part B Q2 in 2024 (4 marks). Absent in 2025. After a one-year gap, this is strongly due in 2026. Include: address = TAG|SET|OFFSET, set selection, parallel TAG comparison in all k ways, LRU replacement on miss. Give a worked example with specific bit counts.</div>
+        <span class="pred-conf high">CERTAIN — 1-year gap</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q10) — Unit 6</div>
+        <div class="pred-q">What is cache memory? What is Hit Ratio?</div>
+        <div class="pred-reason">Hit Ratio appeared in 2022 Part A Q4 and cache + hit ratio appeared in 2025 Part B Q6. Cache memory is the most tested CAO topic across ALL parts in all years. A Part A question on cache or hit ratio is certain for 2026. Know: h = hits/(hits+misses), Tavg = h×Tc + (1−h)×Tm.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (?)</div>
+        <div class="pred-q">What is auxiliary memory? (OR What is virtual memory?)</div>
+        <div class="pred-reason">Auxiliary memory was Part A Q10 in 2024. Cache Hit Ratio was Part A Q4 in 2022. For 2026, one of these will appear as a 2-mark Part A question. Know the one-line definition plus types (HDD, SSD, tape) and the disk access time formula (seek + rotational latency + transfer).</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C (alternate) — Unit 6</div>
+        <div class="pred-q">Explain cache coherence with a suitable example. Describe the MESI protocol.</div>
+        <div class="pred-reason">Cache coherence appeared in 2024 Part C Q5. After a one-year gap, it has HIGH probability of returning in 2026 Part C or Part B. Cover the problem (stale data), write-invalidate protocol, write-update protocol, and MESI states (Modified/Exclusive/Shared/Invalid) with state transitions.</div>
+        <span class="pred-conf high">HIGH confidence — 1-year gap</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B (alternate) — Unit 6</div>
+        <div class="pred-q">Explain memory hierarchy with diagram.</div>
+        <div class="pred-reason">Memory hierarchy appeared as Part B Q5 in 2024, absent in 2025. After a one-year gap, memory hierarchy is likely to return in 2026 Part B. Draw all levels (registers → cache → RAM → disk → tape) with capacity, speed, and cost labels. Include locality of reference and hit ratio formula.</div>
+        <span class="pred-conf high">HIGH confidence — 1-year gap</span>
+      </div>
+    </div>
+    <div class="tip-box validate" style="margin-top:28px">
+      <div class="tip-icon">✅</div>
+      <div class="tip-content">
+        <div class="tip-title">Unit 6 Preparation Priority for 2026</div>
+        <p><strong>MUST prepare completely (guaranteed marks):</strong><br>
+        • RAM chip design calculation method (CERTAIN Part C Q5) — memorize the 4 formulas<br>
+        • All 3 cache mapping types with address division and examples (CERTAIN Part C Q4)<br>
+        • Set-associative mapping with worked example (CERTAIN Part B Q2)<br>
+        • Hit Ratio formula and cache need explanation (CERTAIN Part A)<br><br>
+        <strong>HIGH value (prepare fully):</strong><br>
+        • Cache coherence — problem + write-invalidate + MESI protocol states<br>
+        • Memory hierarchy diagram with all 5 levels, speeds, capacities<br><br>
+        <strong>Medium value (understand concepts):</strong><br>
+        • Virtual memory, page tables, TLB, page fault<br>
+        • Multiprocessor interconnection structures<br>
+        • UMA vs NUMA, shared memory multiprocessors</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PYQ MASTER LIST -->
+<div class="layout">
+<div style="width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;"></div>
+<div class="content">
+<section class="section" id="pyq-master" style="margin-top:40px">
+  <div class="section-header">
+    <span class="section-num">M</span>
+    <h2 class="section-title">All PYQs — Unit 6 Master List</h2>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📋 Complete PYQ Reference — Unit 6 Topics (All Years)</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Full Unit 6 PYQ Coverage — Click to Expand</div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full List</button>
+      <div class="answer-content">
+        <strong>PART A — Unit 6 Related:</strong><br><br>
+        2022: Q4: Hit Ratio in cache memory | Q7: Microprogrammed control unit concept<br><br>
+        2023-Aug: (Unit 6 was minimal in Part A)<br><br>
+        2024: Q10: What is auxiliary memory?<br><br>
+        2025: Q6: Explain fixed point representation (not directly U6) | Q10: Define superscalar processor<br><br>
+        <strong>PART B — Unit 6 Related:</strong><br><br>
+        2022: (none direct U6 in Part B, but cache types in Part C)<br><br>
+        2023-Aug: (none direct U6)<br><br>
+        2024: B-Q2: Explain set-associative mapping with example (4 marks)<br>
+        2024: B-Q5: Explain memory hierarchy (4 marks)<br><br>
+        2025: B-Q6: Explain need of cache memory. Also explain Hit Ratio (4 marks)<br><br>
+        <strong>PART C — Unit 6 Related:</strong><br><br>
+        2022: C-Q3: Explain need of cache memory + Hit Ratio + all three mapping types (15 marks)<br>
+        2022: C-Q4: Instruction pipeline + speedup/efficiency (not U6 but connected)<br>
+        2022: C-Q5: 128×8 RAM chips for 2048 bytes — all 4 parts (15 marks)<br><br>
+        2023-Aug: (C-Q4: 6-segment pipeline; C-Q5: serial communication — both covered elsewhere)<br><br>
+        2024: C-Q5: Explain cache coherence with suitable example (10 marks)<br><br>
+        2025: C-Q5: 128×8 RAM chips for 2048 bytes — SAME as 2022 (10 marks)<br><br>
+        <strong>KEY PATTERNS:</strong><br>
+        Cache mapping (all 3 types): 2022 Part C → absent 3 years → CERTAIN 2026<br>
+        RAM chip design: 2022 Part C Q5 + 2025 Part C Q5 (same values!) → new values in 2026<br>
+        Set-associative mapping: 2024 Part B Q2 → absent 2025 → CERTAIN 2026<br>
+        Memory hierarchy: 2024 Part B Q5 → absent 2025 → HIGH 2026<br>
+        Cache coherence: 2024 Part C Q5 → absent 2025 → HIGH 2026<br>
+        Hit Ratio: 2022 Part A Q4 + 2025 Part B Q6 → CERTAIN Part A 2026<br>
+        Auxiliary memory: 2024 Part A Q10 → HIGH Part A 2026
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="#">🏠 Home</a>
+    <a href="unit2.html">🔴 Unit 2</a>
+    <a href="unit3.html">🟣 Unit 3</a>
+    <a href="unit4.html">🟠 Unit 4</a>
+    <a href="unit5.html">🟢 Unit 5</a>
+    <a href="#pyq-master" style="color:var(--upred)">📋 All PYQs</a>
+  </div>
+  © 2026 RTU CAO Study Guide · Unit 6 — Memory Organization & Multiprocessors · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans=btn.nextElementSibling;
+  if(ans.classList.contains('open')){ans.classList.remove('open');btn.textContent=btn.textContent.replace('▲','▼');}
+  else{ans.classList.add('open');btn.textContent=btn.textContent.replace('▼','▲');}
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('visible');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('visible');}
+const sections=document.querySelectorAll('.section');
+const navItems=document.querySelectorAll('.nav-item');
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){navItems.forEach(n=>{n.classList.remove('active');if(n.getAttribute('href')==='#'+e.target.id)n.classList.add('active');});}});},{rootMargin:'-15% 0px -70% 0px'});
+sections.forEach(s=>observer.observe(s));
+</script>
+</body>
+</html>
