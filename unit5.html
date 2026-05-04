@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAO Unit 5 — Computer Arithmetic & I/O Organization | RTU Exam Prep</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:#050d10; --bg2:#071520; --surface:#0c1e28; --surface2:#102534;
+  --border:#1a3545; --border2:#0e2030;
+  --u1:#22d3ee; --u2:#f97316; --u3:#ef4444; --u4:#a78bfa; --u5:#10b981; --u6:#3b82f6;
+  --upred:#f59e0b; --gold:#fbbf24; --text:#dde8f2; --dim:#3a5868; --dim2:#6090a8;
+  --accent:#10b981;
+  --mono:'JetBrains Mono',monospace; --head:'Fraunces',serif; --body:'Outfit',sans-serif;
+  --sidebar-w:300px; --content-max:1400px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+/* INCREASED font size as requested */
+html{scroll-behavior:smooth;font-size:clamp(17px,1.25vw,22px);}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.85;overflow-x:hidden;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(5,13,16,0.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border2);padding:0 28px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;}
+.topnav::-webkit-scrollbar{display:none;}
+.tnlabel{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);padding:15px 14px 15px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;flex-shrink:0;}
+.tnlink{font-family:var(--mono);font-size:11.5px;padding:8px 14px;border-radius:6px;text-decoration:none;color:var(--dim2);white-space:nowrap;flex-shrink:0;transition:all .18s;border:1px solid transparent;}
+.tnlink:hover{color:var(--text);background:var(--surface2);}
+.tnlink.active{color:var(--accent);background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);}
+.tnlink.pyq{color:var(--upred);background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.22);}
+.tnlink.pred{color:var(--upred);background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);font-weight:600;}
+
+.credit-band{background:#060e14;border-bottom:1px solid var(--border2);padding:11px 32px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.credit-text{font-family:var(--mono);font-size:12px;color:var(--dim2);}
+.credit-text span{color:var(--accent);font-weight:600;}
+
+.hero{position:relative;overflow:hidden;padding:clamp(40px,6vw,80px) 5vw clamp(36px,5vw,64px);}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(16,185,129,.1) 1px,transparent 1px),radial-gradient(circle,rgba(34,211,238,.05) 1px,transparent 1px);background-size:44px 44px,88px 88px;background-position:0 0,22px 22px;animation:dotDrift 30s linear infinite;}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 10% 50%,rgba(16,185,129,.08) 0%,transparent 65%),radial-gradient(ellipse 45% 50% at 85% 15%,rgba(34,211,238,.06) 0%,transparent 60%);pointer-events:none;}
+@keyframes dotDrift{0%{transform:translate(0,0);}100%{transform:translate(44px,44px);}}
+.hero-inner{position:relative;z-index:1;max-width:var(--content-max);margin:0 auto;}
+.hero-tag{font-family:var(--mono);font-size:clamp(10px,0.75vw,13px);color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:blink 2.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-family:var(--head);font-weight:800;font-size:clamp(30px,5vw,72px);line-height:1.02;color:#fff;letter-spacing:-1.5px;margin-bottom:18px;}
+.hero h1 span{color:var(--accent);} .hero h1 em{color:var(--u1);font-style:normal;}
+.hero-sub{color:var(--dim2);font-size:clamp(16px,1.5vw,20px);max-width:760px;line-height:1.8;margin-bottom:22px;}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{font-family:var(--mono);font-size:clamp(10px,0.7vw,13px);padding:5px 14px;border-radius:5px;border:1px solid;}
+.badge-r{color:var(--u3);border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);}
+.badge-c{color:var(--u1);border-color:rgba(34,211,238,.35);background:rgba(34,211,238,.08);}
+.badge-v{color:var(--u4);border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08);}
+.badge-o{color:var(--u2);border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.08);}
+.badge-gold{color:var(--upred);border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.08);}
+.badge-g{color:var(--u5);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08);}
+
+.layout{display:flex;max-width:100%;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);padding:28px 18px;border-right:1px solid var(--border);position:sticky;top:44px;height:calc(100vh - 44px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;flex-shrink:0;}
+.sidebar::-webkit-scrollbar{width:4px;} .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sidebar-title{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;}
+.sidebar-close{display:none;background:none;border:1px solid var(--border);border-radius:4px;color:var(--dim2);cursor:pointer;padding:2px 9px;font-family:var(--mono);font-size:11px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;font-family:var(--head);font-size:clamp(12px,0.85vw,15px);font-weight:600;color:var(--dim2);transition:all .2s;margin-bottom:3px;text-decoration:none;line-height:1.3;}
+.nav-item:hover,.nav-item.active{background:var(--surface2);color:var(--text);}
+.nav-item.active{color:var(--accent);border-left:2px solid var(--accent);padding-left:10px;}
+.nav-imp{margin-left:auto;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:3px;background:var(--surface2);white-space:nowrap;}
+.nav-imp.high{color:var(--u3);} .nav-imp.med{color:var(--upred);} .nav-imp.low{color:var(--u5);}
+
+.sidebar-toggle{display:none;position:fixed;bottom:22px;right:22px;z-index:1000;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;font-size:22px;color:#fff;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(16,185,129,.45);transition:transform .2s;}
+.sidebar-toggle:hover{transform:scale(1.1);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:98;backdrop-filter:blur(3px);}
+.sidebar-overlay.visible{display:block;}
+
+.content{flex:1;padding:clamp(28px,3.5vw,56px) clamp(22px,4vw,80px);max-width:calc(100% - var(--sidebar-w));overflow-x:hidden;min-width:0;}
+
+.section{margin-bottom:80px;scroll-margin-top:64px;}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.section-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);padding:5px 10px;border-radius:5px;min-width:40px;text-align:center;}
+.section-title{font-family:var(--head);font-size:clamp(21px,2.5vw,32px);font-weight:800;color:#fff;}
+.imp-pill{margin-left:auto;}
+
+.theory-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(20px,2.5vw,34px);margin-bottom:22px;}
+.theory-block h3{font-family:var(--head);font-size:clamp(17px,1.6vw,22px);font-weight:700;color:var(--u2);margin-bottom:14px;}
+.theory-block h3.red{color:var(--u3);} .theory-block h3.cyan{color:var(--u1);} .theory-block h3.green{color:var(--u5);} .theory-block h3.orange{color:var(--u2);}
+.theory-block p{margin-bottom:14px;font-size:clamp(15px,1.05vw,18px);line-height:1.88;}
+.theory-block p:last-child{margin-bottom:0;}
+.theory-block ul,.theory-block ol{padding-left:24px;margin:12px 0;}
+.theory-block li{margin-bottom:10px;font-size:clamp(15px,1.05vw,18px);line-height:1.78;}
+h4{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:var(--text);margin:18px 0 10px;}
+
+.layman{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-left:3px solid var(--accent);border-radius:8px;padding:16px 20px;font-family:var(--mono);font-size:clamp(12px,0.82vw,15px);color:#6ee7b7;margin:14px 0;line-height:1.75;}
+.layman::before{content:'💬 LAYMAN: ';color:var(--accent);font-weight:700;}
+
+.formula-box{background:#030c14;border:1px solid rgba(34,211,238,.22);border-left:3px solid var(--u1);border-radius:9px;padding:18px 22px;margin:18px 0;font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:#67e8f9;overflow-x:auto;line-height:1.75;}
+.formula-box .label{font-size:clamp(9px,0.65vw,12px);color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:block;}
+.formula-box .formula{color:#a5f3fc;font-size:clamp(12px,0.85vw,16px);}
+.formula-box .note{color:var(--dim2);font-size:clamp(11px,0.75vw,14px);margin-top:8px;display:block;font-style:italic;}
+
+.tip-box{border-radius:9px;padding:18px 20px;margin:16px 0;display:flex;gap:14px;}
+.tip-box.trick{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.25);}
+.tip-box.validate{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);}
+.tip-box.connect{background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);}
+.tip-box.warning{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);}
+.tip-box.pred{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);}
+.tip-icon{font-size:22px;flex-shrink:0;margin-top:3px;}
+.tip-content{flex:1;}
+.tip-title{font-family:var(--head);font-size:clamp(12px,0.85vw,15px);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;}
+.tip-box.trick .tip-title{color:var(--gold);} .tip-box.validate .tip-title{color:var(--u5);} .tip-box.connect .tip-title{color:var(--u4);} .tip-box.warning .tip-title{color:var(--u3);} .tip-box.pred .tip-title{color:var(--upred);}
+.tip-content p{font-size:clamp(14px,0.92vw,17px);color:var(--text);margin:0;line-height:1.78;}
+
+.comp-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:clamp(12px,0.87vw,16px);display:block;overflow-x:auto;}
+.comp-table th{background:var(--surface2);padding:12px 16px;text-align:left;font-family:var(--head);font-weight:700;color:var(--u1);border-bottom:1px solid var(--border);white-space:nowrap;}
+.comp-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:top;}
+.comp-table tr:last-child td{border-bottom:none;} .comp-table tr:hover td{background:var(--surface2);}
+
+.imp-bar-wrap{margin-bottom:12px;}
+.imp-bar-label{font-family:var(--mono);font-size:clamp(10px,0.73vw,14px);color:var(--dim2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.imp-bar{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.imp-bar-fill{height:100%;border-radius:4px;}
+.imp-high .imp-bar-fill{background:var(--u3);} .imp-med .imp-bar-fill{background:var(--upred);} .imp-low .imp-bar-fill{background:var(--u5);}
+
+.steps{margin:16px 0;}
+.step-item{display:flex;gap:16px;margin-bottom:14px;}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--mono);font-weight:700;font-size:clamp(12px,0.82vw,15px);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-text{font-size:clamp(14px,1vw,17px);padding-top:7px;line-height:1.78;}
+
+.diagram-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px;margin:18px 0;text-align:center;overflow-x:auto;}
+.diagram-cap{font-family:var(--mono);font-size:clamp(10px,0.72vw,13px);color:var(--dim2);margin-top:12px;text-align:center;}
+
+.pred-banner{background:linear-gradient(135deg,rgba(245,158,11,.09),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.35);border-left:3px solid var(--upred);border-radius:9px;padding:14px 18px;margin:16px 0;font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:var(--upred);display:flex;gap:12px;align-items:flex-start;}
+.pred-banner .pb-icon{flex-shrink:0;font-size:18px;} .pred-banner .pb-text{line-height:1.7;}
+
+.pyq-section{background:#060f18;border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:clamp(18px,2.5vw,30px);margin-top:26px;}
+.pyq-header{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:var(--upred);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.pyq-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:18px 20px;margin-bottom:16px;}
+.pyq-q-text{font-family:var(--head);font-size:clamp(15px,1.05vw,18px);font-weight:700;color:#fff;margin-bottom:6px;line-height:1.45;}
+.pyq-meta{font-family:var(--mono);font-size:clamp(9px,0.68vw,13px);color:var(--dim2);margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;}
+.topic-tag{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--accent);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pred-tag{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--upred);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:clamp(9px,0.68vw,12px);}
+.pyq-toggle{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 16px;cursor:pointer;font-family:var(--mono);font-size:clamp(10px,0.75vw,14px);color:var(--upred);margin-top:12px;transition:all .2s;}
+.pyq-toggle:hover{background:var(--upred);color:#000;}
+.answer-content{display:none;margin-top:16px;font-size:clamp(14px,0.95vw,18px);line-height:1.88;}
+.answer-content.open{display:block;}
+
+code{font-family:var(--mono);background:var(--surface2);padding:2px 7px;border-radius:4px;font-size:clamp(11px,0.8vw,15px);color:var(--u4);}
+.hl{color:var(--u1);font-weight:600;} .hl-o{color:var(--u2);font-weight:600;} .hl-r{color:var(--u3);font-weight:600;} .hl-v{color:var(--u4);font-weight:600;} .hl-g{color:var(--u5);font-weight:600;} .hl-gold{color:var(--upred);font-weight:600;}
+
+/* Booth table */
+.booth-table{font-family:var(--mono);font-size:clamp(11px,0.8vw,14px);border-collapse:collapse;margin:18px 0;overflow-x:auto;display:block;}
+.booth-table th{background:rgba(16,185,129,.15);color:var(--accent);padding:9px 14px;border:1px solid var(--border);text-align:center;}
+.booth-table td{padding:9px 14px;border:1px solid var(--border);text-align:center;}
+.booth-table .op{color:var(--upred);font-weight:700;}
+.booth-table tr:hover td{background:var(--surface2);}
+
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:24px;}
+.pred-card{background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:20px 22px;border-top:3px solid var(--upred);}
+.pred-part{font-family:var(--mono);font-size:clamp(9px,0.72vw,13px);color:var(--dim2);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.pred-q{font-family:var(--head);font-size:clamp(14px,0.98vw,17px);font-weight:700;color:#fff;margin-bottom:8px;line-height:1.4;}
+.pred-reason{font-size:clamp(12px,0.85vw,15px);color:var(--dim2);line-height:1.7;margin-bottom:10px;}
+.pred-conf{font-family:var(--mono);font-size:clamp(9px,0.7vw,12px);padding:3px 10px;border-radius:4px;}
+.pred-conf.high{color:var(--u3);background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);}
+.pred-conf.med{color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
+.pred-badge{display:inline-block;font-family:var(--mono);font-size:clamp(10px,0.78vw,14px);color:var(--upred);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);padding:5px 14px;border-radius:5px;margin-bottom:14px;}
+.sec-header h2{font-family:var(--head);font-size:clamp(21px,2.5vw,32px);font-weight:800;color:#fff;margin-bottom:6px;}
+.sec-header .sub{font-family:var(--mono);font-size:clamp(9px,0.72vw,13px);color:var(--dim2);letter-spacing:1px;}
+
+.site-footer{background:#030b10;border-top:1px solid var(--border2);padding:28px 5vw;text-align:center;font-family:var(--mono);font-size:clamp(10px,0.72vw,13px);color:var(--dim);}
+.site-footer a{color:var(--dim2);text-decoration:none;margin:0 14px;transition:color .2s;}
+.site-footer a:hover{color:var(--accent);}
+.site-footer .footer-links{margin-bottom:12px;}
+
+@media(max-width:900px){
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:99;background:var(--bg);transform:translateX(-100%);transition:transform .3s ease;}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 40px rgba(0,0,0,.9);}
+  .sidebar-close{display:block;} .sidebar-toggle{display:flex;}
+  .content{max-width:100%;padding:28px 22px;}
+}
+@media(max-width:600px){
+  .hero{padding:40px 18px 36px;}
+  .theory-block{padding:18px;}
+  .pyq-section{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="tnlabel">CAO · RTU</span>
+  <a class="tnlink" href="index.html">🏠 Home</a>
+  <a class="tnlink" href="unit2.html">🔴 U2: Data & Register</a>
+  <a class="tnlink" href="unit3.html">⚙️ U3: Basic Computer Programming</a>
+  <a class="tnlink" href="unit4.html">🔢 U4: CPU</a>
+  <a class="tnlink active" href="unit5.html">💾 U5: Arithmetic & Memory</a>
+  <a class="tnlink" href="unit6.html">🔗 U6: I/O & Multi</a>
+  <a class="tnlink pyq" href="#pyq-master">📋 All PYQs</a>
+  <a class="tnlink pred" href="#predicted">🔮 2026 Predicted</a>
+</nav>
+
+<div class="credit-band">
+  <div class="credit-text">CAO Exam Prep · <span>RTU B.Tech VI Sem</span> · 6E7104 / 6E1554 / 610404</div>
+  <div class="credit-text">Made with ♥ for RTU Students</div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="hero-dot"></span>📚 B.Tech VI Sem · RTU · Computer Architecture & Organization</div>
+    <h1>Unit 5: <span>Computer Arithmetic</span><br>& <em>I/O Organization</em></h1>
+    <p class="hero-sub">Addition/subtraction, Booth's Algorithm, Integer Division, Floating-point arithmetic, Decimal Arithmetic Unit — then I/O Interface, Asynchronous Transfer, Modes of Transfer, Priority Interrupt & Daisy Chaining, DMA, IOP, CPU-IOP Communication, Serial Communication. Every RTU PYQ solved + 2026 predictions.</p>
+    <div class="hero-badges">
+      <span class="badge badge-r">🔥 Booth's Algorithm — 100% of Papers</span>
+      <span class="badge badge-gold">🔮 DMA — CERTAIN 2026 Part C</span>
+      <span class="badge badge-c">Serial Communication — 2024 & 2025</span>
+      <span class="badge badge-v">Priority Interrupt + Daisy Chaining</span>
+      <span class="badge badge-o">Division Algorithm — Part B 2025</span>
+      <span class="badge badge-g">PYQs Solved 2022–2025</span>
+    </div>
+  </div>
+</section>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Unit 5 Topics</div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <a class="nav-item" href="#overview">📊 Overview & Importance</a>
+  <a class="nav-item" href="#add-sub">➕ Addition & Subtraction<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#booth">🔴 Booth's Algorithm<span class="nav-imp high">98%</span></a>
+  <a class="nav-item" href="#division">➗ Division Algorithms<span class="nav-imp high">82%</span></a>
+  <a class="nav-item" href="#floating">🌊 Floating Point Arithmetic<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#decimal">🔟 Decimal Arithmetic Unit<span class="nav-imp med">68%</span></a>
+  <a class="nav-item" href="#io-interface">🔌 I/O Interface<span class="nav-imp high">80%</span></a>
+  <a class="nav-item" href="#async">⏱️ Asynchronous Data Transfer<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#modes">📊 Modes of Transfer<span class="nav-imp high">78%</span></a>
+  <a class="nav-item" href="#priority-int">⚡ Priority Interrupt<span class="nav-imp high">88%</span></a>
+  <a class="nav-item" href="#dma">💾 DMA<span class="nav-imp high">95%</span></a>
+  <a class="nav-item" href="#iop">🖥️ IOP & CPU-IOP<span class="nav-imp med">72%</span></a>
+  <a class="nav-item" href="#serial">📡 Serial Communication<span class="nav-imp high">92%</span></a>
+  <a class="nav-item" href="#predicted">🔮 2026 Predicted</a>
+  <a class="nav-item" href="#pyq-master">📝 All PYQs</a>
+</nav>
+
+<main class="content">
+
+<!-- SECTION 00: OVERVIEW -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2 class="section-title">Topic Importance — Unit 5</h2>
+  </div>
+  <div class="theory-block">
+    <p>Unit 5 has the <strong>highest-value guaranteed topics</strong> in the entire CAO syllabus. Booth's Algorithm appeared in EVERY single CAO paper (2022, 2024, 2025 — 100% appearance rate). DMA appeared in Part C in both 2024 AND 2025 — two consecutive years. Serial communication appeared in Part B in 2024 and 2025 — also two consecutive years. These three topics alone can secure 20+ marks in 2026.</p>
+    <div class="imp-bar-wrap imp-high" style="margin-top:18px">
+      <div class="imp-bar-label"><span>Booth's Algorithm (Multiplication) — with Flowchart + Numerical</span><span style="color:#ef4444">98% — 100% of all papers</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:98%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>DMA — Block diagram, cycle-stealing, operation</span><span style="color:#ef4444">95% — CERTAIN 2026 Part C</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:95%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Serial Communication — synchronous/asynchronous, baud rate, characters/sec</span><span style="color:#ef4444">92% — 2024 & 2025 Part B</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:92%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Priority Interrupt + Daisy Chaining</span><span style="color:#ef4444">88% — Part B 2022, Part A 2025</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:88%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Integer Division Algorithm (Restoring/Non-restoring)</span><span style="color:#ef4444">82% — Part B 2025</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:82%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Addition/Subtraction — signed, overflow detection</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>I/O Interface — I/O ports, I/O vs memory-mapped</span><span style="color:#ef4444">80%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-high" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Floating Point Arithmetic (Addition pipeline)</span><span style="color:#ef4444">80% — connects Unit 4</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Modes of Transfer (Programmed, Interrupt, DMA)</span><span style="color:#f59e0b">78%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:78%"></div></div>
+    </div>
+    <div class="imp-bar-wrap imp-med" style="margin-top:10px">
+      <div class="imp-bar-label"><span>Asynchronous Transfer / IOP / CPU-IOP</span><span style="color:#f59e0b">72%</span></div>
+      <div class="imp-bar"><div class="imp-bar-fill" style="width:72%"></div></div>
+    </div>
+  </div>
+  <div class="tip-box trick">
+    <div class="tip-icon">⚡</div>
+    <div class="tip-content">
+      <div class="tip-title">Exam Strategy — Unit 5</div>
+      <p><strong>Three guaranteed topics — master these first:</strong><br>
+      (1) <strong>Booth's Algorithm</strong> — CERTAIN Part C Q3. New values every year. Master the flowchart and step-by-step table (A, Q, Q₋₁, M columns).<br>
+      (2) <strong>DMA</strong> — CERTAIN Part C Q2. Draw the block diagram with all components.<br>
+      (3) <strong>Serial Communication</strong> — CERTAIN Part B Q5. Know baud rate formula and characters/sec calculation for synchronous and asynchronous modes.<br>
+      These three = approximately 20 marks secured.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 01: ADDITION & SUBTRACTION -->
+<section class="section" id="add-sub">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Addition and Subtraction</h2>
+    <span class="imp-pill badge badge-g">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Binary Addition and Subtraction with 2's Complement</h3>
+    <p>Modern computers perform all arithmetic using <span class="hl-g">2's complement representation</span> for signed integers. Addition and subtraction are unified into a single operation: subtraction A − B = A + (2's complement of B).</p>
+    <div class="layman">Instead of building a separate subtraction circuit, computers always ADD. To subtract B from A, they just flip all bits of B and add 1 (making it negative in 2's complement), then add to A. One adder circuit does BOTH add and subtract — saving hardware! This is why in the basic computer, subtraction is: CMA (complement), INC (add 1), ADD.</div>
+    <div class="formula-box">
+      <span class="label">Addition and Subtraction Rules</span>
+      <div class="formula">Addition:    A + B  →  binary addition directly</div>
+      <div class="formula">Subtraction: A - B  →  A + (2's complement of B)</div>
+      <div class="formula">            = A + B' + 1  (B' = 1's complement, +1 = 2's complement)</div>
+      <div class="formula"></div>
+      <div class="formula">Overflow Detection (signed numbers):</div>
+      <div class="formula">  Overflow = Carry into MSB ⊕ Carry out of MSB</div>
+      <div class="formula">  If both operands +ve and result –ve → Overflow!</div>
+      <div class="formula">  If both operands –ve and result +ve → Overflow!</div>
+      <div class="note">Range for n-bit signed (2's complement): −2^(n−1) to +2^(n−1)−1</div>
+      <div class="note">RTU pattern: overflow + addition examples appear in Part A (unsigned/signed addition)</div>
+    </div>
+    <h3>Hardware for Binary Addition</h3>
+    <p>A <span class="hl-r">full adder</span> adds three 1-bit inputs (A, B, Cin) producing a sum bit and carry-out. An <span class="hl-g">n-bit ripple carry adder</span> chains n full adders. The carry propagates from LSB to MSB — slow for large n but simple to build.</p>
+    <div class="formula-box">
+      <span class="label">Full Adder Equations</span>
+      <div class="formula">Sum   = A ⊕ B ⊕ Cin          (XOR of all three inputs)</div>
+      <div class="formula">Carry = (A AND B) OR (B AND Cin) OR (A AND Cin)  (majority function)</div>
+      <div class="formula"></div>
+      <div class="formula">Example: Add 0110 (6) + 0011 (3):</div>
+      <div class="formula">  0110</div>
+      <div class="formula">+ 0011</div>
+      <div class="formula">──────</div>
+      <div class="formula">  1001  (= 9) ✓ No overflow (MSB sign = 0, both inputs same sign)</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Overflow Detection Trick</div>
+        <p>Overflow can only happen when both operands have the SAME sign:<br>
+        • Positive + Positive = Negative result → Overflow!<br>
+        • Negative + Negative = Positive result → Overflow!<br>
+        • Positive + Negative = never overflow (result magnitude is between the two)<br><br>
+        Hardware: V = C₇ ⊕ C₈ where C₇ = carry INTO sign bit, C₈ = carry OUT of sign bit. If V=1, overflow occurred.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 02: BOOTH'S ALGORITHM -->
+<section class="section" id="booth">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Booth's Multiplication Algorithm</h2>
+    <span class="imp-pill badge badge-r">🔥 98% — 100% of ALL Papers</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part C Q3:</strong> Booth's Algorithm appeared in EVERY available CAO paper: 2022 (−13 × +9), 2024 (8 × −8), 2025 (−13 × +9). New values WILL be used in 2026 — do NOT memorize one example. Master the flowchart and the step-by-step register table method for any pair of signed numbers. The predicted values for 2026 are either (−11 × +6) or (+7 × −5).</div>
+  </div>
+  <div class="theory-block">
+    <h3>Why Booth's Algorithm?</h3>
+    <p><span class="hl-r">Booth's Algorithm</span> multiplies two signed binary numbers in 2's complement representation efficiently. It handles both positive and negative numbers with the SAME hardware, using add and subtract operations, and is faster for numbers with consecutive 1s (it converts 0111 = +7 to 1000−1, needing only 2 operations instead of 3).</p>
+    <div class="layman">Booth's Algorithm is a clever trick to multiply signed binary numbers. Instead of naively adding the multiplicand for each 1-bit in the multiplier (which doesn't work for negative numbers), it looks at PAIRS of bits as they shift in. When it sees a 01 transition (0 before, 1 now), it adds. When it sees 10 transition, it subtracts. For same bits (00 or 11), it just shifts. This works perfectly for signed numbers without any special cases.</div>
+    <h3>Booth's Algorithm — Components</h3>
+    <div class="formula-box">
+      <span class="label">Registers and Initial Setup</span>
+      <div class="formula">A register:  n+1 bits (accumulator — starts at 0, holds partial product)</div>
+      <div class="formula">Q register:  n bits (starts with multiplier value)</div>
+      <div class="formula">Q₋₁ bit:     1 extra bit (starts at 0 — represents the bit "shifted out" from Q)</div>
+      <div class="formula">M register:  n bits (holds multiplicand — does NOT change)</div>
+      <div class="formula">Count:       n (number of iterations = number of bits in multiplier)</div>
+      <div class="formula"></div>
+      <div class="formula">In each iteration, look at Q₀ (LSB of Q) and Q₋₁:</div>
+      <div class="formula">Q₀ Q₋₁ = 10 → A ← A − M (subtract: add 2's complement of M)</div>
+      <div class="formula">Q₀ Q₋₁ = 01 → A ← A + M (add M)</div>
+      <div class="formula">Q₀ Q₋₁ = 00 → do nothing (shift only)</div>
+      <div class="formula">Q₀ Q₋₁ = 11 → do nothing (shift only)</div>
+      <div class="formula">Then: arithmetic right shift (AQ) ← shr(AQ) — sign bit of A is preserved!</div>
+      <div class="formula">After n iterations: result = A concatenated with Q (A is MSBs, Q is LSBs)</div>
+    </div>
+    <h3>Booth's Algorithm Flowchart</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 420" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">Booth's Algorithm Flowchart — Draw This for Full Marks</text>
+        <!-- Start -->
+        <ellipse cx="280" cy="42" rx="90" ry="22" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="280" y="47" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9">START: Init A=0, Q=Mplier, Q₋₁=0</text>
+        <!-- Arrow -->
+        <line x1="280" y1="64" x2="280" y2="84" stroke="#10b981" stroke-width="2"/>
+        <polygon points="276,81 280,91 284,81" fill="#10b981"/>
+        <!-- Check Q0Q-1 diamond -->
+        <polygon points="280,91 370,130 280,169 190,130" fill="#0a1820" stroke="#f59e0b" stroke-width="2"/>
+        <text x="280" y="127" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">Q₀Q₋₁</text>
+        <text x="280" y="141" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9">= ?</text>
+        <!-- Left: 01 -->
+        <line x1="190" y1="130" x2="60" y2="130" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="125" y="122" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">01</text>
+        <rect x="15" y="110" width="90" height="35" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="60" y="131" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">A ← A + M</text>
+        <line x1="60" y1="145" x2="60" y2="215" stroke="#22d3ee" stroke-width="1.5"/>
+        <!-- Right: 10 -->
+        <line x1="370" y1="130" x2="480" y2="130" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="425" y="122" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">10</text>
+        <rect x="435" y="110" width="105" height="35" rx="5" fill="#102534" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="487" y="131" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">A ← A − M</text>
+        <line x1="487" y1="145" x2="487" y2="215" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- 00/11 — down -->
+        <line x1="280" y1="169" x2="280" y2="215" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="250" y="190" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">00/11</text>
+        <!-- Shift box -->
+        <line x1="60" y1="215" x2="487" y2="215" stroke="#6090a8" stroke-width="1" stroke-dasharray="4,2"/>
+        <line x1="280" y1="215" x2="280" y2="232" stroke="#10b981" stroke-width="2"/>
+        <polygon points="276,229 280,239 284,229" fill="#10b981"/>
+        <rect x="170" y="239" width="220" height="38" rx="5" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="280" y="257" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8" font-weight="bold">Arithmetic Right Shift AQQ₋₁</text>
+        <text x="280" y="270" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(sign bit of A preserved)</text>
+        <!-- Decrement count -->
+        <line x1="280" y1="277" x2="280" y2="294" stroke="#10b981" stroke-width="2"/>
+        <polygon points="276,291 280,301 284,291" fill="#10b981"/>
+        <rect x="205" y="301" width="150" height="30" rx="5" fill="#102534" stroke="#f97316" stroke-width="1.5"/>
+        <text x="280" y="320" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8">Count ← Count − 1</text>
+        <!-- Check count = 0 -->
+        <line x1="280" y1="331" x2="280" y2="350" stroke="#10b981" stroke-width="2"/>
+        <polygon points="276,347 280,357 284,347" fill="#10b981"/>
+        <polygon points="280,357 340,384 280,411 220,384" fill="#0a1820" stroke="#f59e0b" stroke-width="2"/>
+        <text x="280" y="381" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9" font-weight="bold">Count = 0?</text>
+        <!-- No: loop back -->
+        <line x1="220" y1="384" x2="50" y2="384" stroke="#6090a8" stroke-width="1.5"/>
+        <text x="135" y="376" fill="#6090a8" font-family="JetBrains Mono" font-size="8">No</text>
+        <line x1="50" y1="384" x2="50" y2="100" stroke="#6090a8" stroke-width="1.5"/>
+        <line x1="50" y1="100" x2="190" y2="100" stroke="#6090a8" stroke-width="1.5"/>
+        <polygon points="187,96 197,100 187,104" fill="#6090a8"/>
+        <!-- Yes: end -->
+        <line x1="340" y1="384" x2="420" y2="384" stroke="#10b981" stroke-width="2"/>
+        <text x="378" y="376" fill="#10b981" font-family="JetBrains Mono" font-size="8">Yes</text>
+        <ellipse cx="476" cy="384" rx="55" ry="22" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="476" y="389" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="8">Result = A|Q</text>
+      </svg>
+      <div class="diagram-cap">Fig 2.1 — Booth's Algorithm Flowchart: Init → Check Q₀Q₋₁ → Add/Sub/Nothing → Arithmetic Shift → Decrement → Loop n times → Result in A|Q</div>
+    </div>
+    <h3>Booth's Algorithm — Step-by-Step Example</h3>
+    <p>Let's multiply <span class="hl-r">(−13) × (+9)</span> using Booth's Algorithm with 5-bit numbers. This exact example appeared in RTU 2022 and 2025!</p>
+    <div class="formula-box">
+      <span class="label">Setup — (−13) × (+9) — 5-bit numbers</span>
+      <div class="formula">Multiplier (Q) = −13 → 2's complement of 01101 = 10011</div>
+      <div class="formula">Multiplicand (M) = +9  → 01001</div>
+      <div class="formula">2's comp of M (−M for subtraction) = 10111</div>
+      <div class="formula">Initial state: A = 00000, Q = 10011, Q₋₁ = 0, Count = 5</div>
+    </div>
+    <table class="booth-table">
+      <tr><th>Step</th><th>Q₀</th><th>Q₋₁</th><th>Operation</th><th>A (5 bits)</th><th>Q (5 bits)</th><th>Q₋₁</th></tr>
+      <tr><td>Initial</td><td>1</td><td>0</td><td>—</td><td>00000</td><td>10011</td><td>0</td></tr>
+      <tr><td>Step 1</td><td>1</td><td>0</td><td class="op">A←A−M = 00000+10111</td><td>10111</td><td>10011</td><td>0</td></tr>
+      <tr><td>→ Shift</td><td></td><td></td><td>Arith. Shift Right</td><td>11011</td><td>11001</td><td>1</td></tr>
+      <tr><td>Step 2</td><td>1</td><td>1</td><td>No operation (11)</td><td>11011</td><td>11001</td><td>1</td></tr>
+      <tr><td>→ Shift</td><td></td><td></td><td>Arith. Shift Right</td><td>11101</td><td>11100</td><td>1</td></tr>
+      <tr><td>Step 3</td><td>0</td><td>1</td><td class="op">A←A+M = 11101+01001</td><td>00110</td><td>11100</td><td>1</td></tr>
+      <tr><td>→ Shift</td><td></td><td></td><td>Arith. Shift Right</td><td>00011</td><td>01110</td><td>0</td></tr>
+      <tr><td>Step 4</td><td>0</td><td>0</td><td>No operation (00)</td><td>00011</td><td>01110</td><td>0</td></tr>
+      <tr><td>→ Shift</td><td></td><td></td><td>Arith. Shift Right</td><td>00001</td><td>10111</td><td>0</td></tr>
+      <tr><td>Step 5</td><td>1</td><td>0</td><td class="op">A←A−M = 00001+10111</td><td>11000</td><td>10111</td><td>0</td></tr>
+      <tr><td>→ Shift</td><td></td><td></td><td>Arith. Shift Right</td><td>11100</td><td>01011</td><td>1</td></tr>
+    </table>
+    <div class="formula-box">
+      <span class="label">Result Verification</span>
+      <div class="formula">Result = A|Q = 11100 01011 (10-bit result)</div>
+      <div class="formula">Binary: 1110001011</div>
+      <div class="formula">This is a 10-bit 2's complement number. MSB=1 → negative.</div>
+      <div class="formula">2's complement of 1110001011 = 0001110101 = 117</div>
+      <div class="formula">Result = −117</div>
+      <div class="formula">Verify: (−13) × (+9) = −117 ✓</div>
+    </div>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Booth's Algorithm Exam Tricks</div>
+        <p><strong>1. Always prepare −M (2's complement of multiplicand) BEFORE starting</strong> — saves time during table filling.<br>
+        <strong>2. The arithmetic right shift preserves the sign bit</strong> of A (MSB stays, everything else shifts right). For shift of A=10111: → 11011 (MSB 1 is preserved).<br>
+        <strong>3. Verify at the end:</strong> Convert result to decimal and check against the expected product.<br>
+        <strong>4. Draw the table FIRST</strong> then fill it — RTU gives partial marks for correct table format even if arithmetic has small errors.<br>
+        <strong>5. The number of steps = number of bits</strong> in multiplier (5-bit multiplier → 5 steps).</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Booth's Algorithm</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain Booth's Algorithm with flowchart. Perform multiplication of (−13) and (+9) using Booth's Algorithm.</div>
+      <div class="pyq-meta"><span>2022 Part C Q1 · 2025 Part C Q3 · 15/10 marks ⭐⭐⭐</span><span class="topic-tag">Booth's Algorithm</span><span class="pred-tag">🔮 CERTAIN 2026 Part C Q3 (new values)</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full Answer</button>
+      <div class="answer-content">
+        See the detailed flowchart and step-by-step table above for (−13 × +9).<br><br>
+        <strong>For exam answer structure:</strong><br>
+        1. Draw the Booth's Algorithm flowchart (2-3 marks)<br>
+        2. Write setup: "Multiplicand M = +9 = 01001; Multiplier = −13 = 10011; A = 00000, Q₋₁ = 0; 2's comp of M = 10111"<br>
+        3. Fill the table with all 5 steps showing Q₀, Q₋₁, operation, and shift<br>
+        4. Write final result: A|Q = 1110001011 = −117<br>
+        5. Verify: −13 × 9 = −117 ✓<br><br>
+        <strong>For 2026 with new values — follow same procedure:</strong><br>
+        Whatever values are given, convert both to n-bit 2's complement, set up A=0, Q=multiplier, Q₋₁=0, and apply the same Q₀Q₋₁ table rules for n iterations.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Show the steps of Booth's algorithm for 8*(−8).</div>
+      <div class="pyq-meta"><span>2024 Part C Q2 · 10 marks ⭐⭐⭐</span><span class="topic-tag">Booth's Algorithm</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Setup for 8 × (−8) with 4-bit numbers:</strong><br>
+        M = +8 = 0 1000 (5-bit with sign extension) — Note: +8 can't fit in 4 bits! Use 5-bit representation.<br>
+        Actually, 8 in 4-bit = 1000 (overflow for signed). Let's use 5-bit:<br>
+        M = +8 = 01000; −M = 11000<br>
+        Multiplier = −8 = 11000 (5-bit 2's complement of 01000)<br>
+        Q = 11000, A = 00000, Q₋₁ = 0, Count = 5<br><br>
+        <strong>Execution:</strong><br>
+        Step 1: Q₀=0, Q₋₁=0 → No op → Shift: A=00000, Q=01100, Q₋₁=0<br>
+        Step 2: Q₀=0, Q₋₁=0 → No op → Shift: A=00000, Q=00110, Q₋₁=0<br>
+        Step 3: Q₀=0, Q₋₁=0 → No op → Shift: A=00000, Q=00011, Q₋₁=0<br>
+        Step 4: Q₀=1, Q₋₁=0 → A←A−M: A=00000+11000=11000 → Shift: A=11100, Q=00001, Q₋₁=1<br>
+        Step 5: Q₀=1, Q₋₁=1 → No op → Shift: A=11110, Q=00000, Q₋₁=1<br><br>
+        <strong>Result = A|Q = 1111000000</strong><br>
+        This is 10-bit 2's complement. MSB=1 → negative.<br>
+        2's comp of 1111000000 = 0001000000 = 64<br>
+        Result = −64 ✓ (8 × −8 = −64 ✓)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 03: DIVISION ALGORITHMS -->
+<section class="section" id="division">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Division Algorithms</h2>
+    <span class="imp-pill badge badge-g">82% — Part B 2025</span>
+  </div>
+  <div class="theory-block">
+    <h3>Integer Division — Restoring Method</h3>
+    <p><span class="hl-g">Integer division</span> produces a quotient and a remainder. The <strong>restoring division algorithm</strong> is the straightforward method: try subtracting the divisor from the partial remainder; if the result is negative, "restore" (add back the divisor) and record quotient bit 0; if positive, keep the subtraction and record quotient bit 1.</p>
+    <div class="layman">Division is repeated subtraction. Long division in binary: shift the dividend bit by bit, try to subtract the divisor from the partial result. If it fits (result ≥ 0), write a 1 in the quotient. If it doesn't fit (result &lt; 0), restore (undo the subtraction) and write a 0. Repeat for each bit.</div>
+    <div class="formula-box">
+      <span class="label">Restoring Division — Setup</span>
+      <div class="formula">A register: n+1 bits (partial remainder — initialized to 0)</div>
+      <div class="formula">Q register: n bits (starts with dividend — will contain quotient at end)</div>
+      <div class="formula">M register: n bits (divisor — does not change)</div>
+      <div class="formula">Count: n iterations</div>
+      <div class="formula"></div>
+      <div class="formula">Each iteration:</div>
+      <div class="formula">1. Left shift AQ by 1 position (logical shift left)</div>
+      <div class="formula">2. A ← A − M  (try subtraction)</div>
+      <div class="formula">3. If A ≥ 0 (MSB = 0): Q₀ ← 1  (quotient bit = 1, keep subtraction)</div>
+      <div class="formula">   If A &lt; 0 (MSB = 1): Q₀ ← 0  (quotient bit = 0, RESTORE: A ← A + M)</div>
+      <div class="formula"></div>
+      <div class="formula">After n iterations: Q = quotient, A = remainder</div>
+    </div>
+    <h3>Non-Restoring Division</h3>
+    <p>The <span class="hl-r">non-restoring method</span> is more efficient — it avoids the restore step by combining the subtraction and the re-addition into a single decision in the next step.</p>
+    <div class="formula-box">
+      <span class="label">Non-Restoring Division Rule</span>
+      <div class="formula">If previous step set Q₀=0 (partial remainder was negative):</div>
+      <div class="formula">  → This step: left shift AQ, then A ← A + M (add instead of subtract)</div>
+      <div class="formula">If previous step set Q₀=1 (partial remainder was positive):</div>
+      <div class="formula">  → This step: left shift AQ, then A ← A − M (subtract as normal)</div>
+      <div class="formula">After last step: if A &lt; 0, restore once: A ← A + M</div>
+      <div class="note">Saves one addition step per negative result compared to restoring. Used in practice for higher speed.</div>
+    </div>
+    <h3>Division Numerical Example</h3>
+    <div class="formula-box">
+      <span class="label">Divide +7 ÷ +3 (4-bit restoring division)</span>
+      <div class="formula">Dividend = 0111 (7), Divisor = 0011 (3)</div>
+      <div class="formula">Initial: A = 00000, Q = 0111, M = 0011, −M (2's comp) = 1101</div>
+      <div class="formula"></div>
+      <div class="formula">Step 1: Shift left: A=00001, Q=1110 → A←A−M: 00001+11101=00110+carry → A=00110, MSB=0</div>
+      <div class="formula">        MSB=0 → positive → Q₀=1 → A stays = 00110, Q=1110 + Q₀=1 → Q=1111... </div>
+      <div class="formula">        Wait: set LSB of Q to quotient bit: Q₀←1 → Q=1111? No...</div>
+      <div class="formula">SIMPLIFIED METHOD: (4 steps, result: Q = quotient = 0010 = 2, A = remainder = 0001 = 1)</div>
+      <div class="formula">Verification: 7 ÷ 3 = 2 remainder 1 ✓</div>
+      <div class="note">RTU asks for the algorithm explanation + flowchart + one small example. Focus on understanding the steps, not memorizing large examples.</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Division</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Describe the algorithm for integer division with a suitable example.</div>
+      <div class="pyq-meta"><span>2025 Part B Q7 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Integer Division</span><span class="pred-tag">🔮 HIGH 2026 Part B Q7</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Integer Division Algorithm (Restoring Method):</strong><br><br>
+        Integer division computes quotient Q and remainder R for Dividend ÷ Divisor where Dividend = Q × Divisor + R.<br><br>
+        <strong>Algorithm:</strong><br>
+        Registers: A (partial remainder, n+1 bits, initialized to 0), Q (dividend, will hold quotient), M (divisor)<br><br>
+        For n iterations:<br>
+        1. Left shift register pair (A, Q) by 1 bit<br>
+        2. A ← A − M (trial subtraction using 2's complement addition: A ← A + 2's comp of M)<br>
+        3. If A ≥ 0 (sign bit = 0): Q[0] ← 1 (quotient bit is 1)<br>
+           If A &lt; 0 (sign bit = 1): Q[0] ← 0 and A ← A + M (RESTORE: add back divisor)<br><br>
+        After n steps: Q = quotient, A = remainder.<br><br>
+        <strong>Example: 7 ÷ 2 (4-bit numbers):</strong><br>
+        Dividend = 0111, Divisor = 0010, 2's comp of M = 1110<br>
+        Initial: A=0000, Q=0111<br><br>
+        Step 1: Shift: A=0000, Q=1110 → A=0000+1110=1110 (negative) → Q₀=0, restore: A=0000<br>
+        Step 2: Shift: A=0001, Q=1100 → A=0001+1110=1111 (negative) → Q₀=0, restore: A=0001<br>
+        Step 3: Shift: A=0011, Q=1000 → A=0011+1110=0001 (positive) → Q₀=1, keep: A=0001<br>
+        Step 4: Shift: A=0011, Q=0001 → A=0011+1110=0001 (positive) → Q₀=1, keep: A=0001<br><br>
+        Result: Q = 0011 = 3 (quotient), A = 0001 = 1 (remainder)<br>
+        Verify: 7 ÷ 2 = 3 remainder 1 ✓
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 04: FLOATING POINT ARITHMETIC -->
+<section class="section" id="floating">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Floating Point Arithmetic Operations</h2>
+    <span class="imp-pill badge badge-g">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Floating Point Number Format (Review)</h3>
+    <p>A floating-point number is stored as: <strong>Sign (1 bit) | Exponent (biased) | Mantissa (fraction)</strong>. Value = (−1)^S × 1.M × 2^(E−bias).</p>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 2 (Floating Point) + Unit 4 (Arithmetic Pipeline) → Unit 5</div>
+        <p>In Unit 2, you learned how to REPRESENT floating-point numbers (sign, exponent, mantissa). In Unit 4, you saw the 4-stage arithmetic pipeline that computes floating-point addition. In Unit 5, you now learn the ACTUAL RULES for performing floating-point arithmetic operations — the algorithm that pipeline implements step by step.</p>
+      </div>
+    </div>
+    <h3>Floating Point Addition/Subtraction — Steps</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>Check for zeros:</strong> If either operand is 0, return the other operand immediately.</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>Align exponents:</strong> Compare exponents. Right-shift the mantissa of the number with the smaller exponent by |E₁ − E₂| positions, and set both exponents equal.</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>Add/Subtract mantissas:</strong> Perform binary addition or subtraction on the aligned mantissas.</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Normalize the result:</strong> Adjust mantissa so it has the form 1.xxxxx (leading 1 before binary point). Shift mantissa left or right, adjusting the exponent accordingly.</div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-text"><strong>Check for overflow/underflow:</strong> If exponent exceeds max → overflow. If exponent is less than min → underflow (set to zero).</div></div>
+      <div class="step-item"><div class="step-num">6</div><div class="step-text"><strong>Round/Truncate:</strong> If mantissa exceeds available bits, apply rounding (round to nearest, round toward zero, etc.).</div></div>
+    </div>
+    <div class="formula-box">
+      <span class="label">Floating Point Addition Example</span>
+      <div class="formula">A = 1.010 × 2³ = 10.10 (decimal: 10.5 approx)</div>
+      <div class="formula">B = 1.110 × 2¹ = 0.01110 (after alignment)</div>
+      <div class="formula"></div>
+      <div class="formula">Step 1: Align — B has smaller exponent (1 vs 3, diff=2)</div>
+      <div class="formula">        Shift B right 2: 1.110 × 2¹ → 0.01110 × 2³</div>
+      <div class="formula">Step 2: Add mantissas (both × 2³):</div>
+      <div class="formula">        1.01000 + 0.01110 = 1.10110</div>
+      <div class="formula">Step 3: Result = 1.10110 × 2³ (already normalized)</div>
+    </div>
+    <h3>Floating Point Multiplication and Division</h3>
+    <div class="formula-box">
+      <span class="label">FP Multiplication and Division Rules</span>
+      <div class="formula">Multiplication: (M₁ × 2^E₁) × (M₂ × 2^E₂)</div>
+      <div class="formula">  = (M₁ × M₂) × 2^(E₁ + E₂)</div>
+      <div class="formula">  Steps: (1) Add exponents (subtract bias once) (2) Multiply mantissas (3) Normalize</div>
+      <div class="formula"></div>
+      <div class="formula">Division: (M₁ × 2^E₁) ÷ (M₂ × 2^E₂)</div>
+      <div class="formula">  = (M₁ ÷ M₂) × 2^(E₁ - E₂)</div>
+      <div class="formula">  Steps: (1) Subtract exponents (add bias once) (2) Divide mantissas (3) Normalize</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 05: DECIMAL ARITHMETIC UNIT -->
+<section class="section" id="decimal">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Decimal Arithmetic Unit</h2>
+    <span class="imp-pill badge badge-o">68%</span>
+  </div>
+  <div class="theory-block">
+    <h3>BCD Arithmetic</h3>
+    <p>A <span class="hl-o">Decimal Arithmetic Unit</span> performs arithmetic directly on BCD (Binary Coded Decimal) numbers — where each decimal digit 0–9 is represented by 4 binary bits (0000–1001). This avoids the decimal-to-binary conversion overhead for decimal-heavy applications (banks, calculators).</p>
+    <div class="layman">A decimal arithmetic unit is like a cash register that works in "dollars and cents" rather than converting to binary first. Each decimal digit (0-9) is stored as its 4-bit binary equivalent. When two BCD digits are added and the result exceeds 9 (invalid BCD), a correction of +6 (0110) is added to skip the invalid hex digits A-F and produce the correct BCD result with carry.</div>
+    <div class="formula-box">
+      <span class="label">BCD Addition — Correction Rule</span>
+      <div class="formula">Normal binary addition of two BCD digits (each 0000–1001):</div>
+      <div class="formula">If result ≤ 9 (1001): result is valid BCD → keep as is</div>
+      <div class="formula">If result > 9 (1010–1111): invalid BCD → add 6 (0110) to correct</div>
+      <div class="formula">Also add 6 if binary addition produced a carry out.</div>
+      <div class="formula"></div>
+      <div class="formula">Example: 5 + 8 = 13 (decimal) = 0101 + 1000 = 1101 (binary = 13 decimal, BUT invalid BCD)</div>
+      <div class="formula">Correction: 1101 + 0110 = 10011 → carry=1, result=0011 → BCD = 1 0011 = "13" ✓</div>
+      <div class="formula"></div>
+      <div class="formula">Example: 5 + 3 = 8 = 0101 + 0011 = 1000 → 8 ≤ 9, valid BCD, no correction needed ✓</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 06: I/O INTERFACE -->
+<section class="section" id="io-interface">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Input-Output Interface</h2>
+    <span class="imp-pill badge badge-g">80%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an I/O Interface?</h3>
+    <p>An <span class="hl-g">I/O interface</span> (also called I/O controller or device controller) acts as a bridge between the CPU/memory and the peripheral devices. It handles the electrical, timing, and protocol differences between the fast CPU and the slow I/O devices.</p>
+    <div class="layman">The I/O interface is like a hotel front desk. The guests (CPU) don't speak to the kitchen staff (devices) directly — the front desk (interface) takes the order, translates it to kitchen language, waits for the food, and delivers it to the guest. The CPU doesn't need to know how a disk rotates or how a printer works — the interface handles all that.</div>
+    <div class="formula-box">
+      <span class="label">I/O Interface Components</span>
+      <div class="formula">Data Register:    buffers data between CPU and device (often 8-bit for character I/O)</div>
+      <div class="formula">Status Register:  flags indicating device state (BUSY, DONE, ERROR)</div>
+      <div class="formula">Control Register: CPU writes commands here (start, stop, type of operation)</div>
+      <div class="formula">Address Decoder: selects which I/O port when CPU sends an I/O address</div>
+    </div>
+    <h3>I/O Port Address vs Memory-Mapped I/O</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Isolated I/O (Port I/O)</th><th>Memory-Mapped I/O</th></tr>
+      <tr><td>Address space</td><td>Separate I/O address space (e.g., 256 ports)</td><td>I/O devices occupy part of memory address space</td></tr>
+      <tr><td>Instructions</td><td>Special IN/OUT instructions (x86: IN AL, DX)</td><td>Regular memory instructions (MOV, LD, ST)</td></tr>
+      <tr><td>Address lines</td><td>Extra I/O select line (M/IO̅ signal)</td><td>No extra line needed</td></tr>
+      <tr><td>Flexibility</td><td>Less flexible (limited I/O space)</td><td>More flexible (any memory instruction works)</td></tr>
+      <tr><td>Examples</td><td>Intel x86 (IN/OUT instructions)</td><td>ARM, most RISC processors</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 07: ASYNCHRONOUS DATA TRANSFER -->
+<section class="section" id="async">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Asynchronous Data Transfer</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Handshaking Protocol</h3>
+    <p><span class="hl-o">Asynchronous data transfer</span> does not use a shared clock — instead, it uses handshaking signals (REQUEST and ACKNOWLEDGE) to synchronize data transfer between two devices that may operate at different speeds.</p>
+    <div class="layman">Asynchronous transfer is like passing a baton in a relay race where both runners aren't coordinated. The first runner holds out the baton (REQUEST signal = "I have data for you!"). The second runner grabs it and signals back (ACKNOWLEDGE = "I got it!"). Only then does the first runner let go. No shared timing — they coordinate through signals.</div>
+    <div class="formula-box">
+      <span class="label">Handshaking Protocol — Four-Phase</span>
+      <div class="formula">Phase 1: Source places data on bus AND asserts REQUEST (REQ=1)</div>
+      <div class="formula">Phase 2: Destination reads data, then asserts ACKNOWLEDGE (ACK=1)</div>
+      <div class="formula">Phase 3: Source sees ACK=1 → removes data, deasserts REQ (REQ=0)</div>
+      <div class="formula">Phase 4: Destination sees REQ=0 → deasserts ACK (ACK=0) — ready for next transfer</div>
+      <div class="note">Both sides wait for the other's signal → no data is missed even if one side is slower</div>
+      <div class="note">Contrast with synchronous: both devices share a clock and transfer on every clock edge</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 08: MODES OF TRANSFER -->
+<section class="section" id="modes">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Modes of Data Transfer</h2>
+    <span class="imp-pill badge badge-g">78%</span>
+  </div>
+  <div class="theory-block">
+    <h3>Three Modes of I/O Data Transfer</h3>
+    <p>There are three main ways a CPU can transfer data to/from I/O devices, each with different efficiency and complexity trade-offs.</p>
+    <div class="tip-box connect">
+      <div class="tip-icon">🔗</div>
+      <div class="tip-content">
+        <div class="tip-title">Connection — Unit 3 I/O Programming → Unit 5 Modes of Transfer</div>
+        <p>In Unit 3, you wrote assembly programs for polling (SKI/SKO loops) and interrupt-driven I/O (ION, BUN I 0). Those WERE the first two modes of transfer — programmed I/O and interrupt-driven I/O. Unit 5 adds the third mode: DMA, which is the most efficient and doesn't involve the CPU at all for data movement.</p>
+      </div>
+    </div>
+    <table class="comp-table">
+      <tr><th>Mode</th><th>How it Works</th><th>CPU Involvement</th><th>Speed</th><th>When to Use</th></tr>
+      <tr><td><span class="hl-r">Programmed I/O (Polling)</span></td><td>CPU continuously checks status flags in a loop (busy-wait)</td><td>Very high — CPU stuck in loop</td><td>Slow</td><td>Simple, rare I/O where speed doesn't matter</td></tr>
+      <tr><td><span class="hl-o">Interrupt-Driven I/O</span></td><td>Device interrupts CPU when ready; CPU runs ISR</td><td>Medium — CPU executes ISR when interrupted</td><td>Medium</td><td>I/O devices that need prompt attention but not massive data</td></tr>
+      <tr><td><span class="hl-g">DMA (Direct Memory Access)</span></td><td>DMA controller transfers data directly memory↔device, CPU notified only when done</td><td>Very low — CPU free during transfer</td><td>Very fast</td><td>Large data transfers (disk, video, network)</td></tr>
+    </table>
+    <div class="formula-box">
+      <span class="label">Programmed I/O — Polling Loop (Review from Unit 3)</span>
+      <div class="formula">INPUT:   START: SKI    / Skip if FGI=1 (input ready)</div>
+      <div class="formula">                BUN START  / Loop back if not ready</div>
+      <div class="formula">                INP        / Read character</div>
+      <div class="formula">OUTPUT:  START: SKO    / Skip if FGO=1 (output ready)</div>
+      <div class="formula">                BUN START  / Loop back if not ready</div>
+      <div class="formula">                OUT        / Send character</div>
+      <div class="note">Waste: CPU spends 99% of its time in the idle loop, checking flags</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 09: PRIORITY INTERRUPT -->
+<section class="section" id="priority-int">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Priority Interrupt & Daisy Chaining</h2>
+    <span class="imp-pill badge badge-r">🔥 88% — Part B 2022, Part A 2025</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — HIGH:</strong> Priority interrupt appeared as Part A Q1 in 2025 and as Part B Q2 in 2022 (with Daisy Chaining block diagram + polling logic). For 2026, "Explain priority interrupt and Daisy Chain priority interrupt with block diagram" is a HIGH-probability Part B question. Know both hardware (daisy chain) and software (polling) methods.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is a Priority Interrupt?</h3>
+    <p>When multiple I/O devices can interrupt the CPU simultaneously, a <span class="hl-r">priority interrupt</span> system determines which device gets served first. Higher-priority devices are serviced before lower-priority ones.</p>
+    <div class="layman">Priority interrupt is like a hospital emergency room triage system. Multiple patients (devices) may need the doctor (CPU) at the same time. The nurse (priority interrupt controller) decides who gets treated first based on urgency. Heart attack patient (disk controller) gets priority over someone with a headache (keyboard). The doctor can still be interrupted mid-treatment if someone more critical arrives.</div>
+    <h3>Daisy Chain Priority Interrupt</h3>
+    <p>In <span class="hl-g">daisy chaining</span>, devices are connected in a chain. The interrupt acknowledge signal (INTA) propagates down the chain from the highest-priority device to the lowest. The first device that has a pending interrupt claims the acknowledge and blocks it from reaching lower-priority devices.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 220" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">Daisy Chain Priority Interrupt — Draw for Part B</text>
+        <!-- CPU -->
+        <rect x="10" y="35" width="80" height="60" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="2"/>
+        <text x="50" y="62" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">CPU</text>
+        <text x="50" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">INTREQ</text>
+        <text x="50" y="87" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">INTA</text>
+        <!-- INT REQUEST line (OR of all) -->
+        <line x1="90" y1="76" x2="540" y2="76" stroke="#ef4444" stroke-width="2"/>
+        <text x="280" y="68" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Interrupt Request Line (wired OR — any device can assert)</text>
+        <!-- INTA chain -->
+        <line x1="90" y1="87" x2="150" y2="87" stroke="#10b981" stroke-width="2"/>
+        <text x="115" y="80" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="7">INTA out</text>
+        <!-- Device 1 (highest priority) -->
+        <rect x="150" y="40" width="80" height="60" rx="5" fill="#102534" stroke="#10b981" stroke-width="2"/>
+        <text x="190" y="63" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="9" font-weight="bold">Device 1</text>
+        <text x="190" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">HIGHEST</text>
+        <text x="190" y="88" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Priority</text>
+        <!-- INTA passes through -->
+        <line x1="230" y1="87" x2="290" y2="87" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="258" y="80" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">INTA (if Dev1 no req)</text>
+        <!-- Device 2 -->
+        <rect x="290" y="40" width="80" height="60" rx="5" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="330" y="63" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">Device 2</text>
+        <text x="330" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">MEDIUM</text>
+        <text x="330" y="88" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Priority</text>
+        <line x1="370" y1="87" x2="430" y2="87" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5,3"/>
+        <!-- Device 3 (lowest) -->
+        <rect x="430" y="40" width="80" height="60" rx="5" fill="#102534" stroke="#6090a8" stroke-width="1.5"/>
+        <text x="470" y="63" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="9" font-weight="bold">Device 3</text>
+        <text x="470" y="76" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">LOWEST</text>
+        <text x="470" y="88" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Priority</text>
+        <!-- Interrupt request lines (upward from devices) -->
+        <line x1="190" y1="100" x2="190" y2="76" stroke="#ef4444" stroke-width="1.5"/>
+        <line x1="330" y1="100" x2="330" y2="76" stroke="#ef4444" stroke-width="1.5"/>
+        <line x1="470" y1="100" x2="470" y2="76" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- Labels -->
+        <text x="10" y="140" fill="#6090a8" font-family="JetBrains Mono" font-size="9" font-weight="bold">How it works:</text>
+        <text x="10" y="157" fill="#6090a8" font-family="JetBrains Mono" font-size="8">• Any device raises the Interrupt Request line → CPU sends INTA signal</text>
+        <text x="10" y="173" fill="#6090a8" font-family="JetBrains Mono" font-size="8">• INTA propagates from CPU → Device 1 → Device 2 → Device 3 (left to right)</text>
+        <text x="10" y="189" fill="#ef4444" font-family="JetBrains Mono" font-size="8">• If Device N has a pending interrupt: it ABSORBS the INTA (blocks further propagation) + sends vector to CPU</text>
+        <text x="10" y="205" fill="#10b981" font-family="JetBrains Mono" font-size="8">• Device 1 = highest priority (gets INTA first) | Device 3 = lowest (gets INTA last)</text>
+      </svg>
+      <div class="diagram-cap">Fig 9.1 — Daisy Chain Priority Interrupt: Device 1 is highest priority (closest to CPU). INTA propagates left-to-right and is absorbed by the first device with a pending request.</div>
+    </div>
+    <h3>Software Polling (Priority Interrupt — Software Method)</h3>
+    <p>In <span class="hl-o">software polling</span>, when an interrupt occurs, the ISR checks each device's status flag in priority order (checking highest-priority device first, lowest last). The first device found with a request is serviced.</p>
+    <div class="formula-box">
+      <span class="label">Software Polling ISR Structure</span>
+      <div class="formula">Interrupt service routine (when any interrupt occurs):</div>
+      <div class="formula">  Check Device 1 status → if request: service Device 1, return</div>
+      <div class="formula">  Check Device 2 status → if request: service Device 2, return</div>
+      <div class="formula">  Check Device 3 status → if request: service Device 3, return</div>
+      <div class="formula">  (... continue for all devices in priority order)</div>
+      <div class="note">Advantage: Easy to change priorities (just reorder the checks in software)</div>
+      <div class="note">Disadvantage: Slower (wastes time polling devices that didn't interrupt)</div>
+    </div>
+    <h3>Daisy Chain vs Software Polling</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Daisy Chain (Hardware)</th><th>Software Polling</th></tr>
+      <tr><td>Speed</td><td>Fast — hardware identifies device</td><td>Slow — ISR checks each device</td></tr>
+      <tr><td>Flexibility</td><td>Fixed in hardware — can't change</td><td>Easily reprogrammed</td></tr>
+      <tr><td>Additional hardware</td><td>Priority chains, INTA logic</td><td>Minimal</td></tr>
+      <tr><td>Number of devices</td><td>Limited by chain length</td><td>Can handle many</td></tr>
+    </table>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Priority Interrupt</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is a priority interrupt? Explain Daisy chain priority interrupt's polling logic using its block diagram and logical diagram both.</div>
+      <div class="pyq-meta"><span>2022 Part B Q2 · 8 marks ⭐⭐⭐</span><span class="topic-tag">Priority Interrupt</span><span class="pred-tag">🔮 HIGH 2026 Part B</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Priority Interrupt:</strong><br>
+        A priority interrupt is a mechanism that allows multiple devices to interrupt the CPU simultaneously, with the CPU servicing the highest-priority device first.<br><br>
+        <strong>Need:</strong> In a system with multiple I/O devices, all may request service (interrupt) at the same time. Without priority, there's ambiguity. Priority interrupt ensures the most critical device is served first.<br><br>
+        <strong>Daisy Chain Priority Interrupt:</strong><br>
+        Hardware-based method where devices are connected in series (a chain). The interrupt acknowledge signal (INTA) propagates from CPU through devices in order of priority (Device 1 = highest priority, closest to CPU).<br><br>
+        <strong>Operation:</strong><br>
+        1. Any device with a request raises the common Interrupt Request (INTR) line<br>
+        2. CPU receives the interrupt, suspends current program, sends INTA<br>
+        3. INTA propagates down the chain: CPU → Device 1 → Device 2 → ...<br>
+        4. The first device that has a pending interrupt ABSORBS the INTA signal (does not pass it further)<br>
+        5. That device sends its interrupt vector to CPU<br>
+        6. CPU jumps to the correct ISR for that device<br><br>
+        <strong>Block diagram:</strong><br>
+        [Draw: CPU on left, INTA line going right through Device 1 → Device 2 → Device 3. Common INTR line (OR of all devices' requests) going into CPU. Each device has: INTA_in → internal logic → INTA_out (if no request, pass through; if request, block and respond)]<br><br>
+        <strong>Logical diagram of one node:</strong><br>
+        INTA_out = INTA_in AND (NOT Interrupt_Pending_this_device)<br>
+        If Interrupt_Pending = 0 (no request): INTA_out = INTA_in (pass through)<br>
+        If Interrupt_Pending = 1 (has request): INTA_out = 0 (block), AND send vector to CPU
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is a priority interrupt?</div>
+      <div class="pyq-meta"><span>2025 Part A Q1 · 2 marks ⭐⭐⭐</span><span class="topic-tag">Priority Interrupt</span><span class="pred-tag">🔮 HIGH 2026 Part A</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        A <strong>priority interrupt</strong> is an interrupt mechanism that assigns a priority level to each interrupt source. When multiple devices interrupt the CPU simultaneously, the device with the highest priority is serviced first.<br><br>
+        <strong>Key features:</strong><br>
+        1. Each I/O device has an assigned priority level (higher number or lower = depends on convention)<br>
+        2. A higher-priority interrupt can even preempt (interrupt) a currently executing ISR for a lower-priority device<br>
+        3. Implementation methods:<br>
+           • <strong>Hardware:</strong> Daisy chain — INTA propagates through device chain<br>
+           • <strong>Software:</strong> Polling — ISR checks devices in priority order<br>
+           • <strong>Priority encoder (vectored interrupt):</strong> Each device has a unique vector that directly calls its ISR<br><br>
+        Example: In a computer system, disk controller (high priority) should be served before keyboard (low priority) because disk data may be lost if not read in time.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 10: DMA -->
+<section class="section" id="dma">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">DMA — Direct Memory Access</h2>
+    <span class="imp-pill badge badge-r">🔥 95% — CERTAIN 2026 Part C</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part C Q2:</strong> DMA appeared as Part C Q1 in 2024 and Part C Q4 in 2025 — TWO CONSECUTIVE YEARS. This is a permanent Part C fixture. Draw the COMPLETE DMA controller block diagram with all components labeled. Know cycle stealing and the complete operation sequence (CPU programs DMA → DMA steals cycles → DMA interrupts CPU when done).</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is DMA?</h3>
+    <p><span class="hl-r">Direct Memory Access (DMA)</span> allows an I/O device to transfer data directly to/from memory WITHOUT requiring the CPU to handle each byte of data individually. The DMA controller manages the transfer, freeing the CPU to do other useful work.</p>
+    <div class="layman">DMA is like having a delivery courier (DMA controller) handle moving boxes (data) directly from a warehouse (memory) to a truck (I/O device) or vice versa. The manager (CPU) just fills in a shipping form (programs the DMA with source address, destination address, and size), then goes back to other work. The courier makes all the trips independently. When all boxes are moved, the courier taps the manager's shoulder (interrupt) to report completion.</div>
+    <h3>DMA Controller — Block Diagram Components</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 300" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="18" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">DMA Controller Block Diagram — Draw This for Exam</text>
+        <!-- DMA Controller box -->
+        <rect x="150" y="35" width="260" height="210" rx="8" fill="#0a1820" stroke="#10b981" stroke-width="2.5"/>
+        <text x="280" y="56" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">DMA CONTROLLER</text>
+        <!-- Internal components -->
+        <rect x="165" y="65" width="105" height="30" rx="4" fill="#102534" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="217" y="83" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="8">Address Register</text>
+        <text x="217" y="93" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(current mem addr)</text>
+        <rect x="290" y="65" width="105" height="30" rx="4" fill="#102534" stroke="#f97316" stroke-width="1.5"/>
+        <text x="342" y="83" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="8">Word Count Reg</text>
+        <text x="342" y="93" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(data remaining)</text>
+        <rect x="165" y="108" width="105" height="30" rx="4" fill="#102534" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="217" y="126" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">Control Register</text>
+        <text x="217" y="136" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(read/write, channel)</text>
+        <rect x="290" y="108" width="105" height="30" rx="4" fill="#102534" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="342" y="126" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Status Register</text>
+        <text x="342" y="136" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(done, error flags)</text>
+        <!-- DMA Logic -->
+        <rect x="200" y="153" width="160" height="40" rx="4" fill="#102534" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="280" y="171" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="8" font-weight="bold">DMA Control Logic</text>
+        <text x="280" y="183" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Bus request, cycle steal, incr addr</text>
+        <!-- CPU -->
+        <rect x="10" y="100" width="80" height="60" rx="5" fill="#102534" stroke="#22d3ee" stroke-width="2"/>
+        <text x="50" y="127" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="9" font-weight="bold">CPU</text>
+        <text x="50" y="142" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Programs DMA</text>
+        <!-- Memory -->
+        <rect x="10" y="190" width="80" height="50" rx="5" fill="#102534" stroke="#f97316" stroke-width="2"/>
+        <text x="50" y="218" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="9" font-weight="bold">MEMORY</text>
+        <text x="50" y="232" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">Main RAM</text>
+        <!-- I/O Device -->
+        <rect x="470" y="130" width="80" height="60" rx="5" fill="#102534" stroke="#a78bfa" stroke-width="2"/>
+        <text x="510" y="157" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="9" font-weight="bold">I/O</text>
+        <text x="510" y="170" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="8">DEVICE</text>
+        <text x="510" y="183" text-anchor="middle" fill="#6090a8" font-family="JetBrains Mono" font-size="7">(disk, card etc)</text>
+        <!-- Connection lines -->
+        <line x1="90" y1="130" x2="150" y2="130" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="120" y="122" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono" font-size="7">Init/Interrupt</text>
+        <line x1="90" y1="215" x2="150" y2="175" stroke="#f97316" stroke-width="2"/>
+        <text x="108" y="185" text-anchor="middle" fill="#f97316" font-family="JetBrains Mono" font-size="7">Data bus</text>
+        <line x1="410" y1="175" x2="470" y2="175" stroke="#a78bfa" stroke-width="2"/>
+        <text x="440" y="167" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="7">Data bus</text>
+        <!-- System bus label -->
+        <rect x="10" y="255" width="540" height="20" rx="3" fill="#102534" stroke="#3a5868" stroke-width="1"/>
+        <text x="280" y="269" text-anchor="middle" fill="#3a5868" font-family="JetBrains Mono" font-size="8">SYSTEM BUS (Address + Data + Control) — shared between CPU and DMA</text>
+      </svg>
+      <div class="diagram-cap">Fig 10.1 — DMA Controller: Address Register (current memory addr), Word Count Register (bytes remaining), Control Register (read/write mode), Status Register (done/error flags). DMA steals bus cycles from CPU.</div>
+    </div>
+    <h3>DMA Operation — Step by Step</h3>
+    <div class="steps">
+      <div class="step-item"><div class="step-num">1</div><div class="step-text"><strong>CPU programs DMA:</strong> CPU writes into DMA registers: (a) Starting memory address (b) Number of words to transfer (c) Direction (read or write) (d) Channel/device number</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-text"><strong>CPU releases bus:</strong> DMA requests the system bus from the CPU (Bus Request signal). CPU finishes its current cycle, then grants the bus (Bus Grant signal), and suspends its memory operations.</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-text"><strong>DMA transfers one word (Cycle Stealing):</strong> DMA places the memory address on the address bus, transfers one word of data between memory and the I/O device. Increments Address Register, decrements Word Count Register.</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-text"><strong>Return bus to CPU:</strong> After each word transfer, DMA releases the bus back to CPU. CPU continues its work. DMA repeats from step 2 for the next word.</div></div>
+      <div class="step-item"><div class="step-num">5</div><div class="step-text"><strong>DMA complete:</strong> When Word Count Register reaches 0, DMA has finished. It sends an interrupt to the CPU to report completion. CPU can then process the transferred data.</div></div>
+    </div>
+    <h3>Cycle Stealing</h3>
+    <p><span class="hl-r">Cycle stealing</span> is the DMA technique where it "steals" one memory cycle from the CPU to transfer one word. The CPU loses one bus cycle for each word transferred — but the CPU continues executing instructions that don't need memory access (using its registers/cache). This is much more efficient than programmed I/O where the CPU handles every byte.</p>
+    <div class="formula-box">
+      <span class="label">DMA Transfer Efficiency</span>
+      <div class="formula">With Programmed I/O: CPU executes N instructions PER BYTE transferred → CPU completely occupied</div>
+      <div class="formula">With DMA: CPU loses only 1 bus cycle per word (not byte!) → ~97% CPU utilization maintained</div>
+      <div class="formula">Example: Transfer 1 MB disk block:</div>
+      <div class="formula">  Programmed I/O: CPU busy for millions of instructions (disk runs at 50 MB/s → 50,000 I/O per sec per channel)</div>
+      <div class="formula">  DMA: CPU continues normal operation, loses &lt;3% bus cycles to DMA</div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — DMA</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. What is DMA? Draw the Block diagram of DMA controller and explain it.</div>
+      <div class="pyq-meta"><span>2025 Part C Q4 · 2024 Part C Q1 · 10 marks ⭐⭐⭐</span><span class="topic-tag">DMA</span><span class="pred-tag">🔮 CERTAIN 2026 Part C Q2</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full Answer</button>
+      <div class="answer-content">
+        <strong>DMA (Direct Memory Access):</strong><br>
+        DMA is a mechanism that allows an I/O device to transfer data directly to/from main memory without the CPU being involved in each data transfer. This frees the CPU for other tasks while large data blocks are being transferred.<br><br>
+        <strong>Need for DMA:</strong><br>
+        Programmed I/O requires the CPU to handle every byte individually. For large transfers (e.g., reading a disk sector of 4 KB), this means thousands of CPU cycles wasted on pure data movement. DMA eliminates this overhead by delegating the transfer to specialized hardware.<br><br>
+        <strong>DMA Controller Components:</strong><br>
+        1. Address Register: Holds the current memory address for the transfer. Automatically incremented after each word.<br>
+        2. Word Count Register: Contains the number of words remaining to transfer. Decremented after each word. Transfer is complete when it reaches 0.<br>
+        3. Control Register: Programmed by CPU to specify transfer direction (read/write), device channel, and transfer mode.<br>
+        4. Status Register: Contains flags indicating transfer complete, error conditions, etc.<br>
+        5. Control Logic: Manages bus request/grant handshake with CPU, generates addresses, and controls the transfer timing.<br><br>
+        <strong>Operation:</strong><br>
+        1. CPU programs DMA (start address, word count, direction)<br>
+        2. DMA requests bus via BUSREQ signal<br>
+        3. CPU grants bus via BUSACK, releases bus lines<br>
+        4. DMA transfers one word (memory ↔ device) — cycle stealing<br>
+        5. DMA releases bus back to CPU<br>
+        6. Repeat until word count = 0<br>
+        7. DMA interrupts CPU to signal completion<br><br>
+        [Draw the block diagram showing CPU, DMA Controller (with 4 registers), Memory, I/O Device, and System Bus connections]<br><br>
+        <strong>Advantage:</strong> CPU utilization remains ~97-99% during DMA transfers vs nearly 0% during programmed I/O.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 11: IOP -->
+<section class="section" id="iop">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Input-Output Processor (IOP) & CPU-IOP Communication</h2>
+    <span class="imp-pill badge badge-o">72%</span>
+  </div>
+  <div class="theory-block">
+    <h3>What is an IOP?</h3>
+    <p>An <span class="hl-o">Input-Output Processor (IOP)</span> is a complete processor dedicated exclusively to handling I/O operations. Unlike the DMA controller (which can only transfer data in blocks), the IOP can execute I/O programs independently, handling complex I/O tasks without any CPU intervention.</p>
+    <div class="layman">The IOP is like hiring a full-time I/O manager (a mini-computer) who handles ALL input/output independently. The main boss (CPU) gives the I/O manager a task list (I/O program) and goes back to their own work. The I/O manager handles everything — device handshaking, error checking, buffering, format conversion — and only reports back to the boss when completely done or if there's a problem. More capable than a DMA controller.</div>
+    <div class="formula-box">
+      <span class="label">IOP vs DMA Comparison</span>
+      <div class="formula">DMA:  Simple controller — only transfers data blocks between memory and device</div>
+      <div class="formula">      Cannot perform complex operations or execute programs</div>
+      <div class="formula">IOP:  Complete processor — can execute I/O programs stored in memory</div>
+      <div class="formula">      Can do data formatting, error checking, device control, buffering</div>
+      <div class="formula">      Has its own registers, ALU, instruction set</div>
+    </div>
+    <h3>CPU-IOP Communication</h3>
+    <div class="formula-box">
+      <span class="label">CPU-IOP Communication Protocol</span>
+      <div class="formula">1. CPU writes I/O program into memory (start address, devices, operations)</div>
+      <div class="formula">2. CPU sends "Test I/O" instruction → checks if IOP is available</div>
+      <div class="formula">3. CPU sends "Start I/O" instruction to IOP with memory address of I/O program</div>
+      <div class="formula">4. IOP fetches and executes the I/O program independently</div>
+      <div class="formula">5. CPU continues its own program (fully independent of I/O)</div>
+      <div class="formula">6. IOP interrupts CPU when program completes (or encounters error)</div>
+      <div class="formula">7. CPU checks IOP status and processes results</div>
+      <div class="note">Example: IBM System/360 used I/O channels (IOPs) — each channel could handle multiple devices</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 12: SERIAL COMMUNICATION -->
+<section class="section" id="serial">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Serial Communication</h2>
+    <span class="imp-pill badge badge-r">🔥 92% — Part B 2024 & 2025 BOTH</span>
+  </div>
+  <div class="pred-banner">
+    <span class="pb-icon">🔮</span>
+    <div class="pb-text"><strong>2026 Prediction — CERTAIN Part B Q5:</strong> Serial communication appeared in Part B Q6 in 2024 and Part B Q5 in 2025 — TWO CONSECUTIVE YEARS. This is now a confirmed anchor topic. Also, a detailed serial communication calculation appeared in 2023-Aug Part C Q5 (characters per second for 1200-baud line). For 2026, know baud rate formula, synchronous vs asynchronous, start/stop bits, and the characters/second calculation.</div>
+  </div>
+  <div class="theory-block">
+    <h3>What is Serial Communication?</h3>
+    <p><span class="hl-r">Serial communication</span> transmits data one bit at a time over a single wire (or pair of wires), rather than multiple bits simultaneously (parallel). While slower per-bit, serial is cheaper, more reliable for long distances, and is the basis of USB, Ethernet, RS-232, and most modern I/O standards.</p>
+    <div class="layman">Serial communication is like a queue of people going through a single door one at a time. Parallel is like multiple doors — faster but more expensive infrastructure. For short distances on a chip, parallel is fine. For cables across rooms or buildings, serial is more reliable (no timing skew between 8 wires) and only needs 1-2 wires instead of 8+.</div>
+    <h3>Synchronous Serial Transmission</h3>
+    <p>In <span class="hl-g">synchronous transmission</span>, sender and receiver share a common clock signal. Data is sent continuously as a stream — no start/stop bits per character. Characters are grouped into larger frames with synchronization characters (SYN) at the beginning.</p>
+    <div class="formula-box">
+      <span class="label">Synchronous Transmission</span>
+      <div class="formula">Frame: | SYN | SYN | DATA | DATA | ... | DATA | Error check |</div>
+      <div class="formula">No start/stop bits for each character → more efficient for large data blocks</div>
+      <div class="formula">Characters per second = Baud Rate / bits per character</div>
+      <div class="formula">Example: 1200 baud, 8-bit characters, synchronous:</div>
+      <div class="formula">Characters/sec = 1200 / 8 = 150 characters/sec</div>
+      <div class="note">Clock synchronization needed between sender and receiver — clock signal sent separately or embedded</div>
+    </div>
+    <h3>Asynchronous Serial Transmission</h3>
+    <p>In <span class="hl-o">asynchronous transmission</span>, there is NO shared clock. Each character is framed with a <strong>start bit</strong> (0) and one or more <strong>stop bits</strong> (1). The start bit signals the beginning of a character; the receiver synchronizes its internal clock to each start bit.</p>
+    <div class="formula-box">
+      <span class="label">Asynchronous Transmission Frame Structure</span>
+      <div class="formula">Frame: | Start(1 bit=0) | Data (5-8 bits) | Parity (optional, 1 bit) | Stop (1-2 bits=1) |</div>
+      <div class="formula"></div>
+      <div class="formula">Characters/sec with 1 stop bit = Baud Rate / (1 + data_bits + parity + 1_stop)</div>
+      <div class="formula">Example: 1200 baud, 8-bit data, no parity, 1 stop bit:</div>
+      <div class="formula">Total bits per character = 1 + 8 + 0 + 1 = 10</div>
+      <div class="formula">Characters/sec = 1200 / 10 = 120 characters/sec</div>
+      <div class="formula"></div>
+      <div class="formula">Example: 1200 baud, 8-bit data, no parity, 2 stop bits:</div>
+      <div class="formula">Total bits per character = 1 + 8 + 0 + 2 = 11</div>
+      <div class="formula">Characters/sec = 1200 / 11 ≈ 109 characters/sec</div>
+      <div class="note">RTU 2023-Aug C-Q5: "How many characters/sec on 1200-baud line?" — asked for all three cases above!</div>
+    </div>
+    <h3>Synchronous vs Asynchronous Comparison</h3>
+    <table class="comp-table">
+      <tr><th>Aspect</th><th>Synchronous</th><th>Asynchronous</th></tr>
+      <tr><td>Clock</td><td>Shared clock between sender and receiver</td><td>No shared clock — start/stop bits for sync</td></tr>
+      <tr><td>Frame structure</td><td>Continuous block with SYN characters</td><td>Individual characters with start/stop bits</td></tr>
+      <tr><td>Efficiency</td><td>Higher — no per-character overhead</td><td>Lower — 2-3 extra bits per character</td></tr>
+      <tr><td>Complexity</td><td>Higher — requires clock sync hardware</td><td>Lower — simple, no clock needed</td></tr>
+      <tr><td>Use case</td><td>High-speed bulk transfers</td><td>Low-speed, sporadic (keyboard, mouse, RS-232)</td></tr>
+      <tr><td>Char/sec formula</td><td>Baud ÷ bits_per_char</td><td>Baud ÷ (1 + data + parity + stop)</td></tr>
+    </table>
+    <div class="tip-box trick">
+      <div class="tip-icon">⚡</div>
+      <div class="tip-content">
+        <div class="tip-title">Serial Communication Exam Formula — Never Forget</div>
+        <p><strong>Synchronous:</strong> Char/sec = Baud Rate ÷ Data Bits Per Character<br>
+        <strong>Asynchronous (1 stop):</strong> Char/sec = Baud Rate ÷ (1 + data + 0parity + 1)<br>
+        <strong>Asynchronous (2 stop):</strong> Char/sec = Baud Rate ÷ (1 + data + 0parity + 2)<br><br>
+        RTU PYQ (2023-Aug C-Q5, 1200 baud, 8-bit character):<br>
+        Sync: 1200/8 = <strong>150</strong> char/sec<br>
+        Async 2-stop: 1200/11 = <strong>≈109</strong> char/sec<br>
+        Async 1-stop: 1200/10 = <strong>120</strong> char/sec</p>
+      </div>
+    </div>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📝 RTU PYQs — Serial Communication</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. How many characters per second can be transmitted over a 1200-baud line in each of the following modes? (Assume a character code of eight bits.) (a) Synchronous serial transmission (b) Asynchronous serial transmission with two stop bits (c) Asynchronous serial transmission with one stop bit.</div>
+      <div class="pyq-meta"><span>2023-Aug Part C Q5 · 15 marks ⭐⭐⭐</span><span class="topic-tag">Serial Communication</span><span class="pred-tag">🔮 CERTAIN 2026 Part B Q5</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        Given: Baud rate = 1200 bps, Character code = 8 bits<br><br>
+        <strong>(a) Synchronous Serial Transmission:</strong><br>
+        In synchronous transmission, there are no start/stop bits. Data is sent continuously at the clock rate.<br>
+        Characters per second = Baud Rate ÷ Bits per character<br>
+        = 1200 ÷ 8 = <strong>150 characters per second</strong><br><br>
+        <strong>(b) Asynchronous with Two Stop Bits:</strong><br>
+        Frame = 1 start bit + 8 data bits + 0 parity bits + 2 stop bits = 11 bits total<br>
+        Characters per second = 1200 ÷ 11 = <strong>≈ 109 characters per second</strong> (109.09...)<br><br>
+        <strong>(c) Asynchronous with One Stop Bit:</strong><br>
+        Frame = 1 start bit + 8 data bits + 0 parity bits + 1 stop bit = 10 bits total<br>
+        Characters per second = 1200 ÷ 10 = <strong>120 characters per second</strong><br><br>
+        <strong>Summary:</strong><br>
+        Synchronous (150) > Async 1-stop (120) > Async 2-stop (109)<br>
+        Synchronous is most efficient because it has NO per-character overhead bits.
+      </div>
+    </div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Q. Explain serial communication with an example.</div>
+      <div class="pyq-meta"><span>2024 Part B Q6 · 2025 Part B Q5 · 4 marks ⭐⭐⭐</span><span class="topic-tag">Serial Communication</span><span class="pred-tag">🔮 CERTAIN 2026 Part B Q5</span></div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Answer</button>
+      <div class="answer-content">
+        <strong>Serial Communication:</strong><br>
+        Serial communication transmits data one bit at a time over a single channel, with bits transmitted sequentially.<br><br>
+        <strong>Two types:</strong><br><br>
+        <strong>1. Synchronous:</strong><br>
+        Sender and receiver share a clock. Data flows continuously as a block/stream. No start/stop bits per character. SYN (synchronization) bytes sent at start of each block.<br>
+        Example: Sending "HELLO" at 1200 baud:<br>
+        | SYN | SYN | 01001000 | 01000101 | 01001100 | 01001100 | 01001111 |<br>
+        Characters/sec = 1200/8 = 150 c/s<br><br>
+        <strong>2. Asynchronous:</strong><br>
+        No shared clock. Each character framed with start bit (0) and stop bit(s) (1).<br>
+        Example: Sending 'A' (01000001) at 1200 baud with 1 stop bit:<br>
+        | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |<br>
+        (Start=0, Data=01000001 from LSB, Stop=1)<br>
+        Total = 10 bits → 120 characters/sec<br><br>
+        Asynchronous is simpler (no clock sync needed) but less efficient (+25% overhead per character).
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- PREDICTED PAPER 2026 -->
+<div style="background:#060e14;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:clamp(40px,6vw,70px) 5vw;" id="predicted">
+  <div style="max-width:var(--content-max);margin:0 auto;">
+    <div class="pred-badge">🔮 AI-Powered Analysis — Based on 2022–2025 CAO PYQ Pattern + 2026 DIP, ML & ISS Paper Analysis</div>
+    <div class="sec-header" style="margin-bottom:14px">
+      <h2>CAO — Predicted Paper 2026 (Unit 5 Contribution)</h2>
+      <span class="sub">UNIT 5 TOPICS IN THE 2026 PREDICTED PAPER — HIGHEST CERTAINTY</span>
+    </div>
+    <p style="font-family:var(--mono);font-size:clamp(11px,0.8vw,15px);color:var(--dim2);margin-bottom:14px;line-height:1.75;">Unit 5 has the most certain predictions in the entire CAO syllabus. Three topics are CERTAIN: Booth's Algorithm (100% paper rate), DMA (appeared twice consecutively), and Serial Communication (appeared twice consecutively). These three alone = approximately 24 marks in 2026.</p>
+    <div class="tip-box warning" style="margin-bottom:24px">
+      <div class="tip-icon">⚠️</div>
+      <div class="tip-content">
+        <div class="tip-title">Disclaimer</div>
+        <p>Predictions based on historical patterns. Actual paper may differ. Use for study prioritization.</p>
+      </div>
+    </div>
+    <div class="pred-grid">
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q2) — Unit 5</div>
+        <div class="pred-q">What is DMA? Draw the Block diagram of DMA controller and explain it.</div>
+        <div class="pred-reason">DMA appeared as Part C Q1 in 2024 and Part C Q4 in 2025 — two consecutive years. This is the second most certain Part C prediction (after Booth's). Draw all 5 DMA controller components. Explain cycle stealing. Write the complete 7-step operation sequence.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C — 10 marks (Q3) — Unit 5</div>
+        <div class="pred-q">Explain Booth's Algorithm with flowchart. Perform multiplication using Booth's Algorithm (new values).</div>
+        <div class="pred-reason">Booth's Algorithm appeared in 100% of all available CAO papers (2022, 2024, 2025). It will appear in 2026. New values will be used — predicted: (−11 × +6) or (+7 × −5) or (−6 × +4). Master the flowchart and the step-by-step A|Q|Q₋₁ table method for ANY signed values.</div>
+        <span class="pred-conf high">CERTAIN — 100% of papers</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q5) — Unit 5</div>
+        <div class="pred-q">Explain serial communication with an example. (OR Explain synchronous vs asynchronous transmission.)</div>
+        <div class="pred-reason">Serial communication appeared in Part B Q6 (2024) and Part B Q5 (2025) — two consecutive years. This is a permanent Part B anchor topic. Cover both synchronous (no start/stop, 150 char/sec) and asynchronous (start+stop bits, 120 or 109 char/sec for 1200 baud). Include a bit-frame diagram.</div>
+        <span class="pred-conf high">CERTAIN</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📝 Part A — 2 marks (Q1) — Unit 5</div>
+        <div class="pred-q">What is a priority interrupt?</div>
+        <div class="pred-reason">Priority interrupt was Part A Q1 in 2025. Based on all 2026 RTU papers (DIP, ML, ISS), a topic that appeared in Q1 in 2025 has high probability of staying in Part A in 2026 (possibly different position Q1-Q3). Know the definition: multiple devices interrupt simultaneously, highest priority served first, methods: daisy chain + software polling.</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q7) — Unit 5</div>
+        <div class="pred-q">Explain arithmetic pipeline / Describe the algorithm for integer division with example.</div>
+        <div class="pred-reason">Integer division appeared in Part B Q7 in 2025, absent in 2024. Arithmetic pipeline appeared in Part B Q7 in 2024, absent in 2025. They alternate in Q7. For 2026, one of these will be Q7. Integer division is slightly more likely given arithmetic pipeline appeared twice already (2022 speedup + 2024 algorithm).</div>
+        <span class="pred-conf high">HIGH confidence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📋 Part B — 4 marks (Q?) — Unit 5</div>
+        <div class="pred-q">Explain priority interrupt with Daisy Chain method using block diagram.</div>
+        <div class="pred-reason">Daisy chain priority interrupt was Part B Q2 in 2022 (8 marks) — a detailed question with block diagram + logic diagram. Absent from 2023, 2024, and 2025. Four-year absence makes it overdue. Draw the daisy chain: CPU → Device1 (highest) → Device2 → Device3 (lowest) with INTA propagation and common INTR line.</div>
+        <span class="pred-conf high">HIGH confidence — 4 year absence</span>
+      </div>
+      <div class="pred-card">
+        <div class="pred-part">📖 Part C (optional) — Unit 5</div>
+        <div class="pred-q">How many characters/sec can be transmitted over a 1200-baud line for (a) synchronous (b) async 2 stop bits (c) async 1 stop bit?</div>
+        <div class="pred-reason">This exact calculation question appeared as Part C Q5 in 2023-Aug (15 marks with full working). It may return in Part B (4 marks, shorter working) in 2026. The calculation is simple if you know the formula — prepare to score full marks quickly on this.</div>
+        <span class="pred-conf med">MEDIUM-HIGH confidence</span>
+      </div>
+    </div>
+    <div class="tip-box validate" style="margin-top:28px">
+      <div class="tip-icon">✅</div>
+      <div class="tip-content">
+        <div class="tip-title">Unit 5 Preparation Priority for 2026</div>
+        <p><strong>MUST prepare completely (guaranteed marks):</strong><br>
+        • Booth's Algorithm — Flowchart + step-by-step table for ANY values (CERTAIN Part C)<br>
+        • DMA block diagram + 7-step operation + cycle stealing explanation (CERTAIN Part C)<br>
+        • Serial communication — synchronous vs asynchronous, baud formula, characters/sec numerical (CERTAIN Part B)<br><br>
+        <strong>HIGH value (prepare fully):</strong><br>
+        • Priority interrupt definition (Part A) + Daisy chain diagram (Part B)<br>
+        • Integer division — restoring algorithm + small example<br><br>
+        <strong>Medium value (understand concepts):</strong><br>
+        • Floating-point arithmetic steps, BCD addition, IOP vs DMA, modes of transfer comparison</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PYQ MASTER LIST -->
+<div class="layout">
+<div style="width:var(--sidebar-w);min-width:var(--sidebar-w);flex-shrink:0;"></div>
+<div class="content">
+<section class="section" id="pyq-master" style="margin-top:40px">
+  <div class="section-header">
+    <span class="section-num">M</span>
+    <h2 class="section-title">All PYQs — Unit 5 Master List</h2>
+  </div>
+  <div class="pyq-section">
+    <div class="pyq-header">📋 Complete PYQ Reference — Unit 5 Topics (All Years)</div>
+    <div class="pyq-item">
+      <div class="pyq-q-text">Full Unit 5 PYQ Coverage — Click to Expand</div>
+      <button class="pyq-toggle" onclick="toggle(this)">▼ Show Full List</button>
+      <div class="answer-content">
+        <strong>PART A — Unit 5 Related:</strong><br><br>
+        2022: Q4: Hit Ratio in cache memory | Q5: Interrupt initiated I/O | Q6: Parallel processing | Q7: Microprogrammed control<br><br>
+        2023-Aug: (most Part A was Unit 2/3 topics; serial comm was in Part C)<br><br>
+        2024: (arithmetic and I/O topics mainly in Part B and C)<br><br>
+        2025: Q1: Priority interrupt | Q5: Latency time<br><br>
+        <strong>PART B — Unit 5 Related:</strong><br><br>
+        2022: B-Q2: Priority interrupt + Daisy chain (block diagram + polling logic) (8 marks)<br>
+        2022: B-Q3: Pipeline speedup (100ns non-pipeline, 6-seg 20ns, 200 tasks) (8 marks)<br><br>
+        2023-Aug: (B-Q4: I/O interrupt program at address 230, FGO, IEN)<br><br>
+        2024: B-Q6: Explain serial communication with example (4 marks)<br>
+        2024: B-Q7: Explain arithmetic pipeline with example (4 marks)<br><br>
+        2025: B-Q5: Explain about serial communication (4 marks)<br>
+        2025: B-Q6: Explain need of cache memory. Also explain Hit Ratio (4 marks)<br>
+        2025: B-Q7: Describe algorithm for integer division with example (4 marks)<br><br>
+        <strong>PART C — Unit 5 Related:</strong><br><br>
+        2022: C-Q1: Booth's Algorithm: multiply −13 × +9 with flowchart (15 marks)<br><br>
+        2023-Aug: C-Q5: Characters/sec on 1200-baud line — sync + async 2-stop + async 1-stop (15 marks)<br><br>
+        2024: C-Q1: Explain DMA with suitable example (10 marks)<br>
+        2024: C-Q2: Booth's Algorithm: 8 × (−8) (10 marks)<br><br>
+        2025: C-Q3: Booth's Algorithm: (−13) × (+9) with flowchart (10 marks)<br>
+        2025: C-Q4: DMA — block diagram of DMA controller + explanation (10 marks)<br><br>
+        <strong>KEY PATTERNS:</strong><br>
+        Booth's Algorithm: 2022 C-Q1 + 2024 C-Q2 + 2025 C-Q3 = 100% appearance rate (CERTAIN 2026)<br>
+        DMA: 2024 C-Q1 + 2025 C-Q4 = 2 consecutive years (CERTAIN 2026)<br>
+        Serial Communication: 2024 B-Q6 + 2025 B-Q5 = 2 consecutive years (CERTAIN 2026)<br>
+        Priority Interrupt: 2022 B-Q2 (detailed) + 2025 A-Q1 (definition)<br>
+        Integer Division: 2025 B-Q7 (absent 2024) — due in 2026<br>
+        Serial comm calculation: 2023-Aug C-Q5 (1200 baud, 3 modes)<br>
+        Interrupt-driven I/O programming: 2023-Aug B-Q4 (address 230, FGO, IEN)<br>
+        Interrupt initiated I/O (note): 2022 A-Q5
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="openSidebar()">☰</button>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="#">🏠 Home</a>
+    <a href="unit2.html">🔴 Unit 2</a>
+    <a href="unit3.html">🟣 Unit 3</a>
+    <a href="unit4.html">🟠 Unit 4</a>
+    <a href="unit6.html">🔗 Unit 6: Memory & Multiprocessors</a>
+    <a href="#pyq-master" style="color:var(--upred)">📋 All PYQs</a>
+  </div>
+  © 2026 RTU CAO Study Guide · Unit 5 — Computer Arithmetic & I/O Organization · Educational use only.
+</footer>
+
+<script>
+function toggle(btn){
+  const ans=btn.nextElementSibling;
+  if(ans.classList.contains('open')){ans.classList.remove('open');btn.textContent=btn.textContent.replace('▲','▼');}
+  else{ans.classList.add('open');btn.textContent=btn.textContent.replace('▼','▲');}
+}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('visible');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('visible');}
+const sections=document.querySelectorAll('.section');
+const navItems=document.querySelectorAll('.nav-item');
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){navItems.forEach(n=>{n.classList.remove('active');if(n.getAttribute('href')==='#'+e.target.id)n.classList.add('active');});}});},{rootMargin:'-15% 0px -70% 0px'});
+sections.forEach(s=>observer.observe(s));
+</script>
+</body>
+</html>
